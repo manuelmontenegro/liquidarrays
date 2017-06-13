@@ -8,27 +8,54 @@ import kotlin.reflect.KProperty
  * Created by manuel on 30/05/17.
  */
 
+/**
+ * An instance of a subclass of ASTElem represents an element of the Abstract Syntax Tree,
+ * which can be an expression, a type, a typed variable, or an assertion.
+ *
+ * Each instance contains a dynamically extensible set of [properties]. Properties can be defined
+ * by extension attributes by means of the [ASTDelegate] class.
+ *
+ * @author Manuel Montenegro
+ * @param properties A map with the dynamically attached decorations of the AST element.
+ */
 abstract class ASTElem(val properties: MutableMap<String, Any?> = mutableMapOf())
 
-data class Type(val typeConstructor: String, val arguments: List<Type> = listOf()) : ASTElem()
+data class Type(val typeConstructor: String,
+                val arguments: List<Type> = listOf()) : ASTElem()
 
 
 abstract class Atomic : BindingExpression()
-data class Literal(val value: String, val type: Type) : Atomic()
-data class Variable(val value: String) : Atomic()
+
+data class Literal(val value: String,
+                   val type: Type) : Atomic()
+
+data class Variable(val name: String) : Atomic()
 
 abstract class BindingExpression : Term()
-data class FunctionApplication(val name: String, val arguments: List<Atomic> = listOf()) : BindingExpression()
+
+data class FunctionApplication(val name: String,
+                               val arguments: List<Atomic> = listOf()) : BindingExpression()
+
 data class Tuple(val arguments: List<Atomic>) : BindingExpression()
-data class ConstructorApplication(val name: String, val arguments: List<Atomic> = listOf()) : BindingExpression()
+
+data class ConstructorApplication(val name: String,
+                                  val arguments: List<Atomic> = listOf()) : BindingExpression()
 
 abstract class Term : ASTElem()
-data class Let(val bindings: List<TypedVar>, val bindingExpression: BindingExpression, val mainExpression: Term): Term() {
+
+data class Let(val bindings: List<TypedVar>,
+               val bindingExpression: BindingExpression,
+               val mainExpression: Term) : Term() {
     constructor(variable: String, type: Type, bindingExpression: BindingExpression, mainExpression: Term)
-        : this(listOf(TypedVar(variable, type)), bindingExpression, mainExpression)
+            : this(listOf(TypedVar(variable, type)), bindingExpression, mainExpression)
 }
-data class LetFun(val defs: List<FunctionDefinition>, val mainExpression: Term): Term()
-data class Case(val discriminant: Atomic, val branches: List<CaseBranch>, val defaultBranch: CaseBranch? = null) : Term()
+
+data class LetFun(val defs: List<FunctionDefinition>,
+                  val mainExpression: Term) : Term()
+
+data class Case(val discriminant: Atomic,
+                val branches: List<CaseBranch>,
+                val defaultBranch: CaseBranch? = null) : Term()
 
 
 abstract class CaseBranch(val constructorName: String,
@@ -46,36 +73,55 @@ data class FunctionDefinition(val name: String,
                               val postcondition: Assertion = True()) : ASTElem()
 
 abstract class Assertion : ASTElem()
+
 class True : Assertion()
+
 class False : Assertion()
-data class PredicateApplication(val name: String, val arguments: List<Atomic> = listOf()) : Assertion()
-data class Not(val assertion: Assertion): Assertion()
+
+data class PredicateApplication(val name: String,
+                                val arguments: List<Atomic> = listOf()) : Assertion()
+
+data class Not(val assertion: Assertion) : Assertion()
+
 data class And(val conjuncts: List<Assertion>) : Assertion() {
     constructor(vararg conjuncts: Assertion) : this(conjuncts.asList())
 }
+
 data class Or(val disjuncts: List<Assertion>) : Assertion() {
     constructor(vararg disjuncts: Assertion) : this(disjuncts.asList())
 }
-data class Implication(val operands: List<Assertion>): Assertion() {
-    constructor(antecedent: Assertion, consequent: Assertion): this(listOf(antecedent, consequent))
+
+data class Implication(val operands: List<Assertion>) : Assertion() {
+    constructor(antecedent: Assertion, consequent: Assertion) : this(listOf(antecedent, consequent))
 }
-data class Iff(val operands: List<Assertion>): Assertion() {
+
+data class Iff(val operands: List<Assertion>) : Assertion() {
     constructor(lhs: Assertion, rhs: Assertion)
             : this(listOf(lhs, rhs))
 }
-data class ForAll(val boundVars: List<TypedVar>, val assertion: Assertion) : Assertion() {
+
+data class ForAll(val boundVars: List<TypedVar>,
+                  val assertion: Assertion) : Assertion() {
     constructor(varName: String, type: Type, assertion: Assertion)
             : this(listOf(TypedVar(varName, type)), assertion)
 }
-data class Exists(val boundVars: List<TypedVar>, val assertion: Assertion) : Assertion() {
+
+data class Exists(val boundVars: List<TypedVar>,
+                  val assertion: Assertion) : Assertion() {
     constructor(varName: String, type: Type, assertion: Assertion)
             : this(listOf(TypedVar(varName, type)), assertion)
 }
-data class LetAssertion(val bindings: List<TypedVar>, val boundTerm: Term, val mainAssertion: Assertion) : Assertion() {
+
+data class LetAssertion(val bindings: List<TypedVar>,
+                        val boundTerm: Term,
+                        val mainAssertion: Assertion) : Assertion() {
     constructor(varName: String, type: Type, boundTerm: Term, mainAssertion: Assertion)
             : this(listOf(TypedVar(varName, type)), boundTerm, mainAssertion)
 }
-data class CaseAssertion(val discriminant: Atomic, val branches: List<CaseBranch>, val defaultBranch: CaseBranch?) : Assertion()
+
+data class CaseAssertion(val discriminant: Atomic,
+                         val branches: List<CaseBranch>,
+                         val defaultBranch: CaseBranch?) : Assertion()
 
 
 class ASTDelegate {
