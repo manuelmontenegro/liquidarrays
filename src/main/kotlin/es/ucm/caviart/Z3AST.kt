@@ -222,6 +222,11 @@ fun Assertion.toZ3BoolExpr(ctx: Context,
     else -> throw UnsupportedZ3AST(this)
 }
 
+
+fun UninterpretedFunctionType.toFuncDecl(name: String, ctx: Context) =
+    ctx.mkFuncDecl(name, argumentTypes.map { it.toZ3Sort(ctx) }.toTypedArray(), resultType.toZ3Sort(ctx))
+
+
 class UnsupportedZ3AST(term: ASTElem) : RuntimeException("Cannot convert to Z3: $term")
 class UnsupportedZ3ArithExpr(term: ASTElem) : RuntimeException("Cannot use as arithmetic expression: $term")
 class UnsupportedZ3ArrayExpr(term: ASTElem) : RuntimeException("Cannot use as array expression: $term")

@@ -23,6 +23,8 @@ abstract class ASTElem(val properties: MutableMap<String, Any?> = mutableMapOf()
 data class Type(val typeConstructor: String,
                 val arguments: List<Type> = listOf()) : ASTElem()
 
+data class UninterpretedFunctionType(val argumentTypes: List<Type>, val resultType: Type) : ASTElem()
+
 
 abstract class Atomic : BindingExpression()
 
@@ -41,6 +43,8 @@ data class Tuple(val arguments: List<Atomic>) : BindingExpression()
 data class ConstructorApplication(val name: String,
                                   val arguments: List<BindingExpression> = listOf()) : BindingExpression()
 
+
+
 abstract class Term : ASTElem()
 
 data class Let(val bindings: List<TypedVar>,
@@ -58,7 +62,7 @@ data class Case(val discriminant: Atomic,
                 val defaultBranch: CaseBranch? = null) : Term()
 
 
-abstract class CaseBranch(val constructorName: String,
+data class CaseBranch(val constructorName: String,
                           val constructorVars: List<TypedVar>,
                           val expression: Term) : ASTElem()
 
@@ -120,8 +124,13 @@ data class LetAssertion(val bindings: List<TypedVar>,
 }
 
 data class CaseAssertion(val discriminant: Atomic,
-                         val branches: List<CaseBranch>,
-                         val defaultBranch: CaseBranch?) : Assertion()
+                         val branches: List<CaseAssertionBranch>,
+                         val defaultBranch: CaseAssertionBranch?) : Assertion()
+
+
+data class CaseAssertionBranch(val constructorName: String,
+                      val constructorVars: List<TypedVar>,
+                      val assertion: Assertion) : ASTElem()
 
 
 class ASTDelegate {
