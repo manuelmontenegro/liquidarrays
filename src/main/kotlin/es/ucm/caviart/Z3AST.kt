@@ -9,7 +9,6 @@ import com.microsoft.z3.*
  */
 
 private val arithmeticOperators = setOf("+", "-", "*", "/")
-private val arithmeticRelationalOperators = setOf("<", ">", "<=", ">=")
 
 
 typealias SymbolMap = Map<String, Symbol>
