@@ -34,12 +34,12 @@ data class Variable(val name: String) : Atomic()
 abstract class BindingExpression : Term()
 
 data class FunctionApplication(val name: String,
-                               val arguments: List<Atomic> = listOf()) : BindingExpression()
+                               val arguments: List<BindingExpression> = listOf()) : BindingExpression()
 
 data class Tuple(val arguments: List<Atomic>) : BindingExpression()
 
 data class ConstructorApplication(val name: String,
-                                  val arguments: List<Atomic> = listOf()) : BindingExpression()
+                                  val arguments: List<BindingExpression> = listOf()) : BindingExpression()
 
 abstract class Term : ASTElem()
 
@@ -79,7 +79,7 @@ class True : Assertion()
 class False : Assertion()
 
 data class PredicateApplication(val name: String,
-                                val arguments: List<Atomic> = listOf()) : Assertion()
+                                val arguments: List<BindingExpression> = listOf()) : Assertion()
 
 data class Not(val assertion: Assertion) : Assertion()
 
