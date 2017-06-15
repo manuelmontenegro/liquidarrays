@@ -65,46 +65,49 @@ class GoalsTest {
 
     @Test fun checkG2Valid() {
         val solution = Solution(mutableMapOf())
-        assertTrue(G2.check(solution), "G2 should be true under every solution")
+        assertTrue(G2.check(solution) is Correct, "G2 should be true under every solution")
     }
 
     @Test fun checkG3Wrong() {
         val solution = Solution(mutableMapOf())
-        assertFalse(G3.check(solution), "G3 should not be true under every solution")
+        assertTrue(G3.check(solution) is CannotWeaken, "G3 should not be true under every solution")
     }
 
     @Test fun checkG1EmptySolution() {
         val solution = Solution(mutableMapOf("kappa1" to mutableSetOf()))
-        assertTrue(G1.check(solution), "G1 should be true under the empty solution")
+        assertTrue(G1.check(solution) is Correct, "G1 should be true under the empty solution")
     }
 
     @Test fun checkG1FullSolution() {
         val solution = Solution(mutableMapOf("kappa1" to mutableSetOf(0, 1, 2, 3, 4)))
-        assertFalse(G1.check(solution), "G1 should be false under the full solution")
+        assertTrue(G1.check(solution) is KappaWeakened, "G1 should be false under the full solution")
+        assertEquals(setOf(0, 4), solution.kappas["kappa1"]!!, "kappa1 should have been weakened to (0, 4)")
     }
 
     @Test fun checkG1WrongSolution() {
         val solution = Solution(mutableMapOf("kappa1" to mutableSetOf(1)))
-        assertFalse(G1.check(solution), "G1 should be false under the solution kappa1 nu n = [0 <= n]")
+        assertTrue(G1.check(solution) is KappaWeakened, "G1 should be false under the solution kappa1 nu n = [0 <= n]")
+        assertEquals(setOf<Int>(), solution.kappas["kappa1"]!!, "kappa1 should have been weakened to the empty solution")
     }
 
     @Test fun checkG1GoodSolution() {
         val solution = Solution(mutableMapOf("kappa1" to mutableSetOf(0)))
-        assertTrue(G1.check(solution), "G1 should be true under the solution kappa1 nu n = [0 <= nu]")
+        assertTrue(G1.check(solution) is Correct, "G1 should be true under the solution kappa1 nu n = [0 <= nu]")
     }
 
     @Test fun checkG1BetterSolution() {
         val solution = Solution(mutableMapOf("kappa1" to mutableSetOf(4)))
-        assertTrue(G1.check(solution), "G1 should be true under the solution kappa1 nu n = [0 < nu]")
+        assertTrue(G1.check(solution) is Correct, "G1 should be true under the solution kappa1 nu n = [0 < nu]")
     }
 
     @Test fun checkG1UnnecessarilyBetterSolution() {
         val solution = Solution(mutableMapOf("kappa1" to mutableSetOf(0, 4)))
-        assertTrue(G1.check(solution), "G1 should be true under the solution kappa1 nu n = [0 <= nu, 0 < nu]")
+        assertTrue(G1.check(solution) is Correct, "G1 should be true under the solution kappa1 nu n = [0 <= nu, 0 < nu]")
     }
 
     @Test fun checkG1TooMuchSolutionSolution() {
         val solution = Solution(mutableMapOf("kappa1" to mutableSetOf(0, 4, 5)))
-        assertFalse(G1.check(solution), "G1 should be false under the solution kappa1 nu n = [0 <= nu, 0 < nu, 1 < nu]")
+        assertTrue(G1.check(solution) is KappaWeakened, "G1 should be false under the solution kappa1 nu n = [0 <= nu, 0 < nu, 1 < nu]")
+        assertEquals(setOf(0, 4), solution.kappas["kappa1"]!!, "kappa1 should have been weakened to [0 <= nu, 0 < nu]")
     }
 }

@@ -1,7 +1,6 @@
 package es.ucm.caviart
 
 import com.microsoft.z3.*
-import com.sun.org.apache.xpath.internal.operations.Bool
 
 /**
  * Classes and functions involving goals
@@ -61,32 +60,80 @@ class Goal(val name: String,
         }
     }
 
-    fun check(solution: Solution): Boolean {
+    fun check(solution: Solution): GoalSolveResult {
         println("Solving " + name)
         solver.push()
 
-        namedKappas.forEach {
-            val kappa = kappas[it]!!
-            val qualifiers = kappaQualifiers[it]!!
-            val symbolSorts = kappa.arguments.map { ctx.mkSymbol(it.varName) to it.type.toZ3Sort(ctx) }
+        val lhsKappas = if (rhsKappa == null) namedKappas else (namedKappas - rhsKappa)
 
-            val z3Equivalence = ctx.mkForall(kappa.arguments.map { ctx.mkConst(it.varName, it.type.toZ3Sort(ctx)) }.toTypedArray(),
-                    ctx.mkIff(
-                            ctx.mkApp(z3DeclarationMap[it],
-                                    *symbolSorts.map { (symbol, sort) -> ctx.mkConst(symbol, sort) }.toTypedArray()
-                            ) as BoolExpr,
-                            ctx.mkAnd(* solution.kappas[it]!!.map { n -> qualifiers[n] }.toTypedArray())
-                    ),
-                    0, null, null, null, null)
+        lhsKappas.forEach {
+            val z3Equivalence = kappaDefinitionToZ3(it, solution)
             if (debug) {
                 println("where " + z3Equivalence.sExpr)
             }
             solver.add(z3Equivalence)
         }
 
-        val verdict = solver.check()
+        solver.push()
+        rhsKappa?.let {
+            val z3Equivalence = kappaDefinitionToZ3(it, solution)
+            if (debug) {
+                println("where " + z3Equivalence.sExpr)
+            }
+            solver.add(z3Equivalence)
+        }
+        val wholeFormulaVerdict = solver.check()
         solver.pop()
-        return verdict == Status.UNSATISFIABLE
+
+        val result: GoalSolveResult
+
+        when {
+            wholeFormulaVerdict == Status.UNSATISFIABLE ->
+                result = Correct()
+            rhsKappa != null -> {
+                weakenKappa(solution, rhsKappa)
+                result = KappaWeakened(rhsKappa)
+            }
+            else ->
+                result = CannotWeaken()
+        }
+
+        solver.pop()
+        return result
+    }
+
+    private fun weakenKappa(solution: Solution, rhsKappa: String) {
+        if (debug) println("Weakening $rhsKappa...")
+        val qualifiersInSolution: MutableSet<Int> = solution.kappas[rhsKappa]!!.toCollection(mutableSetOf())
+        val acceptedQualifiers = mutableSetOf<Int>()
+        qualifiersInSolution.forEach {
+            solution.kappas[rhsKappa] = mutableSetOf(it)
+            val z3Equivalence = kappaDefinitionToZ3(rhsKappa, solution)
+            solver.push()
+            solver.add(z3Equivalence)
+            val status = solver.check()
+            if (status == Status.UNSATISFIABLE) {
+                acceptedQualifiers += it
+            }
+            solver.pop()
+        }
+        solution.kappas[rhsKappa] = acceptedQualifiers
+    }
+
+    private fun kappaDefinitionToZ3(kappaName: String, solution: Solution): Quantifier {
+        val kappa = kappas[kappaName]!!
+        val qualifiers = kappaQualifiers[kappaName]!!
+        val symbolSorts = kappa.arguments.map { ctx.mkSymbol(it.varName) to it.type.toZ3Sort(ctx) }
+
+        val z3Equivalence = ctx.mkForall(kappa.arguments.map { ctx.mkConst(it.varName, it.type.toZ3Sort(ctx)) }.toTypedArray(),
+                ctx.mkIff(
+                        ctx.mkApp(z3DeclarationMap[kappaName],
+                                *symbolSorts.map { (symbol, sort) -> ctx.mkConst(symbol, sort) }.toTypedArray()
+                        ) as BoolExpr,
+                        ctx.mkAnd(*solution.kappas[kappaName]!!.map { n -> qualifiers[n] }.toTypedArray())
+                ),
+                0, null, null, null, null)
+        return z3Equivalence
     }
 
     private fun searchAppliedPredicates(assertions: List<Assertion>, predicateNames: Set<String>): Set<String> {
@@ -124,7 +171,7 @@ class Goal(val name: String,
 abstract class GoalSolveResult
 class Correct : GoalSolveResult()
 class CannotWeaken : GoalSolveResult()
-data class KappaWeakened(val varName: String)
+data class KappaWeakened(val varName: String) : GoalSolveResult()
 
 
 class InvalidGoal(message: String) : RuntimeException(message)
