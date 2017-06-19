@@ -16,12 +16,25 @@ class Goal(val name: String,
            conclusion: Assertion,
            environment: Map<String, Type>,
            val kappas: Map<String, Kappa>,
+           val mus: Map<String, Mu>,
            declarationMap: Map<String, UninterpretedFunctionType>) {
+
+    class MuInfo(val boundVar1: Symbol,
+                 val boundVar2: Symbol,
+                 val qIQualifiers: List<BoolExpr>,
+                 val qEQualifiers: List<QEQualifier>,
+                 val qIIQualifiers: List<BoolExpr>,
+                 val qEEQualifiers: List<QEEQualifier>,
+                 val qLenQualifiers: List<BoolExpr>)
+
+    class QEQualifier(val qualifier: BoolExpr, val arrays: List<Symbol>)
+    class QEEQualifier(val qualifier: BoolExpr, val arrays1: List<Symbol>, val arrays2: List<Symbol>)
 
     val namedKappas: Set<String>
     val rhsKappa: String?
 
     private val kappaQualifiers: Map<String, List<BoolExpr>>
+    private val muQualifiers: Map<String, MuInfo>
     private val z3DeclarationMap: Map<String, FuncDecl>
     private val ctx: Context = Context()
     private val solver: Solver
@@ -30,15 +43,31 @@ class Goal(val name: String,
         solver = ctx.mkSolver()
         z3DeclarationMap = declarationMap.map { (k, v) -> k to v.toFuncDecl(k, ctx) }.toMap()
         namedKappas = searchAppliedPredicates(assumptions, kappas.keys) union searchAppliedPredicates(listOf(conclusion), kappas.keys)
-        rhsKappa = when (conclusion) {
-            is PredicateApplication -> if (conclusion.name in kappas.keys) conclusion.name else null
-            else -> null
-        }
+        rhsKappa = if (conclusion is PredicateApplication && conclusion.name in kappas.keys) conclusion.name else null
         kappaQualifiers = kappas.mapValues { (_, kappa) ->
             val environment = kappa.arguments.map { it.varName to it.type.toZ3Sort(ctx) }.toMap()
             val symbolMap = kappa.arguments.map { it.varName to ctx.mkSymbol(it.varName) }.toMap()
 
-            kappa.availableQualifiers.map { it.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment) }
+            kappa.qStar.map { it.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment) }
+        }
+        muQualifiers = mus.mapValues { (_, mu) ->
+            val boundVar1Symbol = ctx.mkSymbol(mu.boundVar1)
+            val boundVar2Symbol = ctx.mkSymbol(mu.boundVar2)
+            val environment = (mu.arguments.map { it.varName to it.type.toZ3Sort(ctx) }
+                    + listOf(mu.boundVar1 to ctx.mkIntSort(), mu.boundVar2 to ctx.mkIntSort())).toMap()
+            val symbolMap = (mu.arguments.map { it.varName to ctx.mkSymbol(it.varName) }
+                    + listOf(mu.boundVar1 to boundVar1Symbol, mu.boundVar2 to boundVar2Symbol)).toMap()
+            MuInfo(boundVar1Symbol,
+                    boundVar2Symbol,
+                    mu.qI.map { it.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment) },
+                    mu.qE.map { QEQualifier(it.qualifier.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment), it.arrayNames.map { symbolMap[it]!! }) },
+                    mu.qII.map { it.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment) },
+                    mu.qEE.map {
+                        QEEQualifier(it.qualifier.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment),
+                                it.arrayNames1.map { symbolMap[it]!! }, it.arrayNames2.map { symbolMap[it]!! })
+                    },
+                    mu.qLen.map { it.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment) }
+            )
         }
         val z3Symbols = environment.mapValues { (k, _) -> ctx.mkSymbol(k) }
         val z3Environment = environment.map { (k, t) -> k to t.toZ3Sort(ctx) }.toMap()

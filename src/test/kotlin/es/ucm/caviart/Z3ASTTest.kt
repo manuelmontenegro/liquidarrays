@@ -230,6 +230,7 @@ class Z3ASTTest {
         assertEquals(Status.UNSATISFIABLE, s.check())
     }
 
+
     /*
     @Test fun mkConstructors() {
         val cons1 = ctx.mkConstructor("ni l", "is-nil", null, null, null)

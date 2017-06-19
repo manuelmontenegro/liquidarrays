@@ -1,9 +1,6 @@
 package es.ucm.caviart
 
-import com.microsoft.z3.Context
-import com.microsoft.z3.Solver
-import com.microsoft.z3.Status
-import com.microsoft.z3.Version
+import com.microsoft.z3.*
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -53,5 +50,44 @@ class Z3Test {
             }
         }
 
+    }
+
+    @Test fun differentSymbolsTest() {
+        val ctx = Context()
+        val sym1 = ctx.mkSymbol("i")
+        val sym2 = ctx.mkSymbol("i")
+        val s = ctx.mkSolver()
+        val formula = ctx.mkNot(ctx.mkEq(ctx.mkConst(sym1, ctx.mkIntSort()), ctx.mkConst(sym2, ctx.mkIntSort())))
+        s.add(formula)
+        assertEquals(Status.UNSATISFIABLE, s.check())
+    }
+
+    @Test fun symbolsAndQuantifiers() {
+        val ctx = Context()
+        val sym1 = ctx.mkSymbol("i")
+        // (= i 0)
+        val formula1 = ctx.mkEq(ctx.mkConst(sym1, ctx.mkIntSort()), ctx.mkInt(0))
+        // (forall ((i Int)) (=> (= i 1) false))
+        val formula2 = ctx.mkForall(arrayOf(ctx.mkConst(sym1, ctx.mkIntSort())),
+                ctx.mkImplies(ctx.mkEq(ctx.mkConst(sym1, ctx.mkIntSort()), ctx.mkInt(1)), ctx.mkFalse()), 0, null, null, null, null)
+        val s = ctx.mkSolver()
+        s.add(formula1)
+        s.add(formula2)
+        assertEquals(Status.UNSATISFIABLE, s.check())
+    }
+
+    @Test fun symbolsAndQuantifiers2() {
+        val ctx = Context()
+        val sym1 = ctx.mkSymbol("i")
+        val sym2 = ctx.mkSymbol("j")
+        // (= i 0)
+        val formula1 = ctx.mkEq(ctx.mkConst(sym1, ctx.mkIntSort()), ctx.mkInt(0))
+        // (forall ((j Int)) (=> (= i 1) false))
+        val formula2 = ctx.mkForall(arrayOf(ctx.mkConst(sym2, ctx.mkIntSort())),
+                ctx.mkImplies(ctx.mkEq(ctx.mkConst(sym1, ctx.mkIntSort()), ctx.mkInt(1)), ctx.mkFalse()), 0, null, null, null, null)
+        val s = ctx.mkSolver()
+        s.add(formula1)
+        s.add(formula2)
+        assertEquals(Status.SATISFIABLE, s.check())
     }
 }
