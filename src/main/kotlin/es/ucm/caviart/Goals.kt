@@ -15,13 +15,12 @@ class Goal(val name: String,
            assumptions: List<Assertion>,
            conclusion: Assertion,
            environment: Map<String, Type>,
-           kappas: Map<String, Kappa>,
+           val kappas: Map<String, Kappa>,
            declarationMap: Map<String, UninterpretedFunctionType>) {
 
     val namedKappas: Set<String>
     val rhsKappa: String?
 
-    private val kappas: Map<String, Kappa> = kappas
     private val kappaQualifiers: Map<String, List<BoolExpr>>
     private val z3DeclarationMap: Map<String, FuncDecl>
     private val ctx: Context = Context()
