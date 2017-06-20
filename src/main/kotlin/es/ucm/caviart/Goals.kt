@@ -1,6 +1,7 @@
 package es.ucm.caviart
 
 import com.microsoft.z3.*
+import java.util.function.Predicate
 
 /**
  * Classes and functions involving goals
@@ -31,7 +32,9 @@ class Goal(val name: String,
     class QEEQualifier(val qualifier: BoolExpr, val arrays1: List<Symbol>, val arrays2: List<Symbol>)
 
     val namedKappas: Set<String>
+    val namedMus: Set<String>
     val rhsKappa: String?
+    val rhsMu: String?
 
     private val kappaQualifiers: Map<String, List<BoolExpr>>
     private val muQualifiers: Map<String, MuInfo>
@@ -42,8 +45,12 @@ class Goal(val name: String,
     init {
         solver = ctx.mkSolver()
         z3DeclarationMap = declarationMap.map { (k, v) -> k to v.toFuncDecl(k, ctx) }.toMap()
-        namedKappas = searchAppliedPredicates(assumptions, kappas.keys) union searchAppliedPredicates(listOf(conclusion), kappas.keys)
-        rhsKappa = if (conclusion is PredicateApplication && conclusion.name in kappas.keys) conclusion.name else null
+        val kappaNames = kappas.keys
+        val muNames = mus.keys
+        namedKappas = searchAppliedPredicates(assumptions, kappaNames) union searchAppliedPredicates(listOf(conclusion), kappaNames)
+        namedMus = searchAppliedPredicates(assumptions, muNames) union searchAppliedPredicates(listOf(conclusion), muNames);
+        rhsKappa = if (conclusion is PredicateApplication && conclusion.name in kappaNames) conclusion.name else null
+        rhsMu = if (conclusion is PredicateApplication && conclusion.name in muNames) conclusion.name else null
         kappaQualifiers = kappas.mapValues { (_, kappa) ->
             val environment = kappa.arguments.map { it.varName to it.type.toZ3Sort(ctx) }.toMap()
             val symbolMap = kappa.arguments.map { it.varName to ctx.mkSymbol(it.varName) }.toMap()
@@ -77,6 +84,7 @@ class Goal(val name: String,
         z3Assumptions.forEach { solver.add(it) }
         solver.add(ctx.mkNot(z3Conclusion))
 
+
         if (debug) {
             println("Created goal " + name + ".")
             println("Given:")
@@ -93,6 +101,7 @@ class Goal(val name: String,
         solver.push()
 
         val lhsKappas = if (rhsKappa == null) namedKappas else (namedKappas - rhsKappa)
+        val lhsMus = if (rhsMu == null) namedMus else (namedMus - rhsMu)
 
         lhsKappas.forEach {
             val z3Equivalence = kappaDefinitionToZ3(it, solution)
@@ -102,9 +111,24 @@ class Goal(val name: String,
             solver.add(z3Equivalence)
         }
 
+        lhsMus.forEach {
+            val z3Equivalence = muDefinitionToZ3(it, solution)
+            if (debug) {
+                println("where " + z3Equivalence.sExpr)
+            }
+            solver.add(z3Equivalence)
+        }
+
         solver.push()
         rhsKappa?.let {
             val z3Equivalence = kappaDefinitionToZ3(it, solution)
+            if (debug) {
+                println("where " + z3Equivalence.sExpr)
+            }
+            solver.add(z3Equivalence)
+        }
+        rhsMu?.let {
+            val z3Equivalence = muDefinitionToZ3(it, solution)
             if (debug) {
                 println("where " + z3Equivalence.sExpr)
             }
@@ -161,6 +185,71 @@ class Goal(val name: String,
                         ctx.mkAnd(*solution.kappas[kappaName]!!.map { n -> qualifiers[n] }.toTypedArray())
                 ),
                 0, null, null, null, null)
+        return z3Equivalence
+    }
+
+    private fun muDefinitionToZ3(muName: String, solution: Solution): Quantifier {
+        val mu = mus[muName]!!
+
+        val symbolSorts = mu.arguments.map { ctx.mkSymbol(it.varName) to it.type.toZ3Sort(ctx) }
+
+        val equivLhs = ctx.mkApp(z3DeclarationMap[muName], *symbolSorts.map { (symbol, sort) -> ctx.mkConst(symbol, sort) }.toTypedArray())
+
+        val singleAssertions = solution.mus[muName]!!.singleRefinements.map {
+
+            val boundVarAsConst = ctx.mkIntConst(mu.boundVar1)
+            ctx.mkForall(arrayOf(boundVarAsConst),
+                    ctx.mkImplies(
+                            ctx.mkAnd(
+                                    ctx.mkGe(boundVarAsConst, ctx.mkInt(0)),
+                                    *it.lhs.map { muQualifiers[muName]!!.qIQualifiers[it]!! }.toTypedArray(),
+                                    *it.rhs.flatMap {
+                                        muQualifiers[muName]!!.qEQualifiers[it]!!.arrays.map {
+                                            ctx.mkLt(boundVarAsConst, ctx.mkIntConst(ctx.mkSymbol("len-of-$it")))
+                                        }
+                                    }.toTypedArray()
+                            ),
+                            ctx.mkAnd(
+                                    *it.rhs.map { muQualifiers[muName]!!.qEQualifiers[it]!!.qualifier }.toTypedArray()
+                            )
+                    ), 0, null, null, null, null
+            )
+        }
+
+        val doubleAssertions = solution.mus[muName]!!.doubleRefinements.map {
+
+            val boundVar1AsConst = ctx.mkIntConst(mu.boundVar1)
+            val boundVar2AsConst = ctx.mkIntConst(mu.boundVar2)
+            ctx.mkForall(arrayOf(boundVar1AsConst, boundVar2AsConst),
+                    ctx.mkImplies(
+                            ctx.mkAnd(
+                                    ctx.mkGe(boundVar1AsConst, ctx.mkInt(0)), ctx.mkGe(boundVar2AsConst, ctx.mkInt(0)),
+                                    *it.lhs.map { muQualifiers[muName]!!.qIIQualifiers[it]!! }.toTypedArray(),
+                                    *it.rhs.flatMap {
+                                        muQualifiers[muName]!!.qEEQualifiers[it]!!.arrays1.map {
+                                            ctx.mkLt(boundVar1AsConst, ctx.mkIntConst(ctx.mkSymbol("len-of-$it")))
+                                        }
+                                    }.toTypedArray(),
+                                    *it.rhs.flatMap {
+                                        muQualifiers[muName]!!.qEEQualifiers[it]!!.arrays2.map {
+                                            ctx.mkLt(boundVar2AsConst, ctx.mkIntConst(ctx.mkSymbol("len-of-$it")))
+                                        }
+                                    }.toTypedArray()
+                            ),
+                            ctx.mkAnd(
+                                    *it.rhs.map { muQualifiers[muName]!!.qEEQualifiers[it]!!.qualifier }.toTypedArray()
+                            )
+                    ), 0, null, null, null, null
+            )
+        }
+
+        val equivRhs = ctx.mkAnd(*singleAssertions.toTypedArray(), *doubleAssertions.toTypedArray())
+
+        val z3Equivalence = ctx.mkForall(
+                mu.arguments.map { ctx.mkConst(it.varName, it.type.toZ3Sort(ctx)) }.toTypedArray(),
+                ctx.mkIff(equivLhs as BoolExpr, equivRhs),
+                0, null, null, null, null
+        )
         return z3Equivalence
     }
 

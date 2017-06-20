@@ -69,6 +69,16 @@ fun Term.toZ3ArrayExpr(ctx: Context,
             else -> throw Z3TypeMismatch(varSort)
         }
     }
+    is FunctionApplication -> {
+        when(name) {
+            "set-array" -> ctx.mkStore(
+                    arguments[0].toZ3ArrayExpr(ctx, symbolMap, declarationMap, typeEnv),
+                    arguments[1].toZ3Expr(ctx, symbolMap, declarationMap, typeEnv),
+                    arguments[2].toZ3Expr(ctx, symbolMap, declarationMap, typeEnv)
+            )
+            else -> throw UnsupportedZ3AST(this)
+        }
+    }
     else -> throw UnsupportedZ3ArrayExpr(this)
 }
 
