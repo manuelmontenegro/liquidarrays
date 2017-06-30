@@ -90,4 +90,45 @@ class Z3Test {
         s.add(formula2)
         assertEquals(Status.SATISFIABLE, s.check())
     }
+
+    @Test fun severalFunDeclsWithSameName() {
+        val ctx = Context()
+        val decl1 = ctx.mkFuncDecl("len", ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort()), ctx.mkIntSort())
+        val decl2 = ctx.mkFuncDecl("len", ctx.mkArraySort(ctx.mkIntSort(), ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort())), ctx.mkIntSort())
+        val decl3 = ctx.mkFuncDecl("len", ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort()), ctx.mkIntSort())
+        val s = ctx.mkSolver()
+
+        // F1: len_1(a : array int) != 0
+        val formula1 = ctx.mkNot(ctx.mkEq(ctx.mkApp(decl1, ctx.mkConst(ctx.mkSymbol("a"), ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort()))), ctx.mkInt(0)))
+        // F2: len_2(a : array (array int)) != 0
+        val formula2 = ctx.mkNot(ctx.mkEq(ctx.mkApp(decl2, ctx.mkConst(ctx.mkSymbol("b"), ctx.mkArraySort(ctx.mkIntSort(), ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort())))), ctx.mkInt(0)))
+        // F3: len_3(a : array int) != 0
+        val formula3 = ctx.mkNot(ctx.mkEq(ctx.mkApp(decl3, ctx.mkConst(ctx.mkSymbol("c"), ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort()))), ctx.mkInt(0)))
+        // F4: forall x: array int. len_1(x) = 0
+        val formula4 = ctx.mkForall(arrayOf(ctx.mkArrayConst(ctx.mkSymbol("x"), ctx.mkIntSort(), ctx.mkIntSort())),
+                ctx.mkEq(ctx.mkApp(decl1, ctx.mkArrayConst("x", ctx.mkIntSort(), ctx.mkIntSort())), ctx.mkInt(0)), 0, null, null, null, null)
+
+
+        s.push()
+        s.add(formula1)
+        s.add(formula4)
+        val status1 = s.check()
+        s.pop()
+        assertEquals(Status.UNSATISFIABLE, status1, "F1 and F4 must be unsatisfiable")
+
+        s.push()
+        s.add(formula2)
+        s.add(formula4)
+        val status2 = s.check()
+        s.pop()
+        assertEquals(Status.SATISFIABLE, status2, "F2 and F4 must be satisfiable")
+
+        s.push()
+        s.add(formula3)
+        s.add(formula4)
+        val status3 = s.check()
+        s.pop()
+        assertEquals(Status.UNSATISFIABLE, status3, "F3 and F4 must be unsatisfiable")
+
+    }
 }

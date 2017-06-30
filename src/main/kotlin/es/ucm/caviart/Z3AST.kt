@@ -40,17 +40,31 @@ fun Term.toZ3ArithExpr(ctx: Context,
     is Variable -> ctx.mkIntConst(symbolMap[name] ?: throw UndefinedVariable(name))
 
     is FunctionApplication -> {
-        val args = arguments.map { it.toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv) }
         when (name) {
-            "+" -> ctx.mkAdd(*args.toTypedArray())
-            "-" -> ctx.mkSub(*args.toTypedArray())
-            "*" -> ctx.mkMul(*args.toTypedArray())
-            "/" -> ctx.mkDiv(args[0], args[1])
+            "+" -> {
+                val args = arguments.map { it.toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv) }
+                ctx.mkAdd(*args.toTypedArray())
+            }
+            "-" -> {
+                val args = arguments.map { it.toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv) }
+                ctx.mkSub(*args.toTypedArray())
+            }
+            "*" -> {
+                val args = arguments.map { it.toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv) }
+                ctx.mkMul(*args.toTypedArray())
+            }
+            "/" -> {
+                val args = arguments.map { it.toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv) }
+                ctx.mkDiv(args[0], args[1])
+            }
             "get-array" -> ctx.mkSelect(
                     arguments[0].toZ3ArrayExpr(ctx, symbolMap, declarationMap, typeEnv),
-                    args[1]
+                    arguments[1].toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv)
             ) as ArithExpr
-            else -> throw UnsupportedZ3AST(this)
+            else -> {
+                val args = arguments.map { it.toZ3Expr(ctx, symbolMap, declarationMap, typeEnv) }
+                ctx.mkApp(declarationMap[name], *args.toTypedArray()) as ArithExpr
+            }
         }
     }
 

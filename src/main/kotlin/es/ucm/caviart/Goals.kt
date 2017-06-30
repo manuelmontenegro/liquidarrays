@@ -28,8 +28,8 @@ class Goal(val name: String,
                  val qEEQualifiers: List<QEEQualifier>,
                  val qLenQualifiers: List<BoolExpr>)
 
-    class QEQualifier(val qualifier: BoolExpr, val arrays: List<Symbol>)
-    class QEEQualifier(val qualifier: BoolExpr, val arrays1: List<Symbol>, val arrays2: List<Symbol>)
+    class QEQualifier(val qualifier: BoolExpr, val arrays: List<Pair<Symbol, Sort>>)
+    class QEEQualifier(val qualifier: BoolExpr, val arrays1: List<Pair<Symbol, Sort>>, val arrays2: List<Pair<Symbol, Sort>>)
 
     val namedKappas: Set<String>
     val namedMus: Set<String>
@@ -67,11 +67,19 @@ class Goal(val name: String,
             MuInfo(boundVar1Symbol,
                     boundVar2Symbol,
                     mu.qI.map { it.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment) },
-                    mu.qE.map { QEQualifier(it.qualifier.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment), it.arrayNames.map { symbolMap[it]!! }) },
+                    mu.qE.map {
+                        QEQualifier(
+                                it.qualifier.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment),
+                                it.arrayNames.map { (name, type) ->
+                                    Pair(symbolMap[name]!!, type.toZ3Sort(ctx))
+                                }
+                        )
+                    },
                     mu.qII.map { it.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment) },
                     mu.qEE.map {
                         QEEQualifier(it.qualifier.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment),
-                                it.arrayNames1.map { symbolMap[it]!! }, it.arrayNames2.map { symbolMap[it]!! })
+                                it.arrayNames1.map { (name, type) -> Pair(symbolMap[name]!!, type.toZ3Sort(ctx)) },
+                                it.arrayNames2.map { (name, type) -> Pair(symbolMap[name]!!, type.toZ3Sort(ctx)) })
                     },
                     mu.qLen.map { it.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment) }
             )
@@ -204,8 +212,9 @@ class Goal(val name: String,
                                     ctx.mkGe(boundVarAsConst, ctx.mkInt(0)),
                                     *it.lhs.map { muQualifiers[muName]!!.qIQualifiers[it]!! }.toTypedArray(),
                                     *it.rhs.flatMap {
-                                        muQualifiers[muName]!!.qEQualifiers[it]!!.arrays.map {
-                                            ctx.mkLt(boundVarAsConst, ctx.mkIntConst(ctx.mkSymbol("len-of-$it")))
+                                        muQualifiers[muName]!!.qEQualifiers[it]!!.arrays.map { (symbol, sort) ->
+                                            val letFunction = ctx.mkFuncDecl("len", ctx.mkArraySort(ctx.mkIntSort(), sort), ctx.mkIntSort())
+                                            ctx.mkLt(boundVarAsConst, ctx.mkApp(letFunction, ctx.mkConst(symbol, ctx.mkArraySort(ctx.mkIntSort(), sort))) as ArithExpr)
                                         }
                                     }.toTypedArray()
                             ),
@@ -226,13 +235,15 @@ class Goal(val name: String,
                                     ctx.mkGe(boundVar1AsConst, ctx.mkInt(0)), ctx.mkGe(boundVar2AsConst, ctx.mkInt(0)),
                                     *it.lhs.map { muQualifiers[muName]!!.qIIQualifiers[it]!! }.toTypedArray(),
                                     *it.rhs.flatMap {
-                                        muQualifiers[muName]!!.qEEQualifiers[it]!!.arrays1.map {
-                                            ctx.mkLt(boundVar1AsConst, ctx.mkIntConst(ctx.mkSymbol("len-of-$it")))
+                                        muQualifiers[muName]!!.qEEQualifiers[it]!!.arrays1.map { (symbol, sort) ->
+                                            val lenFunction = ctx.mkFuncDecl("len", ctx.mkArraySort(ctx.mkIntSort(), sort), ctx.mkIntSort())
+                                            ctx.mkLt(boundVar1AsConst, ctx.mkApp(lenFunction, ctx.mkConst(symbol, ctx.mkArraySort(ctx.mkIntSort(), sort))) as ArithExpr)
                                         }
                                     }.toTypedArray(),
                                     *it.rhs.flatMap {
-                                        muQualifiers[muName]!!.qEEQualifiers[it]!!.arrays2.map {
-                                            ctx.mkLt(boundVar2AsConst, ctx.mkIntConst(ctx.mkSymbol("len-of-$it")))
+                                        muQualifiers[muName]!!.qEEQualifiers[it]!!.arrays2.map { (symbol, sort) ->
+                                            val lenFunction = ctx.mkFuncDecl("len", ctx.mkArraySort(ctx.mkIntSort(), sort), ctx.mkIntSort())
+                                            ctx.mkLt(boundVar2AsConst, ctx.mkApp(lenFunction, ctx.mkConst(symbol, ctx.mkArraySort(ctx.mkIntSort(), sort))) as ArithExpr)
                                         }
                                     }.toTypedArray()
                             ),

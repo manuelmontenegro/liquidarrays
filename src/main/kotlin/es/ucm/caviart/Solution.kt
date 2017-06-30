@@ -16,8 +16,8 @@ data class Mu(val name: String,
               val qEE: List<QEEStarElement>,
               val qLen: List<Assertion>)
 
-data class QEStarElement(val qualifier: Assertion, val arrayNames: List<String>)
-data class QEEStarElement(val qualifier: Assertion, val arrayNames1: List<String>, val arrayNames2: List<String>)
+data class QEStarElement(val qualifier: Assertion, val arrayNames: List<Pair<String, Type>>)
+data class QEEStarElement(val qualifier: Assertion, val arrayNames1: List<Pair<String, Type>>, val arrayNames2: List<Pair<String, Type>>)
 
 
 data class Solution(val kappas: MutableMap<String, KappaSolution>,
