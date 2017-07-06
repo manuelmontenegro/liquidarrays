@@ -154,6 +154,10 @@ class Goal(val name: String,
                 weakenKappa(solution, rhsKappa)
                 result = KappaWeakened(rhsKappa)
             }
+            rhsMu != null -> {
+                weakenMu(solution, rhsMu)
+                result = MuWeakened(rhsMu)
+            }
             else ->
                 result = CannotWeaken()
         }
@@ -164,7 +168,7 @@ class Goal(val name: String,
 
     private fun weakenKappa(solution: Solution, rhsKappa: String) {
         if (debug) println("Weakening $rhsKappa...")
-        val qualifiersInSolution: MutableSet<Int> = solution.kappas[rhsKappa]!!.toCollection(mutableSetOf())
+        val qualifiersInSolution: Set<Int> = solution.kappas[rhsKappa]!!.toSet()
         val acceptedQualifiers = mutableSetOf<Int>()
         qualifiersInSolution.forEach {
             solution.kappas[rhsKappa] = mutableSetOf(it)
@@ -178,6 +182,71 @@ class Goal(val name: String,
             solver.pop()
         }
         solution.kappas[rhsKappa] = acceptedQualifiers
+    }
+
+    private fun weakenMu(solution: Solution, rhsMu: String) {
+        if (debug) println("Weakening $rhsMu...")
+        val muSolutionToWeaken = solution.mus[rhsMu]!!
+
+        val numberOfQI = muQualifiers[rhsMu]!!.qIQualifiers.size
+
+        val acceptedSingleRefinements = mutableListOf<Refinement>()
+        val rejectedSingleRefinements = mutableListOf<Refinement>()
+
+        muSolutionToWeaken.singleRefinements.forEach {
+            solution.mus[rhsMu] = MuSolution(listOf(it), listOf(), setOf())
+            val z3Equivalence = muDefinitionToZ3(rhsMu, solution)
+            solver.push()
+            solver.add(z3Equivalence)
+            val status = solver.check()
+            solver.pop()
+            if (status == Status.UNSATISFIABLE) {
+                acceptedSingleRefinements += it
+            } else {
+                rejectedSingleRefinements += it
+            }
+        }
+
+        rejectedSingleRefinements.forEach {
+            val strongestLhs = (0 until numberOfQI).toSet()
+            solution.mus[rhsMu] = MuSolution(
+                    listOf(Refinement(strongestLhs, it.rhs)),
+                    listOf(),
+                    setOf()
+            )
+            solver.push()
+            solver.add(muDefinitionToZ3(rhsMu, solution))
+            val status = solver.check()
+            solver.pop()
+            if (status != Status.UNSATISFIABLE) {
+                var (currentLhs, setIterator) = iterateSupersetsOf(it.lhs, (0 until numberOfQI).toSet())
+
+                while(currentLhs != null) {
+                    val currentRefinement = Refinement(currentLhs.toSet(), it.rhs)
+                    solution.mus[rhsMu] = MuSolution(
+                            listOf(currentRefinement),
+                            listOf(),
+                            setOf()
+                    )
+                    solver.push()
+                    solver.add(muDefinitionToZ3(rhsMu, solution))
+                    val status = solver.check()
+                    solver.pop()
+
+                    if (status == Status.UNSATISFIABLE) {
+                        acceptedSingleRefinements.add(currentRefinement)
+                        currentLhs = setIterator.next(false)
+                    } else {
+                        currentLhs = setIterator.next(true)
+                    }
+                }
+            }
+        }
+
+        // TODO: Weaken double refinements
+        // TODO: Weaken qLen
+
+        solution.mus[rhsMu] = MuSolution(acceptedSingleRefinements, listOf(), setOf())
     }
 
     private fun kappaDefinitionToZ3(kappaName: String, solution: Solution): Quantifier {
@@ -254,6 +323,8 @@ class Goal(val name: String,
             )
         }
 
+        // TODO: Generate qLen qualifiers
+
         val equivRhs = ctx.mkAnd(*singleAssertions.toTypedArray(), *doubleAssertions.toTypedArray())
 
         val z3Equivalence = ctx.mkForall(
@@ -300,6 +371,7 @@ abstract class GoalSolveResult
 class Correct : GoalSolveResult()
 class CannotWeaken : GoalSolveResult()
 data class KappaWeakened(val varName: String) : GoalSolveResult()
+data class MuWeakened(val varName: String) : GoalSolveResult()
 
 
 class InvalidGoal(message: String) : RuntimeException(message)

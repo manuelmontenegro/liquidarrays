@@ -118,9 +118,9 @@ class MusTest {
     @Test fun checkSolMu() {
         val solution = Solution(mutableMapOf(),
                 mutableMapOf("mu1" to
-                        MuSolution(listOf(
+                        MuSolution(mutableListOf(
                                 Refinement(mutableSetOf(0), mutableSetOf(0))
-                        ), listOf(), mutableSetOf())
+                        ), mutableListOf(), mutableSetOf())
                 )
         )
         val result = G1.check(solution)
@@ -131,8 +131,8 @@ class MusTest {
         val solution = Solution(mutableMapOf(),
                 mutableMapOf("mu1" to
                         MuSolution(
-                                listOf(),
-                                listOf(
+                                mutableListOf(),
+                                mutableListOf(
                                         Refinement(mutableSetOf(0, 2), mutableSetOf(0))
                                 ),
                                 mutableSetOf()
@@ -147,11 +147,11 @@ class MusTest {
         val solution = Solution(mutableMapOf(),
                 mutableMapOf(
                         "mu1" to MuSolution(
-                                listOf(
+                                mutableListOf(
                                         Refinement(mutableSetOf(0), mutableSetOf(0)),
                                         Refinement(mutableSetOf(1), mutableSetOf(1))
                                 ),
-                                listOf(),
+                                mutableListOf(),
                                 mutableSetOf()
                         )
                 )

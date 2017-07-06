@@ -23,11 +23,11 @@ data class QEEStarElement(val qualifier: Assertion, val arrayNames1: List<Pair<S
 data class Solution(val kappas: MutableMap<String, KappaSolution>,
                     val mus: MutableMap<String, MuSolution>)
 
-typealias KappaSolution = MutableSet<Int>
+typealias KappaSolution = Set<Int>
 
 data class MuSolution(
         val singleRefinements: List<Refinement>,
         val doubleRefinements: List<Refinement>,
-        val qLen: MutableSet<Int>)
+        val qLen: Set<Int>)
 
-data class Refinement(val lhs: MutableSet<Int>, val rhs: MutableSet<Int>)
+data class Refinement(val lhs: Set<Int>, val rhs: Set<Int>)
