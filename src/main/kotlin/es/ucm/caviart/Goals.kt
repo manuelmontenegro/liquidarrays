@@ -215,10 +215,14 @@ class Goal(val name: String,
                     setOf()
             )
             solver.push()
-            solver.add(muDefinitionToZ3(rhsMu, solution))
+            val z3Definition = muDefinitionToZ3(rhsMu, solution)
+            solver.add(z3Definition)
             val status = solver.check()
             solver.pop()
-            if (status != Status.UNSATISFIABLE) {
+            if (debug) {
+                println("Strongest mapping\n${z3Definition.sExpr}\nResult: $status")
+            }
+            if (status == Status.UNSATISFIABLE) {
                 var (currentLhs, setIterator) = iterateSupersetsOf(it.lhs, (0 until numberOfQI).toSet())
 
                 while(currentLhs != null) {
@@ -229,10 +233,13 @@ class Goal(val name: String,
                             setOf()
                     )
                     solver.push()
-                    solver.add(muDefinitionToZ3(rhsMu, solution))
+                    val z3Definition = muDefinitionToZ3(rhsMu, solution)
+                    solver.add(z3Definition)
                     val status = solver.check()
                     solver.pop()
-
+                    if (debug) {
+                        println("Superset\n${z3Definition.sExpr}\nResult: $status")
+                    }
                     if (status == Status.UNSATISFIABLE) {
                         acceptedSingleRefinements.add(currentRefinement)
                         currentLhs = setIterator.next(false)

@@ -1,7 +1,7 @@
 package es.ucm.caviart
 
 import org.junit.Test
-import java.util.function.Predicate
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
@@ -115,6 +115,71 @@ class MusTest {
                     "mu1" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int"))), Type("int")), Type("bool")))
     )
 
+    val assumptionsG4 = listOf(
+            PredicateApplication(">=", listOf(Variable("n"), Literal("0", Type("int")))),
+            PredicateApplication("<", listOf(Variable("n"), FunctionApplication("len", listOf(Variable("a"))))),
+            ForAll("i", Type("int"), Implication(listOf(
+                    PredicateApplication("<=", listOf(Literal("0", Type("int")), Variable("i"))),
+                    PredicateApplication("<=", listOf(Variable("i"), Variable("n"))),
+                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("i"))), Literal("0", Type("int"))))
+            )))
+    )
+    val conclusionG4 = PredicateApplication("mu1", listOf(Variable("a"), Variable("n")))
+    val environmentG4 = mapOf("n" to Type("int"), "a" to Type("array", listOf(Type("int"))))
+    val declarationMapG4 = mapOf("len" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int")))), Type("int")),
+            "mu1" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int"))), Type("int")), Type("bool")))
+
+    val G4 = Goal("G4",
+            assumptionsG4,
+            conclusionG4,
+            environmentG4,
+            mapOf(),
+            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", Type("array", listOf(Type("int")))), TypedVar("n", Type("int"))),
+                    "i", "j",
+                    listOf(PredicateApplication("<=", listOf(Variable("i"), Variable("n")))),
+                    listOf(
+                            QEStarElement(
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", Type("int")))),
+                                    listOf("nu" to Type("array", listOf(Type("int"))))
+                            ),
+                            QEStarElement(
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", Type("int")))),
+                                    listOf("nu" to Type("array", listOf(Type("int"))))
+                            )
+                    ),
+                    listOf(),
+                    listOf(),
+                    listOf())),
+            declarationMapG4
+    )
+
+    val G5 = Goal("G5",
+            assumptionsG4,
+            conclusionG4,
+            environmentG4,
+            mapOf(),
+            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", Type("array", listOf(Type("int")))), TypedVar("n", Type("int"))),
+                    "i", "j",
+                    listOf(
+                            PredicateApplication("<=", listOf(Variable("i"), Variable("n"))),
+                            PredicateApplication("<", listOf(Variable("i"), Variable("n")))
+                    ),
+                    listOf(
+                            QEStarElement(
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", Type("int")))),
+                                    listOf("nu" to Type("array", listOf(Type("int"))))
+                            ),
+                            QEStarElement(
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", Type("int")))),
+                                    listOf("nu" to Type("array", listOf(Type("int"))))
+                            )
+                    ),
+                    listOf(),
+                    listOf(),
+                    listOf())),
+            declarationMapG4
+    )
+
     @Test fun checkSolMu() {
         val solution = Solution(mutableMapOf(),
                 mutableMapOf("mu1" to
@@ -160,5 +225,40 @@ class MusTest {
         assertTrue(result is Correct, "G3: solution mu1 nu n = [forall j1. j1 <= m -> nu[j1] = 0] && [forall j1. j1 > m -> nu[j1] = 1]")
     }
 
+    @Test fun checkSolMu4() {
+        val solution = Solution(mutableMapOf(),
+                mutableMapOf(
+                        "mu1" to MuSolution(
+                                listOf(
+                                        Refinement(setOf(), setOf(0)),
+                                        Refinement(setOf(), setOf(1))
+                                ),
+                                listOf(),
+                                setOf()
+                        )
+                )
+        )
+        val result = G4.check(solution)
+        assertEquals(MuWeakened("mu1"), result, "G4 must have been weakened")
+        assertEquals(MuSolution(listOf(Refinement(setOf(0), setOf(0))), listOf(), setOf()), solution.mus["mu1"])
+    }
+
+    @Test fun checkSolMu5() {
+        val solution = Solution(mutableMapOf(),
+                mutableMapOf(
+                        "mu1" to MuSolution(
+                                listOf(
+                                        Refinement(setOf(), setOf(0)),
+                                        Refinement(setOf(), setOf(1))
+                                ),
+                                listOf(),
+                                setOf()
+                        )
+                )
+        )
+        val result = G5.check(solution)
+        assertEquals(MuWeakened("mu1"), result, "G4 must have been weakened")
+        assertEquals(MuSolution(listOf(Refinement(setOf(0), setOf(0)), Refinement(setOf(1), setOf(0))), listOf(), setOf()), solution.mus["mu1"])
+    }
 
 }
