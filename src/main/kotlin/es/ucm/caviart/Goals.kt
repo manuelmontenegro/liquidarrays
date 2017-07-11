@@ -1,7 +1,6 @@
 package es.ucm.caviart
 
 import com.microsoft.z3.*
-import java.util.function.Predicate
 
 /**
  * Classes and functions involving goals
@@ -184,76 +183,94 @@ class Goal(val name: String,
         solution.kappas[rhsKappa] = acceptedQualifiers
     }
 
-    private fun weakenMu(solution: Solution, rhsMu: String) {
-        if (debug) println("Weakening $rhsMu...")
-        val muSolutionToWeaken = solution.mus[rhsMu]!!
+    private fun classifyRefinements(solution: Solution,
+                                    muVar: String,
+                                    refinements: List<Refinement>,
+                                    builder: (List<Refinement>) -> MuSolution): Pair<MutableList<Refinement>, MutableList<Refinement>> {
+        val accepted = mutableListOf<Refinement>()
+        val rejected = mutableListOf<Refinement>()
 
-        val numberOfQI = muQualifiers[rhsMu]!!.qIQualifiers.size
-
-        val acceptedSingleRefinements = mutableListOf<Refinement>()
-        val rejectedSingleRefinements = mutableListOf<Refinement>()
-
-        muSolutionToWeaken.singleRefinements.forEach {
-            solution.mus[rhsMu] = MuSolution(listOf(it), listOf(), setOf())
-            val z3Equivalence = muDefinitionToZ3(rhsMu, solution)
+        refinements.forEach {
+            solution.mus[muVar] = builder(listOf(it))
+            val z3Equivalence = muDefinitionToZ3(muVar, solution)
             solver.push()
             solver.add(z3Equivalence)
             val status = solver.check()
             solver.pop()
             if (status == Status.UNSATISFIABLE) {
-                acceptedSingleRefinements += it
+                accepted += it
             } else {
-                rejectedSingleRefinements += it
+                rejected += it
             }
         }
 
-        rejectedSingleRefinements.forEach {
-            val strongestLhs = (0 until numberOfQI).toSet()
-            solution.mus[rhsMu] = MuSolution(
-                    listOf(Refinement(strongestLhs, it.rhs)),
-                    listOf(),
-                    setOf()
-            )
-            solver.push()
-            val z3Definition = muDefinitionToZ3(rhsMu, solution)
-            solver.add(z3Definition)
-            val status = solver.check()
-            solver.pop()
-            if (debug) {
-                println("Strongest mapping\n${z3Definition.sExpr}\nResult: $status")
-            }
-            if (status == Status.UNSATISFIABLE) {
-                var (currentLhs, setIterator) = iterateSupersetsOf(it.lhs, (0 until numberOfQI).toSet())
+        return Pair(accepted, rejected)
+    }
 
-                while(currentLhs != null) {
-                    val currentRefinement = Refinement(currentLhs.toSet(), it.rhs)
-                    solution.mus[rhsMu] = MuSolution(
-                            listOf(currentRefinement),
-                            listOf(),
-                            setOf()
-                    )
-                    solver.push()
-                    val z3Definition = muDefinitionToZ3(rhsMu, solution)
-                    solver.add(z3Definition)
-                    val status = solver.check()
-                    solver.pop()
-                    if (debug) {
-                        println("Superset\n${z3Definition.sExpr}\nResult: $status")
-                    }
-                    if (status == Status.UNSATISFIABLE) {
-                        acceptedSingleRefinements.add(currentRefinement)
-                        currentLhs = setIterator.next(false)
-                    } else {
-                        currentLhs = setIterator.next(true)
-                    }
-                }
-            }
+    private fun weakenMu(solution: Solution, rhsMu: String) {
+        if (debug) println("Weakening $rhsMu...")
+        val muSolutionToWeaken = solution.mus[rhsMu]!!
+
+
+        val (acceptedSingleRefinements, rejectedSingleRefinements) =
+                classifyRefinements(solution, rhsMu, muSolutionToWeaken.singleRefinements, { MuSolution(it, listOf(), setOf()) })
+
+        val numberOfQI = muQualifiers[rhsMu]!!.qIQualifiers.size
+
+        val newRefinements = rejectedSingleRefinements.flatMap {
+            weakenRefinement(it, numberOfQI, solution, rhsMu, { MuSolution(it, listOf(), setOf()) })
         }
+        acceptedSingleRefinements += newRefinements;
 
         // TODO: Weaken double refinements
         // TODO: Weaken qLen
 
         solution.mus[rhsMu] = MuSolution(acceptedSingleRefinements, listOf(), setOf())
+    }
+
+    private fun weakenRefinement(refinement: Refinement,
+                                 numberOfLHSRefinements: Int,
+                                 solution: Solution,
+                                 rhsMu: String,
+                                 builder: (List<Refinement>) -> MuSolution): List<Refinement> {
+
+        val result = mutableListOf<Refinement>();
+        val strongestLhs = (0 until numberOfLHSRefinements).toSet()
+        solution.mus[rhsMu] = builder(listOf(Refinement(strongestLhs, refinement.rhs)))
+        solver.push()
+        val z3Definition = muDefinitionToZ3(rhsMu, solution)
+        solver.add(z3Definition)
+        val status = solver.check()
+        if (debug) {
+            println("Strongest mapping\n${z3Definition.sExpr}\nResult: $status")
+        }
+        solver.pop()
+
+        if (status != Status.UNSATISFIABLE) {
+            return listOf()
+        }
+
+        var (currentLhs, setIterator) = iterateSupersetsOf(refinement.lhs, (0 until numberOfLHSRefinements).toSet())
+
+        while (currentLhs != null) {
+            val currentRefinement = Refinement(currentLhs.toSet(), refinement.rhs)
+            solution.mus[rhsMu] = builder(listOf(currentRefinement))
+            solver.push()
+            val z3Definition = muDefinitionToZ3(rhsMu, solution)
+            solver.add(z3Definition)
+            val status = solver.check()
+            if (debug) {
+                println("Superset\n${z3Definition.sExpr}\nResult: $status")
+            }
+            solver.pop()
+            if (status == Status.UNSATISFIABLE) {
+                result.add(currentRefinement)
+                currentLhs = setIterator.next(false)
+            } else {
+                currentLhs = setIterator.next(true)
+            }
+        }
+        return result
     }
 
     private fun kappaDefinitionToZ3(kappaName: String, solution: Solution): Quantifier {
