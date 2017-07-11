@@ -213,19 +213,28 @@ class Goal(val name: String,
 
 
         val (acceptedSingleRefinements, rejectedSingleRefinements) =
-                classifyRefinements(solution, rhsMu, muSolutionToWeaken.singleRefinements, { MuSolution(it, listOf(), setOf()) })
+            classifyRefinements(solution, rhsMu, muSolutionToWeaken.singleRefinements, { MuSolution(it, listOf(), setOf()) })
 
         val numberOfQI = muQualifiers[rhsMu]!!.qIQualifiers.size
 
-        val newRefinements = rejectedSingleRefinements.flatMap {
+        val newSingleRefinements = rejectedSingleRefinements.flatMap {
             weakenRefinement(it, numberOfQI, solution, rhsMu, { MuSolution(it, listOf(), setOf()) })
         }
-        acceptedSingleRefinements += newRefinements;
+        acceptedSingleRefinements += newSingleRefinements
 
-        // TODO: Weaken double refinements
+        val (acceptedDoubleRefinements, rejectedDoubleRefinements) =
+                classifyRefinements(solution, rhsMu, muSolutionToWeaken.doubleRefinements, { MuSolution(listOf(), it, setOf())})
+
+        val numberOfQII = muQualifiers[rhsMu]!!.qIIQualifiers.size
+
+        val newDoubleRefinements = rejectedDoubleRefinements.flatMap {
+            weakenRefinement(it, numberOfQII, solution, rhsMu, { MuSolution(listOf(), it, setOf()) })
+        }
+        acceptedDoubleRefinements += newDoubleRefinements
+
         // TODO: Weaken qLen
 
-        solution.mus[rhsMu] = MuSolution(acceptedSingleRefinements, listOf(), setOf())
+        solution.mus[rhsMu] = MuSolution(acceptedSingleRefinements, acceptedDoubleRefinements, setOf())
     }
 
     private fun weakenRefinement(refinement: Refinement,

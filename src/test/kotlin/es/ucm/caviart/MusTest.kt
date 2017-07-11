@@ -261,4 +261,176 @@ class MusTest {
         assertEquals(MuSolution(listOf(Refinement(setOf(0), setOf(0)), Refinement(setOf(1), setOf(0))), listOf(), setOf()), solution.mus["mu1"])
     }
 
+
+    val auxG6 = { qii: List<Assertion> -> Goal("G6",
+            listOf(
+                    ForAll(
+                            listOf(TypedVar("i", Type("int")), TypedVar("j", Type("int"))),
+                            Implication(
+                                    Or(
+                                            And(
+                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", Type("int")))),
+                                                    PredicateApplication("=", listOf(Variable("j"), Literal("2", Type("int"))))
+                                            ),
+                                            And(
+                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", Type("int")))),
+                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", Type("int"))))
+                                            ),
+                                            And(
+                                                    PredicateApplication("=", listOf(Variable("i"), Literal("2", Type("int")))),
+                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", Type("int"))))
+                                            ),
+                                            PredicateApplication("=", listOf(Variable("i"), Variable("j")))
+                                    ),
+                                    PredicateApplication("<=", listOf(
+                                            FunctionApplication("get-array", listOf(Variable("a"), Variable("i"))),
+                                            FunctionApplication("get-array", listOf(Variable("a"), Variable("j")))
+                                    ))
+                            )
+                    )
+            ),
+            PredicateApplication("mu1", listOf(Variable("a"))),
+            mapOf("a" to Type("array", listOf(Type("int")))),
+            mapOf(),
+            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", Type("array", listOf(Type("int"))))),
+                    "i", "j",
+                    listOf(),
+                    listOf(),
+                    qii,
+                    listOf(
+                            QEEStarElement(
+                                    PredicateApplication("<=", listOf(
+                                            FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))),
+                                            FunctionApplication("get-array", listOf(Variable("nu"), Variable("j")))
+                                    )),
+                                    listOf(Pair("nu", Type("array", listOf(Type("int"))))),
+                                    listOf(Pair("nu", Type("array", listOf(Type("int")))))
+                            ),
+                            QEEStarElement(
+                                    PredicateApplication("<", listOf(
+                                            FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))),
+                                            FunctionApplication("get-array", listOf(Variable("nu"), Variable("j")))
+                                    )),
+                                    listOf(Pair("nu", Type("array", listOf(Type("int"))))),
+                                    listOf(Pair("nu", Type("array", listOf(Type("int")))))
+                            )
+                    ),
+                    listOf()
+            )),
+            mapOf("len" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int")))), Type("int")),
+                    "mu1" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int")))), Type("bool")))
+    )}
+
+    val G6 = auxG6(listOf(
+            PredicateApplication("<=", listOf(Variable("i"), Variable("j")))
+    ))
+
+    val G7 = auxG6(listOf(
+            PredicateApplication("<=", listOf(Literal("1", Type("int")), Variable("i"))),
+            PredicateApplication("<=", listOf(Variable("i"), Variable("j"))),
+            PredicateApplication("<=", listOf(Variable("j"), Literal("3", Type("int")))),
+            PredicateApplication("<", listOf(Variable("i"), Variable("j"))),
+            And(
+                    PredicateApplication("<", listOf(Literal("0", Type("int")), Variable("i"))),
+                    PredicateApplication("<", listOf(Variable("j"), Literal("4", Type("int")))),
+                    PredicateApplication("<=", listOf(Variable("i"), Variable("j")))
+            )
+    ))
+
+    @Test fun checkSolMu6() {
+        val solution = Solution(mutableMapOf(),
+                mutableMapOf(
+                        "mu1" to MuSolution(
+                                listOf(),
+                                listOf(
+                                        Refinement(setOf(), setOf(0)),
+                                        Refinement(setOf(), setOf(1))
+                                ),
+                                setOf()
+                        )
+                )
+        )
+        val result = G6.check(solution)
+        assertEquals(MuWeakened("mu1"), result, "With G6 solution must have been weakened")
+        assertEquals(listOf(), solution.mus["mu1"]!!.doubleRefinements, "All refinements must have been erased")
+    }
+
+    @Test fun checkSolMu7() {
+        val solution = Solution(mutableMapOf(),
+                mutableMapOf(
+                        "mu1" to MuSolution(
+                                listOf(),
+                                listOf(
+                                        Refinement(setOf(0, 1, 2), setOf(0))
+                                ),
+                                setOf()
+                        )
+                )
+        )
+        val result = G7.check(solution)
+        assertTrue(result is Correct, "Correct solution with G7 must be valid")
+    }
+
+    @Test fun checkSolMu8() {
+        val solution = Solution(mutableMapOf(),
+                mutableMapOf(
+                        "mu1" to MuSolution(
+                                listOf(),
+                                listOf(
+                                        Refinement(setOf(0, 1, 2), setOf(0)),
+                                        Refinement(setOf(0, 1, 2), setOf(1))
+                                ),
+                                setOf()
+                        )
+                )
+        )
+        val result = G7.check(solution)
+        assertEquals(MuWeakened("mu1"), result, "G7: A redundant qualifier in QEE must have been weakened")
+        assertEquals(listOf(Refinement(setOf(0, 1, 2), setOf(0))), solution.mus["mu1"]!!.doubleRefinements,
+                "G7: Redundant qualifier of QEE must have been removed")
+    }
+
+    @Test fun checkSolMu9() {
+        val solution = Solution(mutableMapOf(),
+                mutableMapOf(
+                        "mu1" to MuSolution(
+                                listOf(),
+                                listOf(
+                                        Refinement(setOf(0), setOf(0)),
+                                        Refinement(setOf(0, 1, 2), setOf(1))
+                                ),
+                                setOf()
+                        )
+                )
+        )
+        val result = G7.check(solution)
+        assertEquals(MuWeakened("mu1"), result, "G7: mu1 must have been weakened")
+        assertEquals(listOf(
+                Refinement(setOf(0, 4), setOf(0)),
+                Refinement(setOf(0, 1, 2), setOf(0)),
+                Refinement(setOf(0, 2, 3), setOf(0))
+                ), solution.mus["mu1"]!!.doubleRefinements, "G7: Weakened mu1 is correct")
+    }
+
+    @Test fun checkSolMu10() {
+        val solution = Solution(mutableMapOf(),
+                mutableMapOf(
+                        "mu1" to MuSolution(
+                                listOf(),
+                                listOf(
+                                        Refinement(setOf(), setOf(0))
+                                ),
+                                setOf()
+                        )
+                )
+        )
+        val result = G7.check(solution)
+        assertEquals(MuWeakened("mu1"), result, "G7: mu1 must have been weakened")
+        assertEquals(listOf(
+                Refinement(setOf(4), setOf(0)),
+                Refinement(setOf                (0, 1, 2), setOf(0)),
+                Refinement(setOf(0, 2, 3), setOf(0))
+        ), solution.mus["mu1"]!!.doubleRefinements, "G7: Weakened mu1 is correct")
+    }
+
 }
