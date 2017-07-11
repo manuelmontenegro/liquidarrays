@@ -49,4 +49,14 @@ class SupersetsTest {
         assertEquals(setOf(1, 2, 4, 5), iterator.next(false))
         assertNull(iterator.next(false))
     }
+
+    @Test fun alreadyEnqueuedSubset() {
+        val (first, iterator) = iterateSupersetsOf(setOf(0), setOf(1, 2, 3))
+        assertEquals(setOf(0, 1), first)
+        assertEquals(setOf(0, 2), iterator.next(true))
+        assertEquals(setOf(0, 3), iterator.next(true))
+        assertEquals(setOf(0, 1, 2), iterator.next(false))
+        assertEquals(null, iterator.next(true)) // ERROR
+        // TODO: Creo que es necesario que la cola tenga conjuntos de elementos descartados
+    }
 }
