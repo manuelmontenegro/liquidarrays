@@ -14,6 +14,9 @@ class TokenSExp(line: Int, column: Int, val value: String): SExp(line, column) {
     override fun toString(): String =
         if (value.contains(Regex("\\s"))) "\"$value\"" else value
 
+    override fun hashCode(): Int {
+        return value.hashCode()
+    }
 
 }
 
@@ -26,6 +29,10 @@ class ParenSExp(line: Int, column: Int, val children: List<SExp>): SExp(line, co
 
     override fun toString(): String {
         return "(${children.joinToString(" ")})"
+    }
+
+    override fun hashCode(): Int {
+        return children.hashCode()
     }
 }
 
@@ -69,7 +76,7 @@ fun getSExps(tokens: List<Token>): List<SExp> {
 
 fun getSExps(reader: Reader): List<SExp> = getSExps(readTokens(reader))
 
-fun getSExps(string: String): List<SExp> = getSExps(readTokens(StringReader(string)))
+fun getSExps(string: String): List<SExp> = getSExps(StringReader(string))
 
 class UnexpectedRightParenException(val line: Int, val column: Int) : Exception("Unexpected ')': line $line, column $column")
 class UnmatchedLeftParenException(val line: Int, val column: Int) : Exception("Unmatched '(': line $line, column $column")
