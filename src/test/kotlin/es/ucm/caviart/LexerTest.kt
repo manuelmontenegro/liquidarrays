@@ -80,7 +80,7 @@ class LexerTest {
 
     @Test fun QuotesAfterToken() {
         try {
-            val tokens = readTokens(StringReader("(d\"hello other\" guy)"))
+            readTokens(StringReader("(d\"hello other\" guy)"))
             fail("No quote allowed after literal token")
         } catch (e : UnexpectedQuoteException) {
             assertEquals(1, e.line)
