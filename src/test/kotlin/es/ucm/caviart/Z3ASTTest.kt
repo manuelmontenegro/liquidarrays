@@ -17,19 +17,19 @@ class Z3ASTTest {
     val ctx = Context()
 
     @Test fun intTypeToAST() {
-        assertTrue(Type("int").toZ3Sort(ctx) is IntSort)
+        assertTrue(HMType("int").toZ3Sort(ctx) is IntSort)
     }
 
     @Test fun arrayTypeToAST() {
-        assertEquals("(Array Int Int)", Type("array", listOf(Type("int"))).toZ3Sort(ctx).sExpr)
+        assertEquals("(Array Int Int)", HMType("array", listOf(HMType("int"))).toZ3Sort(ctx).sExpr)
     }
 
     @Test fun varTypeToAST() {
-        assertEquals("a", Type("'a").toZ3Sort(ctx).sExpr)
+        assertEquals("a", HMType("'a").toZ3Sort(ctx).sExpr)
     }
 
     @Test fun literalToAST() {
-        val ast = Literal("5", Type("int")).toZ3Expr(ctx, mapOf(), mapOf(), mapOf())
+        val ast = Literal("5", HMType("int")).toZ3Expr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(ast.astKind == Z3_ast_kind.Z3_NUMERAL_AST, "5 must be a Z3 literal")
         assertEquals("5", ast.sExpr)
     }
@@ -42,7 +42,7 @@ class Z3ASTTest {
     }
 
     @Test fun sumToAST() {
-        val sum = FunctionApplication("+", listOf(Literal("1", Type("int")), Variable("x")))
+        val sum = FunctionApplication("+", listOf(Literal("1", HMType("int")), Variable("x")))
         val ast = sum.toZ3Expr(
                 ctx,
                 symbolMap = mapOf("x" to ctx.mkSymbol("x")),
@@ -53,7 +53,7 @@ class Z3ASTTest {
     }
 
     @Test fun functionApplicationToAST() {
-        val funApp = FunctionApplication("f", listOf(Literal("5", Type("int")), Variable("x")))
+        val funApp = FunctionApplication("f", listOf(Literal("5", HMType("int")), Variable("x")))
         val arraySort = ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort())
         val ast = funApp.toZ3Expr(
                 ctx,
@@ -67,7 +67,7 @@ class Z3ASTTest {
     }
 
     @Test fun constructorApplicationToAST() {
-        val consApp = ConstructorApplication("c", listOf(Literal("1", Type("int")), Literal("false", Type("bool"))))
+        val consApp = ConstructorApplication("c", listOf(Literal("1", HMType("int")), Literal("false", HMType("bool"))))
         val constrDecl = ctx.mkFuncDecl("c", arrayOf(ctx.mkIntSort(), ctx.mkBoolSort()), ctx.mkUninterpretedSort("C"))
         val ast = consApp.toZ3Expr(ctx,
                 symbolMap = mapOf(),
@@ -88,99 +88,99 @@ class Z3ASTTest {
     }
 
     @Test fun lessOrEqualThanAST() {
-        val ast = PredicateApplication("<=", listOf(Literal("5", Type("int")), Literal("2", Type("int"))))
+        val ast = PredicateApplication("<=", listOf(Literal("5", HMType("int")), Literal("2", HMType("int"))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isLE, "(<= 5 2) is a <= expression")
         assertEquals("(<= 5 2)", z3.sExpr)
     }
 
     @Test fun lessThanAST() {
-        val ast = PredicateApplication("<", listOf(Literal("1", Type("int")), Variable("x")))
+        val ast = PredicateApplication("<", listOf(Literal("1", HMType("int")), Variable("x")))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf("x" to ctx.mkSymbol("x")), mapOf(), mapOf("x" to ctx.mkIntSort()))
         assertTrue(z3.isLT, "(< 1 x) is a < expression")
         assertEquals("(< 1 x)", z3.sExpr)
     }
 
     @Test fun greaterThanAST() {
-        val ast = PredicateApplication(">", listOf(Variable("x"), Literal("2", Type("int"))))
+        val ast = PredicateApplication(">", listOf(Variable("x"), Literal("2", HMType("int"))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf("x" to ctx.mkSymbol("x")), mapOf(), mapOf("x" to ctx.mkIntSort()))
         assertTrue(z3.isGT, "(> x 2) is a > expression")
         assertEquals("(> x 2)", z3.sExpr)
     }
 
     @Test fun greaterOrEqualThanAST() {
-        val ast = PredicateApplication(">=", listOf(Literal("5", Type("int")), Literal("2", Type("int"))))
+        val ast = PredicateApplication(">=", listOf(Literal("5", HMType("int")), Literal("2", HMType("int"))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isGE, "(>= 5 2) is a >= expression")
         assertEquals("(>= 5 2)", z3.sExpr)
     }
 
     @Test fun equalToAST() {
-        val ast = PredicateApplication("=", listOf(Literal("1", Type("int")), Literal("2", Type("int"))))
+        val ast = PredicateApplication("=", listOf(Literal("1", HMType("int")), Literal("2", HMType("int"))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isEq, "(= 1 2) is a = expression")
         assertEquals("(= 1 2)", z3.sExpr)
     }
 
     @Test fun notEqualToAST() {
-        val ast = PredicateApplication("!=", listOf(Literal("1", Type("int")), Literal("2", Type("int"))))
+        val ast = PredicateApplication("!=", listOf(Literal("1", HMType("int")), Literal("2", HMType("int"))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isNot, "(!= 1 2) is a not expression")
         assertEquals("(not (= 1 2))", z3.sExpr)
     }
 
     @Test fun andAST() {
-        val ast1 = PredicateApplication("<", listOf(Literal("1", Type("int")), Literal("2", Type("int"))))
-        val ast2 = PredicateApplication("<", listOf(Literal("3", Type("int")), Literal("5", Type("int"))))
-        val ast3 = PredicateApplication("<", listOf(Literal("5", Type("int")), Literal("7", Type("int"))))
+        val ast1 = PredicateApplication("<", listOf(Literal("1", HMType("int")), Literal("2", HMType("int"))))
+        val ast2 = PredicateApplication("<", listOf(Literal("3", HMType("int")), Literal("5", HMType("int"))))
+        val ast3 = PredicateApplication("<", listOf(Literal("5", HMType("int")), Literal("7", HMType("int"))))
         val z3 = And(ast1, ast2, ast3).toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isAnd, "(and (< 1 2) (< 3 5) (< 5 7)) is an and expression")
         assertEquals("(and (< 1 2) (< 3 5) (< 5 7))", z3.sExpr)
     }
 
     @Test fun orAST() {
-        val ast1 = PredicateApplication("<", listOf(Literal("1", Type("int")), Literal("2", Type("int"))))
-        val ast2 = PredicateApplication("<", listOf(Literal("3", Type("int")), Literal("5", Type("int"))))
-        val ast3 = PredicateApplication("<", listOf(Literal("5", Type("int")), Literal("7", Type("int"))))
+        val ast1 = PredicateApplication("<", listOf(Literal("1", HMType("int")), Literal("2", HMType("int"))))
+        val ast2 = PredicateApplication("<", listOf(Literal("3", HMType("int")), Literal("5", HMType("int"))))
+        val ast3 = PredicateApplication("<", listOf(Literal("5", HMType("int")), Literal("7", HMType("int"))))
         val z3 = Or(ast1, ast2, ast3).toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isOr, "(or (< 1 2) (< 3 5) (< 5 7)) is an or expression")
         assertEquals("(or (< 1 2) (< 3 5) (< 5 7))", z3.sExpr)
     }
 
     @Test fun notAST() {
-        val ast1 = PredicateApplication("<", listOf(Literal("1", Type("int")), Literal("2", Type("int"))))
+        val ast1 = PredicateApplication("<", listOf(Literal("1", HMType("int")), Literal("2", HMType("int"))))
         val z3 = Not(ast1).toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isNot, "(not (< 1 2)) is a not expression")
         assertEquals("(not (< 1 2))", z3.sExpr)
     }
 
     @Test fun impliesAST() {
-        val ast1 = PredicateApplication("<", listOf(Literal("1", Type("int")), Literal("2", Type("int"))))
-        val ast2 = PredicateApplication("<", listOf(Literal("3", Type("int")), Literal("5", Type("int"))))
-        val ast3 = PredicateApplication("<", listOf(Literal("5", Type("int")), Literal("7", Type("int"))))
+        val ast1 = PredicateApplication("<", listOf(Literal("1", HMType("int")), Literal("2", HMType("int"))))
+        val ast2 = PredicateApplication("<", listOf(Literal("3", HMType("int")), Literal("5", HMType("int"))))
+        val ast3 = PredicateApplication("<", listOf(Literal("5", HMType("int")), Literal("7", HMType("int"))))
         val z3 = Implication(listOf(ast1, ast2, ast3)).toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isImplies, "(-> (< 1 2) (< 3 5) (< 5 7)) is a not expression")
         assertEquals("(=> (< 1 2) (=> (< 3 5) (< 5 7)))", z3.sExpr)
     }
 
     @Test fun iffAST() {
-        val ast1 = PredicateApplication("<", listOf(Literal("1", Type("int")), Literal("2", Type("int"))))
-        val ast2 = PredicateApplication("<", listOf(Literal("3", Type("int")), Literal("5", Type("int"))))
-        val ast3 = PredicateApplication("<", listOf(Literal("5", Type("int")), Literal("7", Type("int"))))
+        val ast1 = PredicateApplication("<", listOf(Literal("1", HMType("int")), Literal("2", HMType("int"))))
+        val ast2 = PredicateApplication("<", listOf(Literal("3", HMType("int")), Literal("5", HMType("int"))))
+        val ast3 = PredicateApplication("<", listOf(Literal("5", HMType("int")), Literal("7", HMType("int"))))
         val z3 = Iff(listOf(ast1, ast2, ast3)).toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isIff, "(<-> (< 1 2) (< 3 5) (< 5 7)) is a not expression")
         assertEquals("(= (= (< 1 2) (< 3 5)) (< 5 7))", z3.sExpr)
     }
 
     @Test fun forAllAST() {
-        val ast = ForAll("x", Type("int"), PredicateApplication(">=", listOf(Variable("x"), Literal("0", Type("int")))))
+        val ast = ForAll("x", HMType("int"), PredicateApplication(">=", listOf(Variable("x"), Literal("0", HMType("int")))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isQuantifier, "(forall ((x int)) (>= x 0)) is a quantified expression")
         assertEquals("(forall ((x Int)) (>= x 0))", z3.sExpr)
     }
 
     @Test fun existsAST() {
-        val ast = Exists("x", Type("int"), PredicateApplication(">=", listOf(Variable("x"), Literal("0", Type("int")))))
+        val ast = Exists("x", HMType("int"), PredicateApplication(">=", listOf(Variable("x"), Literal("0", HMType("int")))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isQuantifier, "(exists ((x int)) (>= x 0)) is a quantified expression")
         assertEquals("(exists ((x Int)) (>= x 0))", z3.sExpr)
@@ -190,9 +190,9 @@ class Z3ASTTest {
         val symbolMap = mapOf("n" to ctx.mkSymbol("n"), "a" to ctx.mkSymbol("a"))
         val typeEnvironment = mapOf("n" to ctx.mkIntSort(), "a" to ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort()))
 
-        val ord1 = ForAll(listOf(TypedVar("j1", Type("int")), TypedVar("j2", Type("int"))), Implication(
+        val ord1 = ForAll(listOf(TypedVar("j1", HMType("int")), TypedVar("j2", HMType("int"))), Implication(
                 And(
-                        PredicateApplication("<=", listOf(Literal("0", Type("int")), Variable("j1"))),
+                        PredicateApplication("<=", listOf(Literal("0", HMType("int")), Variable("j1"))),
                         PredicateApplication("<=", listOf(Variable("j1"), Variable("j2"))),
                         PredicateApplication("<", listOf(Variable("j2"), Variable("n")))
                 ),
@@ -203,13 +203,13 @@ class Z3ASTTest {
         )).toZ3BoolExpr(ctx, symbolMap, mapOf(), typeEnvironment)
 
         val ord2 = PredicateApplication("<=", listOf(
-                FunctionApplication("get-array", listOf(Variable("a"), FunctionApplication("-", listOf(Variable("n"), Literal("1", Type("int")))))),
+                FunctionApplication("get-array", listOf(Variable("a"), FunctionApplication("-", listOf(Variable("n"), Literal("1", HMType("int")))))),
                 FunctionApplication("get-array", listOf(Variable("a"), Variable("n")))
         )).toZ3BoolExpr(ctx, symbolMap, mapOf(), typeEnvironment)
 
-        val ord3 = Not(ForAll(listOf(TypedVar("j3", Type("int")), TypedVar("j4", Type("int"))), Implication(
+        val ord3 = Not(ForAll(listOf(TypedVar("j3", HMType("int")), TypedVar("j4", HMType("int"))), Implication(
                 And(
-                        PredicateApplication("<=", listOf(Literal("0", Type("int")), Variable("j3"))),
+                        PredicateApplication("<=", listOf(Literal("0", HMType("int")), Variable("j3"))),
                         PredicateApplication("<=", listOf(Variable("j3"), Variable("j4"))),
                         PredicateApplication("<=", listOf(Variable("j4"), Variable("n")))
                 ),

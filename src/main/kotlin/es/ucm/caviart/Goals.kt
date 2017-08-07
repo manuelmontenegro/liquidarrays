@@ -14,7 +14,7 @@ val debug = true
 class Goal(val name: String,
            assumptions: List<Assertion>,
            conclusion: Assertion,
-           environment: Map<String, Type>,
+           environment: Map<String, HMType>,
            val kappas: Map<String, Kappa>,
            val mus: Map<String, Mu>,
            declarationMap: Map<String, UninterpretedFunctionType>) {

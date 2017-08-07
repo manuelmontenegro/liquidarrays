@@ -16,13 +16,13 @@ var ASTElem.secondaryProp: String by ASTDelegate()
 
 class ASTTest {
     @Test fun addAndRemoveProperty() {
-        val l = Literal("5", Type("int"))
+        val l = Literal("5", HMType("int"))
         l.testProp = 3
         assertEquals(3, l.testProp)
     }
 
     @Test fun initiallyEmpty() {
-        val l = Literal("5", Type("int"))
+        val l = Literal("5", HMType("int"))
         assertFailsWith(PropertyNotFoundException::class) {
             val x = l.testProp
             println(x)

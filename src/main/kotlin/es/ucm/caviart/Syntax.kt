@@ -20,16 +20,21 @@ import kotlin.reflect.KProperty
  */
 abstract class ASTElem(val properties: MutableMap<String, Any?> = mutableMapOf())
 
-data class Type(val typeConstructor: String,
-                val arguments: List<Type> = listOf()) : ASTElem()
+data class HMType(val typeConstructor: String,
+                  val arguments: List<HMType> = listOf()) : Type()
 
-data class UninterpretedFunctionType(val argumentTypes: List<Type>, val resultType: Type) : ASTElem()
+data class QualType(val nu: String, val HMType: HMType, val qualifier: Assertion) : Type()
+
+abstract class Type : ASTElem()
+
+
+data class UninterpretedFunctionType(val argumentTypes: List<HMType>, val resultType: HMType) : ASTElem()
 
 
 abstract class Atomic : BindingExpression()
 
 data class Literal(val value: String,
-                   val type: Type) : Atomic()
+                   val type: HMType) : Atomic()
 
 data class Variable(val name: String) : Atomic()
 
@@ -50,7 +55,7 @@ abstract class Term : ASTElem()
 data class Let(val bindings: List<TypedVar>,
                val bindingExpression: BindingExpression,
                val mainExpression: Term) : Term() {
-    constructor(variable: String, type: Type, bindingExpression: BindingExpression, mainExpression: Term)
+    constructor(variable: String, type: HMType, bindingExpression: BindingExpression, mainExpression: Term)
             : this(listOf(TypedVar(variable, type)), bindingExpression, mainExpression)
 }
 
@@ -67,7 +72,6 @@ data class CaseBranch(val constructorName: String,
                           val expression: Term) : ASTElem()
 
 data class TypedVar(val varName: String, val type: Type) : ASTElem()
-
 
 data class FunctionDefinition(val name: String,
                               val inputParams: List<TypedVar>,
@@ -106,20 +110,20 @@ data class Iff(val operands: List<Assertion>) : Assertion() {
 
 data class ForAll(val boundVars: List<TypedVar>,
                   val assertion: Assertion) : Assertion() {
-    constructor(varName: String, type: Type, assertion: Assertion)
+    constructor(varName: String, type: HMType, assertion: Assertion)
             : this(listOf(TypedVar(varName, type)), assertion)
 }
 
 data class Exists(val boundVars: List<TypedVar>,
                   val assertion: Assertion) : Assertion() {
-    constructor(varName: String, type: Type, assertion: Assertion)
+    constructor(varName: String, type: HMType, assertion: Assertion)
             : this(listOf(TypedVar(varName, type)), assertion)
 }
 
 data class LetAssertion(val bindings: List<TypedVar>,
                         val boundTerm: Term,
                         val mainAssertion: Assertion) : Assertion() {
-    constructor(varName: String, type: Type, boundTerm: Term, mainAssertion: Assertion)
+    constructor(varName: String, type: HMType, boundTerm: Term, mainAssertion: Assertion)
             : this(listOf(TypedVar(varName, type)), boundTerm, mainAssertion)
 }
 

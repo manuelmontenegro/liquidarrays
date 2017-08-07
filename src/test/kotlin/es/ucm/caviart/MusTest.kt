@@ -12,16 +12,16 @@ class MusTest {
     val G1 = Goal(
             "G1",
             listOf(
-                    PredicateApplication(">=", listOf(Variable("n"), Literal("0", Type("int")))),
+                    PredicateApplication(">=", listOf(Variable("n"), Literal("0", HMType("int")))),
                     PredicateApplication("mu1", listOf(Variable("a"), Variable("n"))),
-                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("n"))), Literal("0", Type("int"))))
+                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("n"))), Literal("0", HMType("int"))))
             ),
-            PredicateApplication("mu1", listOf(Variable("a"), FunctionApplication("+", listOf(Variable("n"), Literal("1", Type("int")))))),
-            mapOf("a" to Type("array", listOf(Type("int"))), "n" to Type("int")),
+            PredicateApplication("mu1", listOf(Variable("a"), FunctionApplication("+", listOf(Variable("n"), Literal("1", HMType("int")))))),
+            mapOf("a" to HMType("array", listOf(HMType("int"))), "n" to HMType("int")),
             mapOf(),
             mapOf(
                     "mu1" to Mu("mu1",
-                            listOf(TypedVar("nu", Type("array", listOf(Type("int")))), TypedVar("m", Type("int"))),
+                            listOf(TypedVar("nu", HMType("array", listOf(HMType("int")))), TypedVar("m", HMType("int"))),
                             "j1", "j2",
                             listOf(
                                     PredicateApplication("<", listOf(Variable("j1"), Variable("m"))),
@@ -29,30 +29,30 @@ class MusTest {
                                     PredicateApplication(">", listOf(Variable("j1"), Variable("m")))
                             ),
                             listOf(
-                                    QEStarElement(PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", Type("int")))), listOf(Pair("nu", Type("int")))),
-                                    QEStarElement(PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Variable("m"))), listOf(Pair("nu", Type("int"))))
+                                    QEStarElement(PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", HMType("int")))), listOf(Pair("nu", HMType("int")))),
+                                    QEStarElement(PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Variable("m"))), listOf(Pair("nu", HMType("int"))))
                             ),
                             listOf(),
                             listOf(),
                             listOf()
                     )
             ),
-            mapOf("mu1" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int"))), Type("int")), Type("bool")))
+            mapOf("mu1" to UninterpretedFunctionType(listOf(HMType("array", listOf(HMType("int"))), HMType("int")), HMType("bool")))
     )
 
     val G2 = Goal(
             "G2",
             listOf(
-                    PredicateApplication(">", listOf(Variable("n"), Literal("0", Type("int")))),
+                    PredicateApplication(">", listOf(Variable("n"), Literal("0", HMType("int")))),
                     PredicateApplication("mu1", listOf(Variable("a"), Variable("n"))),
-                    PredicateApplication("<=", listOf(FunctionApplication("get-array", listOf(Variable("a"), FunctionApplication("-", listOf(Variable("n"), Literal("1", Type("int")))))), FunctionApplication("get-array", listOf(Variable("a"), Variable("n")))))
+                    PredicateApplication("<=", listOf(FunctionApplication("get-array", listOf(Variable("a"), FunctionApplication("-", listOf(Variable("n"), Literal("1", HMType("int")))))), FunctionApplication("get-array", listOf(Variable("a"), Variable("n")))))
             ),
-            PredicateApplication("mu1", listOf(Variable("a"), FunctionApplication("+", listOf(Variable("n"), Literal("1", Type("int")))))),
-            mapOf("a" to Type("array", listOf(Type("int"))), "n" to Type("int")),
+            PredicateApplication("mu1", listOf(Variable("a"), FunctionApplication("+", listOf(Variable("n"), Literal("1", HMType("int")))))),
+            mapOf("a" to HMType("array", listOf(HMType("int"))), "n" to HMType("int")),
             mapOf(),
             mapOf("mu1" to Mu(
                     "mu1",
-                    listOf(TypedVar("nu", Type("array", listOf(Type("int")))), TypedVar("n", Type("int"))),
+                    listOf(TypedVar("nu", HMType("array", listOf(HMType("int")))), TypedVar("n", HMType("int"))),
                     "j1",
                     "j2",
                     listOf(),
@@ -61,17 +61,17 @@ class MusTest {
                     listOf(
                             QEEStarElement(
                                     PredicateApplication("<=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), FunctionApplication("get-array", listOf(Variable("nu"), Variable("j2"))))),
-                                    listOf(Pair("nu", Type("int"))),
-                                    listOf(Pair("nu", Type("int")))
+                                    listOf(Pair("nu", HMType("int"))),
+                                    listOf(Pair("nu", HMType("int")))
                             ),
                             QEEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", Type("int")))),
-                                    listOf(Pair("nu", Type("int"))),
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", HMType("int")))),
+                                    listOf(Pair("nu", HMType("int"))),
                                     listOf()
                             )),
                     listOf()
             )),
-            mapOf("mu1" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int"))), Type("int")), Type("bool")))
+            mapOf("mu1" to UninterpretedFunctionType(listOf(HMType("array", listOf(HMType("int"))), HMType("int")), HMType("bool")))
     )
 
     val G3 = Goal(
@@ -79,19 +79,19 @@ class MusTest {
             listOf(
                     PredicateApplication("mu1", listOf(Variable("a"), Variable("m")))
             ),
-            ForAll(listOf(TypedVar("j1", Type("int")), TypedVar("j2", Type("int"))),
+            ForAll(listOf(TypedVar("j1", HMType("int")), TypedVar("j2", HMType("int"))),
                     Implication(listOf(
-                            PredicateApplication("<=", listOf(Literal("0", Type("int")), Variable("j1"))),
+                            PredicateApplication("<=", listOf(Literal("0", HMType("int")), Variable("j1"))),
                             PredicateApplication("<=", listOf(Variable("j1"), Variable("j2"))),
                             PredicateApplication("<", listOf(Variable("j2"), FunctionApplication("len", listOf(Variable("a"))))),
                             PredicateApplication("<=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("j1"))), FunctionApplication("get-array", listOf(Variable("a"), Variable("j2")))))
                     ))
             ),
-            mapOf("a" to Type("array", listOf(Type("int"))), "m" to Type("int")),
+            mapOf("a" to HMType("array", listOf(HMType("int"))), "m" to HMType("int")),
             mapOf(),
             mapOf("mu1" to Mu(
                     "mu1",
-                    listOf(TypedVar("nu", Type("array", listOf(Type("int")))), TypedVar("m", Type("int"))),
+                    listOf(TypedVar("nu", HMType("array", listOf(HMType("int")))), TypedVar("m", HMType("int"))),
                     "j1", "j2",
                     listOf(
                             PredicateApplication("<=", listOf(Variable("j1"), Variable("m"))),
@@ -99,52 +99,52 @@ class MusTest {
                     ),
                     listOf(
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", Type("int")))),
-                                    listOf(Pair("nu", Type("int")))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", HMType("int")))),
+                                    listOf(Pair("nu", HMType("int")))
                             ),
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("1", Type("int")))),
-                                    listOf(Pair("nu", Type("int")))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("1", HMType("int")))),
+                                    listOf(Pair("nu", HMType("int")))
                             )
                     ),
                     listOf(),
                     listOf(),
                     listOf()
             )),
-            mapOf("len" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int")))), Type("int")),
-                    "mu1" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int"))), Type("int")), Type("bool")))
+            mapOf("len" to UninterpretedFunctionType(listOf(HMType("array", listOf(HMType("int")))), HMType("int")),
+                    "mu1" to UninterpretedFunctionType(listOf(HMType("array", listOf(HMType("int"))), HMType("int")), HMType("bool")))
     )
 
     val assumptionsG4 = listOf(
-            PredicateApplication(">=", listOf(Variable("n"), Literal("0", Type("int")))),
+            PredicateApplication(">=", listOf(Variable("n"), Literal("0", HMType("int")))),
             PredicateApplication("<", listOf(Variable("n"), FunctionApplication("len", listOf(Variable("a"))))),
-            ForAll("i", Type("int"), Implication(listOf(
-                    PredicateApplication("<=", listOf(Literal("0", Type("int")), Variable("i"))),
+            ForAll("i", HMType("int"), Implication(listOf(
+                    PredicateApplication("<=", listOf(Literal("0", HMType("int")), Variable("i"))),
                     PredicateApplication("<=", listOf(Variable("i"), Variable("n"))),
-                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("i"))), Literal("0", Type("int"))))
+                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("i"))), Literal("0", HMType("int"))))
             )))
     )
     val conclusionG4 = PredicateApplication("mu1", listOf(Variable("a"), Variable("n")))
-    val environmentG4 = mapOf("n" to Type("int"), "a" to Type("array", listOf(Type("int"))))
-    val declarationMapG4 = mapOf("len" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int")))), Type("int")),
-            "mu1" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int"))), Type("int")), Type("bool")))
+    val environmentG4 = mapOf("n" to HMType("int"), "a" to HMType("array", listOf(HMType("int"))))
+    val declarationMapG4 = mapOf("len" to UninterpretedFunctionType(listOf(HMType("array", listOf(HMType("int")))), HMType("int")),
+            "mu1" to UninterpretedFunctionType(listOf(HMType("array", listOf(HMType("int"))), HMType("int")), HMType("bool")))
 
     val G4 = Goal("G4",
             assumptionsG4,
             conclusionG4,
             environmentG4,
             mapOf(),
-            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", Type("array", listOf(Type("int")))), TypedVar("n", Type("int"))),
+            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", HMType("array", listOf(HMType("int")))), TypedVar("n", HMType("int"))),
                     "i", "j",
                     listOf(PredicateApplication("<=", listOf(Variable("i"), Variable("n")))),
                     listOf(
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", Type("int")))),
-                                    listOf("nu" to Type("array", listOf(Type("int"))))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", HMType("int")))),
+                                    listOf("nu" to HMType("array", listOf(HMType("int"))))
                             ),
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", Type("int")))),
-                                    listOf("nu" to Type("array", listOf(Type("int"))))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", HMType("int")))),
+                                    listOf("nu" to HMType("array", listOf(HMType("int"))))
                             )
                     ),
                     listOf(),
@@ -158,7 +158,7 @@ class MusTest {
             conclusionG4,
             environmentG4,
             mapOf(),
-            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", Type("array", listOf(Type("int")))), TypedVar("n", Type("int"))),
+            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", HMType("array", listOf(HMType("int")))), TypedVar("n", HMType("int"))),
                     "i", "j",
                     listOf(
                             PredicateApplication("<=", listOf(Variable("i"), Variable("n"))),
@@ -166,12 +166,12 @@ class MusTest {
                     ),
                     listOf(
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", Type("int")))),
-                                    listOf("nu" to Type("array", listOf(Type("int"))))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", HMType("int")))),
+                                    listOf("nu" to HMType("array", listOf(HMType("int"))))
                             ),
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", Type("int")))),
-                                    listOf("nu" to Type("array", listOf(Type("int"))))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", HMType("int")))),
+                                    listOf("nu" to HMType("array", listOf(HMType("int"))))
                             )
                     ),
                     listOf(),
@@ -265,20 +265,20 @@ class MusTest {
     val auxG6 = { qii: List<Assertion> -> Goal("G6",
             listOf(
                     ForAll(
-                            listOf(TypedVar("i", Type("int")), TypedVar("j", Type("int"))),
+                            listOf(TypedVar("i", HMType("int")), TypedVar("j", HMType("int"))),
                             Implication(
                                     Or(
                                             And(
-                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", Type("int")))),
-                                                    PredicateApplication("=", listOf(Variable("j"), Literal("2", Type("int"))))
+                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", HMType("int")))),
+                                                    PredicateApplication("=", listOf(Variable("j"), Literal("2", HMType("int"))))
                                             ),
                                             And(
-                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", Type("int")))),
-                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", Type("int"))))
+                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", HMType("int")))),
+                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", HMType("int"))))
                                             ),
                                             And(
-                                                    PredicateApplication("=", listOf(Variable("i"), Literal("2", Type("int")))),
-                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", Type("int"))))
+                                                    PredicateApplication("=", listOf(Variable("i"), Literal("2", HMType("int")))),
+                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", HMType("int"))))
                                             ),
                                             PredicateApplication("=", listOf(Variable("i"), Variable("j")))
                                     ),
@@ -290,9 +290,9 @@ class MusTest {
                     )
             ),
             PredicateApplication("mu1", listOf(Variable("a"))),
-            mapOf("a" to Type("array", listOf(Type("int")))),
+            mapOf("a" to HMType("array", listOf(HMType("int")))),
             mapOf(),
-            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", Type("array", listOf(Type("int"))))),
+            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", HMType("array", listOf(HMType("int"))))),
                     "i", "j",
                     listOf(),
                     listOf(),
@@ -303,22 +303,22 @@ class MusTest {
                                             FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))),
                                             FunctionApplication("get-array", listOf(Variable("nu"), Variable("j")))
                                     )),
-                                    listOf(Pair("nu", Type("array", listOf(Type("int"))))),
-                                    listOf(Pair("nu", Type("array", listOf(Type("int")))))
+                                    listOf(Pair("nu", HMType("array", listOf(HMType("int"))))),
+                                    listOf(Pair("nu", HMType("array", listOf(HMType("int")))))
                             ),
                             QEEStarElement(
                                     PredicateApplication("<", listOf(
                                             FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))),
                                             FunctionApplication("get-array", listOf(Variable("nu"), Variable("j")))
                                     )),
-                                    listOf(Pair("nu", Type("array", listOf(Type("int"))))),
-                                    listOf(Pair("nu", Type("array", listOf(Type("int")))))
+                                    listOf(Pair("nu", HMType("array", listOf(HMType("int"))))),
+                                    listOf(Pair("nu", HMType("array", listOf(HMType("int")))))
                             )
                     ),
                     listOf()
             )),
-            mapOf("len" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int")))), Type("int")),
-                    "mu1" to UninterpretedFunctionType(listOf(Type("array", listOf(Type("int")))), Type("bool")))
+            mapOf("len" to UninterpretedFunctionType(listOf(HMType("array", listOf(HMType("int")))), HMType("int")),
+                    "mu1" to UninterpretedFunctionType(listOf(HMType("array", listOf(HMType("int")))), HMType("bool")))
     )}
 
     val G6 = auxG6(listOf(
@@ -326,13 +326,13 @@ class MusTest {
     ))
 
     val G7 = auxG6(listOf(
-            PredicateApplication("<=", listOf(Literal("1", Type("int")), Variable("i"))),
+            PredicateApplication("<=", listOf(Literal("1", HMType("int")), Variable("i"))),
             PredicateApplication("<=", listOf(Variable("i"), Variable("j"))),
-            PredicateApplication("<=", listOf(Variable("j"), Literal("3", Type("int")))),
+            PredicateApplication("<=", listOf(Variable("j"), Literal("3", HMType("int")))),
             PredicateApplication("<", listOf(Variable("i"), Variable("j"))),
             And(
-                    PredicateApplication("<", listOf(Literal("0", Type("int")), Variable("i"))),
-                    PredicateApplication("<", listOf(Variable("j"), Literal("4", Type("int")))),
+                    PredicateApplication("<", listOf(Literal("0", HMType("int")), Variable("i"))),
+                    PredicateApplication("<", listOf(Variable("j"), Literal("4", HMType("int")))),
                     PredicateApplication("<=", listOf(Variable("i"), Variable("j")))
             )
     ))

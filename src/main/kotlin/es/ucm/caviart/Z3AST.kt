@@ -17,23 +17,28 @@ typealias DeclarationMap = Map<String, FuncDecl>
 
 
 
-fun Type.toZ3Sort(ctx: Context): Sort = when (this.typeConstructor) {
-    "int" -> ctx.mkIntSort()
-    "bool" -> ctx.mkBoolSort()
-    "array" -> ctx.mkArraySort(ctx.mkIntSort(), this.arguments[0].toZ3Sort(ctx))
-    else -> if (this.arguments.size == 0 && this.typeConstructor.startsWith("\'")) {
-        ctx.mkUninterpretedSort(this.typeConstructor.substring(1))
-    } else {
-        throw UnsupportedTypeException(this)
+fun Type.toZ3Sort(ctx: Context): Sort = when(this) {
+    is HMType -> when (this.typeConstructor) {
+        "int" -> ctx.mkIntSort()
+        "bool" -> ctx.mkBoolSort()
+        "array" -> ctx.mkArraySort(ctx.mkIntSort(), this.arguments[0].toZ3Sort(ctx))
+        else -> if (this.arguments.size == 0 && this.typeConstructor.startsWith("\'")) {
+            ctx.mkUninterpretedSort(this.typeConstructor.substring(1))
+        } else {
+            throw UnsupportedTypeException(this)
+        }
     }
+    is QualType -> this.HMType.toZ3Sort(ctx)
+    else -> throw UnsupportedTypeException(this)
 }
+
 
 fun Term.toZ3ArithExpr(ctx: Context,
                        symbolMap: SymbolMap,
                        declarationMap: DeclarationMap,
                        typeEnv: TypeEnv): ArithExpr = when (this) {
     is Literal -> when {
-        type == Type("int") -> ctx.mkInt(Integer.parseInt(value))
+        type == HMType("int") -> ctx.mkInt(Integer.parseInt(value))
         else -> throw UnsupportedTypeException(type)
     }
 
@@ -102,8 +107,8 @@ fun Term.toZ3Expr(ctx: Context,
                   typeEnv: TypeEnv): Expr = when (this) {
 
     is Literal -> when (type) {
-        Type("int") -> toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv)
-        Type("bool") -> when (value) {
+        HMType("int") -> toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv)
+        HMType("bool") -> when (value) {
             "true" -> ctx.mkTrue()
             "false" -> ctx.mkFalse()
             else -> throw UnsupportedZ3AST(this)
@@ -257,4 +262,4 @@ class UnsupportedZ3ArrayExpr(term: ASTElem) : RuntimeException("Cannot use as ar
 class UnsupportedTypeException(t: Type) : RuntimeException("Unsupported type $t")
 class UndefinedVariable(name: String) : RuntimeException("Undefined variable $name")
 class UndefinedFunction(name: String) : RuntimeException("Undefined function $name")
-class Z3TypeMismatch(sort: Sort) : RuntimeException("Type mismatch ${sort.sExpr}")
+class Z3TypeMismatch(sort: Sort) : RuntimeException("HMType mismatch ${sort.sExpr}")
