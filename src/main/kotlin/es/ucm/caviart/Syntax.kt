@@ -1,5 +1,6 @@
 package es.ucm.caviart
 
+import com.microsoft.z3.Expr
 import kotlin.reflect.KProperty
 
 /**
@@ -20,8 +21,12 @@ import kotlin.reflect.KProperty
  */
 abstract class ASTElem(val properties: MutableMap<String, Any?> = mutableMapOf())
 
-data class HMType(val typeConstructor: String,
-                  val arguments: List<HMType> = listOf()) : Type()
+data class ConstrType(val typeConstructor: String,
+                  val arguments: List<HMType> = listOf()) : HMType()
+
+data class VarType(val variable: String) : HMType()
+
+abstract class HMType : Type()
 
 data class QualType(val nu: String, val HMType: HMType, val qualifier: Assertion) : Type()
 
@@ -49,14 +54,13 @@ data class ConstructorApplication(val name: String,
                                   val arguments: List<BindingExpression> = listOf()) : BindingExpression()
 
 
-
 abstract class Term : ASTElem()
 
-data class Let(val bindings: List<TypedVar>,
+data class Let(val bindings: List<HMTypedVar>,
                val bindingExpression: BindingExpression,
                val mainExpression: Term) : Term() {
     constructor(variable: String, type: HMType, bindingExpression: BindingExpression, mainExpression: Term)
-            : this(listOf(TypedVar(variable, type)), bindingExpression, mainExpression)
+            : this(listOf(HMTypedVar(variable, type)), bindingExpression, mainExpression)
 }
 
 data class LetFun(val defs: List<FunctionDefinition>,
@@ -64,14 +68,24 @@ data class LetFun(val defs: List<FunctionDefinition>,
 
 data class Case(val discriminant: Atomic,
                 val branches: List<CaseBranch>,
-                val defaultBranch: CaseBranch? = null) : Term()
+                val defaultBranch: Term? = null) : Term()
 
 
-data class CaseBranch(val constructorName: String,
-                          val constructorVars: List<TypedVar>,
-                          val expression: Term) : ASTElem()
+data class CaseBranch(val pattern: Pattern,
+                      val expression: Term) : ASTElem() {
+    constructor(constructorName: String, constructorVars: List<String>, expression: Term)
+            : this(ConstructorPattern(constructorName, constructorVars), expression)
+}
+
+abstract class Pattern : ASTElem()
+
+data class LiteralPattern(val literal: String) : Pattern()
+data class ConstructorPattern(val constructorName: String, val constructorArgs: List<String>) : Pattern()
+
 
 data class TypedVar(val varName: String, val type: Type) : ASTElem()
+data class HMTypedVar(val varName: String, val HMType: HMType) : ASTElem()
+
 
 data class FunctionDefinition(val name: String,
                               val inputParams: List<TypedVar>,
@@ -108,18 +122,19 @@ data class Iff(val operands: List<Assertion>) : Assertion() {
             : this(listOf(lhs, rhs))
 }
 
-data class ForAll(val boundVars: List<TypedVar>,
+data class ForAll(val boundVars: List<HMTypedVar>,
                   val assertion: Assertion) : Assertion() {
     constructor(varName: String, type: HMType, assertion: Assertion)
-            : this(listOf(TypedVar(varName, type)), assertion)
+            : this(listOf(HMTypedVar(varName, type)), assertion)
 }
 
-data class Exists(val boundVars: List<TypedVar>,
+data class Exists(val boundVars: List<HMTypedVar>,
                   val assertion: Assertion) : Assertion() {
     constructor(varName: String, type: HMType, assertion: Assertion)
-            : this(listOf(TypedVar(varName, type)), assertion)
+            : this(listOf(HMTypedVar(varName, type)), assertion)
 }
 
+/*
 data class LetAssertion(val bindings: List<TypedVar>,
                         val boundTerm: Term,
                         val mainAssertion: Assertion) : Assertion() {
@@ -133,8 +148,36 @@ data class CaseAssertion(val discriminant: Atomic,
 
 
 data class CaseAssertionBranch(val constructorName: String,
-                      val constructorVars: List<TypedVar>,
-                      val assertion: Assertion) : ASTElem()
+                               val constructorVars: List<TypedVar>,
+                               val assertion: Assertion) : ASTElem()
+*/
+
+data class FunctionalType(val input: List<TypedVar>, val output: List<TypedVar>)
+
+data class GenericQualifier(val nu: HMTypedVar, val markers: HMTypedVar, val assertion: Assertion)
+data class GenericSingleQualifier(val nu: HMTypedVar, val boundVar: String, val markers: HMTypedVar, val assertion: Assertion)
+data class GenericDoubleQualifier(val nu: HMTypedVar, val boundVar1: String, val boundVar2: String, val markers: HMTypedVar, val assertion: Assertion)
+
+
+data class SingleQualifier(val boundVar: String, val assertion: Assertion)
+data class DoubleQualifier(val boundVar1: String, val boundVar2: String, val assertion: Assertion)
+
+data class KappaDeclaration(val name: String, val nuVar: HMTypedVar, val parameters: List<HMTypedVar>, val qSet: Set<Assertion>)
+data class MuDeclaration(val name: String, val nuVar: HMTypedVar, val parameters: List<HMTypedVar>,
+                         val qISet: Set<SingleQualifier>, val qESet: Set<SingleQualifier>,
+                         val qIISet: Set<DoubleQualifier>, val qEESet: Set<DoubleQualifier>)
+
+data class VerificationUnit(val name: String,
+                            val external: Map<String, FunctionalType>,
+                            val qset: Set<GenericQualifier>,
+                            val qISet: Set<GenericSingleQualifier>,
+                            val qESet: Set<GenericSingleQualifier>,
+                            val qIISet: Set<GenericDoubleQualifier>,
+                            val qEESet: Set<GenericDoubleQualifier>,
+                            val qLenSet: Set<GenericQualifier>,
+                            val kappaDeclarations: Set<KappaDeclaration>,
+                            val muDeclaration: Set<MuDeclaration>,
+                            val definitions: List<FunctionDefinition>)
 
 
 class ASTDelegate {

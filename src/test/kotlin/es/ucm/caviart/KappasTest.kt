@@ -11,48 +11,48 @@ import kotlin.test.assertTrue
  */
 
 class KappasTest {
-    val kappa1 = Kappa("kappa1", listOf(TypedVar("nu", HMType("int")), TypedVar("n", HMType("int"))), listOf(
-            PredicateApplication("<=", listOf(Literal("0", HMType("int")), Variable("nu"))),
-            PredicateApplication("<=", listOf(Literal("0", HMType("int")), Variable("n"))),
+    val kappa1 = Kappa("kappa1", listOf(TypedVar("nu", ConstrType("int")), TypedVar("n", ConstrType("int"))), listOf(
+            PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("nu"))),
+            PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("n"))),
             PredicateApplication("<", listOf(Variable("nu"), Variable("n"))),
             PredicateApplication("<=", listOf(Variable("nu"), Variable("n"))),
-            PredicateApplication("<", listOf(Literal("0", HMType("int")), Variable("nu"))),
-            PredicateApplication("<", listOf(Literal("1", HMType("int")), Variable("nu")))
+            PredicateApplication("<", listOf(Literal("0", ConstrType("int")), Variable("nu"))),
+            PredicateApplication("<", listOf(Literal("1", ConstrType("int")), Variable("nu")))
             ))
-    val assertion1 = PredicateApplication("<=", listOf(Literal("0", HMType("int")), Variable("x")))
-    val assertion2 = PredicateApplication("=", listOf(Variable("xp"), FunctionApplication("+", listOf(Variable("x"), Literal("1", HMType("int"))))))
+    val assertion1 = PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("x")))
+    val assertion2 = PredicateApplication("=", listOf(Variable("xp"), FunctionApplication("+", listOf(Variable("x"), Literal("1", ConstrType("int"))))))
     val conclusion = PredicateApplication("kappa1", listOf(Variable("xp"), Variable("n")))
-    val conclusion2 = PredicateApplication("<=", listOf(Literal("0", HMType("int")), Variable("xp")))
-    val wrongConclusion = PredicateApplication("<", listOf(Literal("1", HMType("int")), Variable("xp")))
+    val conclusion2 = PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("xp")))
+    val wrongConclusion = PredicateApplication("<", listOf(Literal("1", ConstrType("int")), Variable("xp")))
 
     val G1 = Goal(
             "G1",
             listOf(assertion1, assertion2),
             conclusion,
-            mapOf("x" to HMType("int"), "xp" to HMType("int"), "n" to HMType("int")),
+            mapOf("x" to ConstrType("int"), "xp" to ConstrType("int"), "n" to ConstrType("int")),
             mapOf("kappa1" to kappa1),
             mapOf(),
-            mapOf("kappa1" to UninterpretedFunctionType(listOf(HMType("int"), HMType("int")), HMType("bool")))
+            mapOf("kappa1" to UninterpretedFunctionType(listOf(ConstrType("int"), ConstrType("int")), ConstrType("bool")))
     )
 
     val G2 = Goal(
             "G2",
             listOf(assertion1, assertion2),
             conclusion2,
-            mapOf("x" to HMType("int"), "xp" to HMType("int"), "n" to HMType("int")),
+            mapOf("x" to ConstrType("int"), "xp" to ConstrType("int"), "n" to ConstrType("int")),
             mapOf("kappa1" to kappa1),
             mapOf(),
-            mapOf("kappa1" to UninterpretedFunctionType(listOf(HMType("int"), HMType("int")), HMType("bool")))
+            mapOf("kappa1" to UninterpretedFunctionType(listOf(ConstrType("int"), ConstrType("int")), ConstrType("bool")))
     )
 
     val G3 = Goal(
             "G3",
             listOf(assertion1, assertion2),
             wrongConclusion,
-            mapOf("x" to HMType("int"), "xp" to HMType("int"), "n" to HMType("int")),
+            mapOf("x" to ConstrType("int"), "xp" to ConstrType("int"), "n" to ConstrType("int")),
             mapOf("kappa1" to kappa1),
             mapOf(),
-            mapOf("kappa1" to UninterpretedFunctionType(listOf(HMType("int"), HMType("int")), HMType("bool")))
+            mapOf("kappa1" to UninterpretedFunctionType(listOf(ConstrType("int"), ConstrType("int")), ConstrType("bool")))
     )
 
     @Test fun namedKappasG1() {

@@ -18,7 +18,7 @@ typealias DeclarationMap = Map<String, FuncDecl>
 
 
 fun Type.toZ3Sort(ctx: Context): Sort = when(this) {
-    is HMType -> when (this.typeConstructor) {
+    is ConstrType -> when (this.typeConstructor) {
         "int" -> ctx.mkIntSort()
         "bool" -> ctx.mkBoolSort()
         "array" -> ctx.mkArraySort(ctx.mkIntSort(), this.arguments[0].toZ3Sort(ctx))
@@ -38,7 +38,7 @@ fun Term.toZ3ArithExpr(ctx: Context,
                        declarationMap: DeclarationMap,
                        typeEnv: TypeEnv): ArithExpr = when (this) {
     is Literal -> when {
-        type == HMType("int") -> ctx.mkInt(Integer.parseInt(value))
+        type is ConstrType && type.typeConstructor == "int" -> ctx.mkInt(Integer.parseInt(value))
         else -> throw UnsupportedTypeException(type)
     }
 
@@ -107,8 +107,8 @@ fun Term.toZ3Expr(ctx: Context,
                   typeEnv: TypeEnv): Expr = when (this) {
 
     is Literal -> when (type) {
-        HMType("int") -> toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv)
-        HMType("bool") -> when (value) {
+        ConstrType("int") -> toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv)
+        ConstrType("bool") -> when (value) {
             "true" -> ctx.mkTrue()
             "false" -> ctx.mkFalse()
             else -> throw UnsupportedZ3AST(this)
