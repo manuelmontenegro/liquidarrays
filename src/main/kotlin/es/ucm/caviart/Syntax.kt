@@ -152,20 +152,21 @@ data class CaseAssertionBranch(val constructorName: String,
                                val assertion: Assertion) : ASTElem()
 */
 
-data class FunctionalType(val input: List<TypedVar>, val output: List<TypedVar>)
+data class FunctionalType(val input: List<TypedVar>, val output: List<TypedVar>) : ASTElem()
 
-data class GenericQualifier(val nu: HMTypedVar, val markers: HMTypedVar, val assertion: Assertion)
-data class GenericSingleQualifier(val nu: HMTypedVar, val boundVar: String, val markers: HMTypedVar, val assertion: Assertion)
-data class GenericDoubleQualifier(val nu: HMTypedVar, val boundVar1: String, val boundVar2: String, val markers: HMTypedVar, val assertion: Assertion)
+data class GenericQualifier(val nu: HMTypedVar, val markers: List<HMTypedVar>, val assertion: Assertion) : ASTElem()
+data class GenericSingleQualifier(val nu: HMTypedVar, val boundVar: String, val markers: List<HMTypedVar>, val assertion: Assertion) : ASTElem()
+data class GenericDoubleQualifier(val nu: HMTypedVar, val boundVar1: String, val boundVar2: String, val markers: List<HMTypedVar>, val assertion: Assertion) : ASTElem()
 
 
-data class SingleQualifier(val boundVar: String, val assertion: Assertion)
-data class DoubleQualifier(val boundVar1: String, val boundVar2: String, val assertion: Assertion)
+data class SingleQualifier(val boundVar: String, val assertion: Assertion) : ASTElem()
+data class DoubleQualifier(val boundVar1: String, val boundVar2: String, val assertion: Assertion) : ASTElem()
 
-data class KappaDeclaration(val name: String, val nuVar: HMTypedVar, val parameters: List<HMTypedVar>, val qSet: Set<Assertion>)
+data class KappaDeclaration(val name: String, val nuVar: HMTypedVar, val parameters: List<HMTypedVar>, val qSet: Set<Assertion>?) : ASTElem()
 data class MuDeclaration(val name: String, val nuVar: HMTypedVar, val parameters: List<HMTypedVar>,
-                         val qISet: Set<SingleQualifier>, val qESet: Set<SingleQualifier>,
-                         val qIISet: Set<DoubleQualifier>, val qEESet: Set<DoubleQualifier>)
+                         val qISet: Set<SingleQualifier>?, val qESet: Set<SingleQualifier>?,
+                         val qIISet: Set<DoubleQualifier>?, val qEESet: Set<DoubleQualifier>?,
+                         val qLenSet: Set<Assertion>?) : ASTElem()
 
 data class VerificationUnit(val name: String,
                             val external: Map<String, FunctionalType>,
@@ -176,8 +177,8 @@ data class VerificationUnit(val name: String,
                             val qEESet: Set<GenericDoubleQualifier>,
                             val qLenSet: Set<GenericQualifier>,
                             val kappaDeclarations: Set<KappaDeclaration>,
-                            val muDeclaration: Set<MuDeclaration>,
-                            val definitions: List<FunctionDefinition>)
+                            val muDeclarations: Set<MuDeclaration>,
+                            val definitions: List<FunctionDefinition>) : ASTElem()
 
 
 class ASTDelegate {
