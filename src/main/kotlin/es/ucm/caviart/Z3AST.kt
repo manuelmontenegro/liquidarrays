@@ -157,7 +157,7 @@ private fun buildQuantifier(ctx: Context,
                             symbolMap: SymbolMap,
                             declarationMap: DeclarationMap,
                             typeEnv: TypeEnv,
-                            boundVars: List<TypedVar>,
+                            boundVars: List<HMTypedVar>,
                             body: Assertion,
                             universal: Boolean): Quantifier {
 
@@ -244,9 +244,6 @@ fun Assertion.toZ3BoolExpr(ctx: Context,
 
     is Exists -> buildQuantifier(ctx, symbolMap, declarationMap, typeEnv, boundVars, assertion, false)
 
-    is LetAssertion -> TODO("Let assertions not supported yet")
-
-    is CaseAssertion -> TODO("Case assertions not supported yet")
 
     else -> throw UnsupportedZ3AST(this)
 }
