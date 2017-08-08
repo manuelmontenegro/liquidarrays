@@ -22,15 +22,26 @@ import kotlin.reflect.KProperty
 abstract class ASTElem(val properties: MutableMap<String, Any?> = mutableMapOf())
 
 data class ConstrType(val typeConstructor: String,
-                  val arguments: List<HMType> = listOf()) : HMType()
+                  val arguments: List<HMType> = listOf()) : HMType() {
+    override val hmType: HMType
+        get() = this
+}
 
-data class VarType(val variable: String) : HMType()
+data class VarType(val variable: String) : HMType() {
+    override val hmType: HMType
+        get() = this
+}
 
 abstract class HMType : Type()
 
-data class QualType(val nu: String, val HMType: HMType, val qualifier: Assertion) : Type()
+data class QualType(val nu: String, val HMType: HMType, val qualifier: Assertion) : Type() {
+    override val hmType: HMType
+        get() = HMType
+}
 
-abstract class Type : ASTElem()
+abstract class Type : ASTElem() {
+    abstract val hmType: HMType
+}
 
 
 data class UninterpretedFunctionType(val argumentTypes: List<HMType>, val resultType: HMType) : ASTElem()
@@ -192,7 +203,7 @@ class ASTDelegate {
 }
 
 class PropertyNotFoundException(val property: String) : RuntimeException("Property not found: $property")
-
+class InvalidASTException(elem: ASTElem) : RuntimeException("Invalid AST element: ${elem.toString()}")
 
 
 
