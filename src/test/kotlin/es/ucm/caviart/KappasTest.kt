@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
  */
 
 class KappasTest {
-    val kappa1 = Kappa("kappa1", listOf(TypedVar("nu", ConstrType("int")), TypedVar("n", ConstrType("int"))), listOf(
+    val kappa1 = Kappa("kappa1", listOf(HMTypedVar("nu", ConstrType("int")), HMTypedVar("n", ConstrType("int"))), listOf(
             PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("nu"))),
             PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("n"))),
             PredicateApplication("<", listOf(Variable("nu"), Variable("n"))),

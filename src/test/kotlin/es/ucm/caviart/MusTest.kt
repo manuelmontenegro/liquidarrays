@@ -21,7 +21,7 @@ class MusTest {
             mapOf(),
             mapOf(
                     "mu1" to Mu("mu1",
-                            listOf(TypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), TypedVar("m", ConstrType("int"))),
+                            listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("m", ConstrType("int"))),
                             "j1", "j2",
                             listOf(
                                     PredicateApplication("<", listOf(Variable("j1"), Variable("m"))),
@@ -52,7 +52,7 @@ class MusTest {
             mapOf(),
             mapOf("mu1" to Mu(
                     "mu1",
-                    listOf(TypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), TypedVar("n", ConstrType("int"))),
+                    listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("n", ConstrType("int"))),
                     "j1",
                     "j2",
                     listOf(),
@@ -79,7 +79,7 @@ class MusTest {
             listOf(
                     PredicateApplication("mu1", listOf(Variable("a"), Variable("m")))
             ),
-            ForAll(listOf(TypedVar("j1", ConstrType("int")), TypedVar("j2", ConstrType("int"))),
+            ForAll(listOf(HMTypedVar("j1", ConstrType("int")), HMTypedVar("j2", ConstrType("int"))),
                     Implication(listOf(
                             PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("j1"))),
                             PredicateApplication("<=", listOf(Variable("j1"), Variable("j2"))),
@@ -91,7 +91,7 @@ class MusTest {
             mapOf(),
             mapOf("mu1" to Mu(
                     "mu1",
-                    listOf(TypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), TypedVar("m", ConstrType("int"))),
+                    listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("m", ConstrType("int"))),
                     "j1", "j2",
                     listOf(
                             PredicateApplication("<=", listOf(Variable("j1"), Variable("m"))),
@@ -134,7 +134,7 @@ class MusTest {
             conclusionG4,
             environmentG4,
             mapOf(),
-            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), TypedVar("n", ConstrType("int"))),
+            mapOf("mu1" to Mu("mu1", listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("n", ConstrType("int"))),
                     "i", "j",
                     listOf(PredicateApplication("<=", listOf(Variable("i"), Variable("n")))),
                     listOf(
@@ -158,7 +158,7 @@ class MusTest {
             conclusionG4,
             environmentG4,
             mapOf(),
-            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), TypedVar("n", ConstrType("int"))),
+            mapOf("mu1" to Mu("mu1", listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("n", ConstrType("int"))),
                     "i", "j",
                     listOf(
                             PredicateApplication("<=", listOf(Variable("i"), Variable("n"))),
@@ -265,7 +265,7 @@ class MusTest {
     val auxG6 = { qii: List<Assertion> -> Goal("G6",
             listOf(
                     ForAll(
-                            listOf(TypedVar("i", ConstrType("int")), TypedVar("j", ConstrType("int"))),
+                            listOf(HMTypedVar("i", ConstrType("int")), HMTypedVar("j", ConstrType("int"))),
                             Implication(
                                     Or(
                                             And(
@@ -292,7 +292,7 @@ class MusTest {
             PredicateApplication("mu1", listOf(Variable("a"))),
             mapOf("a" to ConstrType("array", listOf(ConstrType("int")))),
             mapOf(),
-            mapOf("mu1" to Mu("mu1", listOf(TypedVar("nu", ConstrType("array", listOf(ConstrType("int"))))),
+            mapOf("mu1" to Mu("mu1", listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int"))))),
                     "i", "j",
                     listOf(),
                     listOf(),

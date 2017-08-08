@@ -4,10 +4,10 @@ package es.ucm.caviart
  * Created by manuel on 14/06/17.
  */
 
-data class Kappa(val name: String, val arguments: List<TypedVar>, val qStar: List<Assertion>)
+data class Kappa(val name: String, val arguments: List<HMTypedVar>, val qStar: List<Assertion>)
 
 data class Mu(val name: String,
-              val arguments: List<TypedVar>,
+              val arguments: List<HMTypedVar>,
               val boundVar1: String,
               val boundVar2: String,
               val qI: List<Assertion>,

@@ -190,7 +190,7 @@ class Z3ASTTest {
         val symbolMap = mapOf("n" to ctx.mkSymbol("n"), "a" to ctx.mkSymbol("a"))
         val typeEnvironment = mapOf("n" to ctx.mkIntSort(), "a" to ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort()))
 
-        val ord1 = ForAll(listOf(TypedVar("j1", ConstrType("int")), TypedVar("j2", ConstrType("int"))), Implication(
+        val ord1 = ForAll(listOf(HMTypedVar("j1", ConstrType("int")), HMTypedVar("j2", ConstrType("int"))), Implication(
                 And(
                         PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("j1"))),
                         PredicateApplication("<=", listOf(Variable("j1"), Variable("j2"))),
@@ -207,7 +207,7 @@ class Z3ASTTest {
                 FunctionApplication("get-array", listOf(Variable("a"), Variable("n")))
         )).toZ3BoolExpr(ctx, symbolMap, mapOf(), typeEnvironment)
 
-        val ord3 = Not(ForAll(listOf(TypedVar("j3", ConstrType("int")), TypedVar("j4", ConstrType("int"))), Implication(
+        val ord3 = Not(ForAll(listOf(HMTypedVar("j3", ConstrType("int")), HMTypedVar("j4", ConstrType("int"))), Implication(
                 And(
                         PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("j3"))),
                         PredicateApplication("<=", listOf(Variable("j3"), Variable("j4"))),

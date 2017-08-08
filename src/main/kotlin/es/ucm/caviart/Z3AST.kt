@@ -161,7 +161,7 @@ private fun buildQuantifier(ctx: Context,
                             body: Assertion,
                             universal: Boolean): Quantifier {
 
-    val sorts = boundVars.map { it.type.toZ3Sort(ctx) }
+    val sorts = boundVars.map { it.HMType.toZ3Sort(ctx) }
     val varNames = boundVars.map { it.varName }
     val symbols = varNames.map { ctx.mkSymbol(it) }
 

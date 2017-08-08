@@ -51,7 +51,7 @@ class Goal(val name: String,
         rhsKappa = if (conclusion is PredicateApplication && conclusion.name in kappaNames) conclusion.name else null
         rhsMu = if (conclusion is PredicateApplication && conclusion.name in muNames) conclusion.name else null
         kappaQualifiers = kappas.mapValues { (_, kappa) ->
-            val environment = kappa.arguments.map { it.varName to it.type.toZ3Sort(ctx) }.toMap()
+            val environment = kappa.arguments.map { it.varName to it.HMType.toZ3Sort(ctx) }.toMap()
             val symbolMap = kappa.arguments.map { it.varName to ctx.mkSymbol(it.varName) }.toMap()
 
             kappa.qStar.map { it.toZ3BoolExpr(ctx, symbolMap, z3DeclarationMap, environment) }
@@ -59,7 +59,7 @@ class Goal(val name: String,
         muQualifiers = mus.mapValues { (_, mu) ->
             val boundVar1Symbol = ctx.mkSymbol(mu.boundVar1)
             val boundVar2Symbol = ctx.mkSymbol(mu.boundVar2)
-            val environment = (mu.arguments.map { it.varName to it.type.toZ3Sort(ctx) }
+            val environment = (mu.arguments.map { it.varName to it.HMType.toZ3Sort(ctx) }
                     + listOf(mu.boundVar1 to ctx.mkIntSort(), mu.boundVar2 to ctx.mkIntSort())).toMap()
             val symbolMap = (mu.arguments.map { it.varName to ctx.mkSymbol(it.varName) }
                     + listOf(mu.boundVar1 to boundVar1Symbol, mu.boundVar2 to boundVar2Symbol)).toMap()
@@ -285,9 +285,9 @@ class Goal(val name: String,
     private fun kappaDefinitionToZ3(kappaName: String, solution: Solution): Quantifier {
         val kappa = kappas[kappaName]!!
         val qualifiers = kappaQualifiers[kappaName]!!
-        val symbolSorts = kappa.arguments.map { ctx.mkSymbol(it.varName) to it.type.toZ3Sort(ctx) }
+        val symbolSorts = kappa.arguments.map { ctx.mkSymbol(it.varName) to it.HMType.toZ3Sort(ctx) }
 
-        val z3Equivalence = ctx.mkForall(kappa.arguments.map { ctx.mkConst(it.varName, it.type.toZ3Sort(ctx)) }.toTypedArray(),
+        val z3Equivalence = ctx.mkForall(kappa.arguments.map { ctx.mkConst(it.varName, it.HMType.toZ3Sort(ctx)) }.toTypedArray(),
                 ctx.mkIff(
                         ctx.mkApp(z3DeclarationMap[kappaName],
                                 *symbolSorts.map { (symbol, sort) -> ctx.mkConst(symbol, sort) }.toTypedArray()
@@ -301,7 +301,7 @@ class Goal(val name: String,
     private fun muDefinitionToZ3(muName: String, solution: Solution): Quantifier {
         val mu = mus[muName]!!
 
-        val symbolSorts = mu.arguments.map { ctx.mkSymbol(it.varName) to it.type.toZ3Sort(ctx) }
+        val symbolSorts = mu.arguments.map { ctx.mkSymbol(it.varName) to it.HMType.toZ3Sort(ctx) }
 
         val equivLhs = ctx.mkApp(z3DeclarationMap[muName], *symbolSorts.map { (symbol, sort) -> ctx.mkConst(symbol, sort) }.toTypedArray())
 
@@ -361,7 +361,7 @@ class Goal(val name: String,
         val equivRhs = ctx.mkAnd(*singleAssertions.toTypedArray(), *doubleAssertions.toTypedArray())
 
         val z3Equivalence = ctx.mkForall(
-                mu.arguments.map { ctx.mkConst(it.varName, it.type.toZ3Sort(ctx)) }.toTypedArray(),
+                mu.arguments.map { ctx.mkConst(it.varName, it.HMType.toZ3Sort(ctx)) }.toTypedArray(),
                 ctx.mkIff(equivLhs as BoolExpr, equivRhs),
                 0, null, null, null, null
         )
@@ -384,11 +384,6 @@ class Goal(val name: String,
                 is Iff -> assertion.operands.forEach { traverseAssertion(it) }
                 is ForAll -> traverseAssertion(assertion.assertion)
                 is Exists -> traverseAssertion(assertion.assertion)
-                is LetAssertion -> traverseAssertion(assertion.mainAssertion)
-                is CaseAssertion -> {
-                    assertion.branches.forEach { traverseAssertion(it.assertion) }
-                    assertion.defaultBranch?.let { traverseAssertion(it.assertion) }
-                }
             }
         }
 
