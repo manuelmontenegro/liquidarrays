@@ -19,17 +19,27 @@ private fun toQualType(typedVar: TypedVar, defName: String, scope: MutableList<H
     val result = if (typedVar.type is HMType) {
         if (typedVar.type is ConstrType && typedVar.type.typeConstructor == "array") {
             val name = "_mu_${defName}_${typedVar.varName}"
-            val parameters = scope.toList()
-            val mu = emptyMu(name, HMTypedVar("nu", typedVar.type), parameters)
-            muGenerated.add(mu)
-            QualType("nu", typedVar.type, PredicateApplication(name, listOf(Variable("nu")) + parameters.map { Variable(it.varName) }))
+            val alreadyExisting = muGenerated.find { it.name == name }
+            if (alreadyExisting != null) {
+                QualType(alreadyExisting.nuVar.varName, alreadyExisting.nuVar.HMType, PredicateApplication(alreadyExisting.name, listOf(Variable(alreadyExisting.nuVar.varName)) + alreadyExisting.parameters.map { Variable(it.varName) }))
+            } else {
+                val parameters = scope.toList()
+                val mu = emptyMu(name, HMTypedVar("nu", typedVar.type), parameters)
+                muGenerated.add(mu)
+                QualType("nu", typedVar.type, PredicateApplication(name, listOf(Variable("nu")) + parameters.map { Variable(it.varName) }))
+            }
 
         } else {
             val name = "_kappa_${defName}_${typedVar.varName}"
-            val parameters = scope.toList()
-            val kappa = emptyKappa(name, HMTypedVar("nu", typedVar.type), parameters)
-            kappaGenerated.add(kappa)
-            QualType("nu", typedVar.type, PredicateApplication(name, listOf(Variable("nu")) + parameters.map { Variable(it.varName) }))
+            val alreadyExisting = kappaGenerated.find { it.name == name }
+            if (alreadyExisting != null) {
+                QualType(alreadyExisting.nuVar.varName, alreadyExisting.nuVar.HMType, PredicateApplication(alreadyExisting.name, listOf(Variable(alreadyExisting.nuVar.varName)) + alreadyExisting.parameters.map { Variable(it.varName) }))
+            } else {
+                val parameters = scope.toList()
+                val kappa = emptyKappa(name, HMTypedVar("nu", typedVar.type), parameters)
+                kappaGenerated.add(kappa)
+                QualType("nu", typedVar.type, PredicateApplication(name, listOf(Variable("nu")) + parameters.map { Variable(it.varName) }))
+            }
         }
     } else {
         typedVar.type
@@ -45,11 +55,13 @@ private fun qualifyFunctionDefinition(definition: FunctionDefinition, scope: Mut
         TypedVar(it.varName, result)
     }
 
-    val expression = qualifyExpression(definition.body, scope, externals)
+    val expression = qualifyExpression(definition.body, scope.toMutableList(), externals)
 
-    definition.outputParams.forEach { addToScope(scope, it.varName, it.type.hmType) }
-
-    val results = definition.outputParams.map { TypedVar(it.varName, toQualType(it, definition.name, scope)) }
+    val results = definition.outputParams.map {
+        val result = toQualType(it, definition.name, scope)
+        addToScope(scope, it.varName, it.type.hmType)
+        TypedVar(it.varName, result)
+    }
 
     return definition.copy(inputParams = parameters, outputParams = results, body = expression)
 }
@@ -96,16 +108,16 @@ private fun qualifyExpression(expression: Term, scope: MutableList<HMTypedVar>, 
 }
 
 
-fun qualifyVeriticationUnit(verificationUnit: VerificationUnit, externals: Map<String, FunctionalType>): VerificationUnit {
-    kappaGenerated = mutableSetOf()
-    muGenerated = mutableSetOf()
+fun qualifyVeriticationUnit(verificationUnit: VerificationUnit): VerificationUnit {
+    kappaGenerated = verificationUnit.kappaDeclarations.toMutableSet()
+    muGenerated = verificationUnit.muDeclarations.toMutableSet()
 
 
-    val newDefs = verificationUnit.definitions.map { qualifyFunctionDefinition(it, mutableListOf(), externals) }
+    val newDefs = verificationUnit.definitions.map { qualifyFunctionDefinition(it, mutableListOf(), verificationUnit.external) }
 
     return verificationUnit.copy(
-            kappaDeclarations = verificationUnit.kappaDeclarations + kappaGenerated,
-            muDeclarations = verificationUnit.muDeclarations + muGenerated,
+            kappaDeclarations = kappaGenerated,
+            muDeclarations = muGenerated,
             definitions = newDefs
     )
 }
