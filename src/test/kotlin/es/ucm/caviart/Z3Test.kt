@@ -131,4 +131,17 @@ class Z3Test {
         assertEquals(Status.UNSATISFIABLE, status3, "F3 and F4 must be unsatisfiable")
 
     }
+
+    @Test fun booleans() {
+        val ctx = Context()
+
+        val symb = ctx.mkBoolConst("b")
+        val comparison = ctx.mkLe(ctx.mkInt(0), ctx.mkInt(1))
+
+        val s = ctx.mkSolver()
+        s.add(ctx.mkEq(symb, comparison))
+        s.add(ctx.mkNot(ctx.mkEq(symb, ctx.mkTrue())))
+        val status = s.check()
+        assertEquals(Status.UNSATISFIABLE, status)
+    }
 }

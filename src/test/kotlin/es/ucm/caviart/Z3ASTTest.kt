@@ -231,6 +231,20 @@ class Z3ASTTest {
     }
 
 
+    @Test fun compareBooleans() {
+        val symbolMap = mapOf("b" to ctx.mkSymbol("b"))
+        val typeEnv = mapOf("b" to ctx.mkBoolSort())
+        val b1 = BooleanEquality(BooleanVariable("b"),
+                    PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Literal("1", ConstrType("int"))))
+        )
+        val b2 = PredicateApplication("=", listOf(Variable("b"), Literal("true", ConstrType("bool"))))
+
+        val s = ctx.mkSolver()
+        s.add(b1.toZ3BoolExpr(ctx, symbolMap, mapOf(), typeEnv))
+        s.add(Not(b2).toZ3BoolExpr(ctx, symbolMap, mapOf(), typeEnv))
+
+        assertEquals(Status.UNSATISFIABLE, s.check())
+    }
     /*
     @Test fun mkConstructors() {
         val cons1 = ctx.mkConstructor("ni l", "is-nil", null, null, null)

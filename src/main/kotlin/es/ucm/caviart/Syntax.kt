@@ -111,6 +111,10 @@ class True : Assertion()
 
 class False : Assertion()
 
+data class BooleanVariable(val name: String) : Assertion()
+
+data class BooleanEquality(val assertion1: Assertion, val assertion2: Assertion) : Assertion()
+
 data class PredicateApplication(val name: String,
                                 val arguments: List<BindingExpression> = listOf()) : Assertion()
 
