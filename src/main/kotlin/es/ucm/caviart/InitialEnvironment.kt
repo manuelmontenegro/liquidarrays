@@ -18,7 +18,7 @@ private val logicPredicates = mapOf(
         ">" to listOf(ConstrType("int"), ConstrType("int")),
         "<=" to listOf(ConstrType("int"), ConstrType("int")),
         ">=" to listOf(ConstrType("int"), ConstrType("int")),
-        "=" to listOf(ConstrType("int"), ConstrType("int"))
+        "=" to listOf(VarType("'a"), VarType("'a"))
 )
 
 val initialEnvironment = GlobalEnvironment(

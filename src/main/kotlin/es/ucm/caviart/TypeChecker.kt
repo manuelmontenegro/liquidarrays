@@ -284,60 +284,60 @@ fun checkType(type: Type,
 }
 
 
-class UndefinedConstructorException(line: Int, column: Int, constrName: String) :
+class UndefinedConstructorException(val line: Int, val column: Int, val constrName: String) :
         RuntimeException("In L$line, C$column: Undefined constructor $constrName")
 
-class NumResultsMismatchException(line: Int, column: Int, expected: Int, given: Int) :
+class NumResultsMismatchException(val line: Int, val column: Int, val expected: Int, val given: Int) :
         RuntimeException("In L$line, C$column: Mismatch in number of results (expected: $expected, given: $given)")
 
-class NoInstanceResultsException(line: Int, column: Int, declared: List<HMType>, inferred: List<HMType>) :
+class NoInstanceResultsException(val line: Int, val column: Int, val declared: List<HMType>, val inferred: List<HMType>) :
         RuntimeException("In L$line, C$column: Declared types must be equal or more specific than the inferred ones.\n" +
                 "Declared: ${declared.map { it.toSExp() }.joinToString(" ")}\n" +
                 "Inferred: ${inferred.map { it.toSExp() }.joinToString(" ")}")
 
-class UndefinedVariableException(line: Int, column: Int, variable: String) :
+class UndefinedVariableException(val line: Int, val column: Int, val variable: String) :
         RuntimeException("In L$line, C$column: Undefined variable $variable")
 
-class UndefinedFunctionException(line: Int, column: Int, function: String) :
+class UndefinedFunctionException(val line: Int, val column: Int, val function: String) :
         RuntimeException("In L$line, C$column: Undefined function $function")
 
-class WrongNumberArgumentsException(line: Int, column: Int, function: String, expected: Int, given: Int) :
+class WrongNumberArgumentsException(val line: Int, val column: Int, val function: String, val expected: Int, val given: Int) :
         RuntimeException("In L$line, C$column: wrong number of arguments given to $function\nExpected: $expected\nGiven: $given")
 
-class InputTypeMismatchException(line: Int, column: Int, function: String, expected: List<HMType>, given: List<HMType>) :
+class InputTypeMismatchException(val line: Int, val column: Int, val function: String, val expected: List<HMType>, val given: List<HMType>) :
         RuntimeException("In L$line, C$column: input type parameter mismatch in application of $function\n" +
                 "Expected: ${expected.map { it.toSExp() }.joinToString(" ")}\n" +
                 "Given: ${given.map { it.toSExp() }.joinToString(" ")}")
 
-class LetNumberBindingsMismatchException(line: Int, column: Int, lhs: Int, rhs: Int) :
+class LetNumberBindingsMismatchException(val line: Int, val column: Int, val lhs: Int, val rhs: Int) :
         RuntimeException("In L$line, C$column: number of results of let expression do not match the number of bindings\nLeft: $lhs\nRight: $rhs")
 
-class LetTypeMismatchException(line: Int, column: Int, lhs: List<HMType>, rhs: List<HMType>) :
+class LetTypeMismatchException(val line: Int, val column: Int, val lhs: List<HMType>, val rhs: List<HMType>) :
         RuntimeException("In L$line, C$column: let assignment type mismatch\n" +
                 "Left: ${lhs.map { it.toSExp() }.joinToString(" ")}\n" +
                 "Right: ${rhs.map { it.toSExp() }.joinToString(" ")}")
 
-class MultipleOutputConstructorException(line: Int, column: Int, constrName: String) :
+class MultipleOutputConstructorException(val line: Int, val column: Int, val constrName: String) :
         RuntimeException("In L$line, C$column: multiple-output constructor $constrName")
 
 
-class PatternTypeMismatchException(line: Int, column: Int, typePattern: HMType, typeDiscriminant: HMType) :
+class PatternTypeMismatchException(val line: Int, val column: Int, val typePattern: HMType, val typeDiscriminant: HMType) :
         RuntimeException("In L$line C$column: the type of the pattern is not compatible with the type of the discriminant\n" +
                 "Pattern: ${typePattern.toSExp()}\n" +
                 "Discriminant: ${typeDiscriminant.toSExp()}")
 
-class IncompatibleCaseBranchesException(line: Int, column: Int, branch1Type: List<HMType>, branch2Type: List<HMType>) :
+class IncompatibleCaseBranchesException(val line: Int, val column: Int, val branch1Type: List<HMType>, val branch2Type: List<HMType>) :
         RuntimeException("In L$line, C$column: incompatible case branches\n" +
                 "Branch: ${branch1Type.map { it.toSExp() }.joinToString(" ")}\n" +
                 "against: ${branch2Type.map { it.toSExp() }.joinToString(" ")}")
 
-class DuplicateFunctionDefinition(line: Int, column: Int, name: String) :
+class DuplicateFunctionDefinition(val line: Int, val column: Int, val name: String) :
         RuntimeException("In L$line, C$column: duplicate function name $name\n" +
                 "Function names must be pairwise distinct *even if* they are defined in different scopes")
 
-class WrongPredicateVariableException(line: Int, column: Int, name: String, type: HMType) :
+class WrongPredicateVariableException(val line: Int, val column: Int, val name: String, val type: HMType) :
         RuntimeException("In L$line, C$column: predicate variable $name must be of type bool, but it is ${type.toSExp()}")
 
-class UndefinedPredicateException(line: Int, column: Int, predicate: String) :
+class UndefinedPredicateException(val line: Int, val column: Int, val predicate: String) :
         RuntimeException("In L$line, C$column: Unknown predicate $predicate")
 
