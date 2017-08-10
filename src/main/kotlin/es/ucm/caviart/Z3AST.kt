@@ -17,7 +17,7 @@ typealias DeclarationMap = Map<String, FuncDecl>
 
 
 
-fun Type.toZ3Sort(ctx: Context): Sort = when(this) {
+fun Type.toZ3Sort(ctx: Context): Sort = when (this) {
     is ConstrType -> when (this.typeConstructor) {
         "int" -> ctx.mkIntSort()
         "bool" -> ctx.mkBoolSort()
@@ -89,7 +89,7 @@ fun Term.toZ3ArrayExpr(ctx: Context,
         }
     }
     is FunctionApplication -> {
-        when(name) {
+        when (name) {
             "set-array" -> ctx.mkStore(
                     arguments[0].toZ3ArrayExpr(ctx, symbolMap, declarationMap, typeEnv),
                     arguments[1].toZ3Expr(ctx, symbolMap, declarationMap, typeEnv),
@@ -184,6 +184,15 @@ fun Assertion.toZ3BoolExpr(ctx: Context,
     is False ->
         ctx.mkFalse()
 
+    is BooleanVariable ->
+        ctx.mkBoolConst(name)
+
+    is BooleanEquality ->
+        ctx.mkEq(
+                assertion1.toZ3BoolExpr(ctx, symbolMap, declarationMap, typeEnv),
+                assertion2.toZ3BoolExpr(ctx, symbolMap, declarationMap, typeEnv)
+        )
+
     is PredicateApplication ->
         when (name) {
             "<" ->
@@ -250,7 +259,7 @@ fun Assertion.toZ3BoolExpr(ctx: Context,
 
 
 fun UninterpretedFunctionType.toFuncDecl(name: String, ctx: Context) =
-    ctx.mkFuncDecl(name, argumentTypes.map { it.toZ3Sort(ctx) }.toTypedArray(), resultType.toZ3Sort(ctx))
+        ctx.mkFuncDecl(name, argumentTypes.map { it.toZ3Sort(ctx) }.toTypedArray(), resultType.toZ3Sort(ctx))
 
 
 class UnsupportedZ3AST(term: ASTElem) : RuntimeException("Cannot convert to Z3: $term")

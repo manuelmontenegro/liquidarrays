@@ -91,7 +91,7 @@ private fun qualifyExpression(expression: Term, scope: MutableList<HMTypedVar>, 
                     val newScope = scope.toMutableList()
                     if (pat is ConstructorPattern) {
                         val constrType = externals[pat.constructorName]
-                        if (constrType == null) throw UndefinedConstructor(pat.line, pat.column, pat.constructorName)
+                        if (constrType == null) throw UndefinedConstructorException(pat.line, pat.column, pat.constructorName)
                         pat.constructorArgs.zip(constrType.input).forEach { (varName, typedVar) ->
                             addToScope(newScope, varName, typedVar.type.hmType)
                         }
