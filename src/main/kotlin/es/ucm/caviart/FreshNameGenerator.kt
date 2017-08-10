@@ -1,7 +1,11 @@
 package es.ucm.caviart
 
 object FreshNameGenerator {
-    private val generatedSubscripts: MutableMap<String, Int> = mutableMapOf()
+    private var generatedSubscripts: MutableMap<String, Int> = mutableMapOf()
+
+    fun resetGenerator() {
+        generatedSubscripts = mutableMapOf()
+    }
 
     fun nextName(prefix: String): String {
         val lastGenerated = generatedSubscripts[prefix] ?: 0
