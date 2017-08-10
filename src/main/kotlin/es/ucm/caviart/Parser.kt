@@ -423,7 +423,8 @@ fun parseExpression(sexp: SExp): Term = when (sexp) {
 
                 val defaultBranch = if (sexp.children.size == 4) parseExpression(sexp.children[3]) else null
 
-                Case(Variable(discriminant), branches, defaultBranch).setLineColumn(sexp.line, sexp.column)
+                Case(Variable(discriminant).setLineColumn(sexp.children[1].line, sexp.children[1].column),
+                        branches, defaultBranch).setLineColumn(sexp.line, sexp.column)
             }
             else -> parseBindingExpression(sexp)
         }
