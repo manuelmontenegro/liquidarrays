@@ -6,6 +6,18 @@ import kotlin.test.assertEquals
 
 class QStarGeneratorTest {
 
+    val header = """(verification-unit dummy
+       :qset (Q (nu1 int ((* int)) (@ <= nu1 *)) (nu2 int ((* int) (** int)) (@ <= nu (@ + * **))))
+       :qset (QI i (nu (array int) () (@ >= nu 0)) (nu (array int) () (@ >= nu 3)) (nu (array int) ((* int)) (@ <= * nu)))
+       :qset (QE i (nu (array int) () (@ >= (@ get-array nu i) 0)) (nu (array int) ((** (array int)) (* int)) (@ >= (@ get-array ** i) *)))
+       :qset (QII i j (nu (array int) () (@ >= j 0)) (nu (array int) () (@ <= i j)) (nu (array int) ((* int)) (@ <= * j)))
+       :qset (QEE i j (nu (array int) ((* (array int))) (@ <= (@ get-array nu i) (@ get-array * j))))
+       :kappa (kappa1 ((nu int) (x int) (y int)))
+              (kappa2 ((nu int) (x int) (y bool)) (Q (@ <= nu x) (@ = y true)))
+
+       :mu (mu1 ((NU (array int)) (a (array int)) (x int) (y int) (z bool)))
+    )"""
+
     @Before fun beforeTest() {
         FreshNameGenerator.resetGenerator()
     }
@@ -222,5 +234,39 @@ class QStarGeneratorTest {
                 ("_J_2" to "_J_3") to "(@ f mi_nu _J_2 i j _J_3)",
                 ("i" to "_J_6") to "(@ f mi_nu i j j _J_6)",
                 ("_J_4" to "_J_5") to "(@ f mi_nu _J_4 j i _J_5)"), set.map { (it.boundVar1 to it.boundVar2) to it.assertion.toSExp() }.toSet())
+    }
+
+    @Test fun generateKappas1() {
+        val p = parseVerificationUnit(getSExps(header))
+        val kappas = p.kappaDeclarations.map {
+            generateKappa(it, p.qset)
+        }
+        assertEquals(2, kappas.size)
+        assertEquals("kappa1", kappas[0].name)
+        assertEquals("kappa2", kappas[1].name)
+        assertEquals("(nu int) (x int) (y int)", kappas[0].arguments.map { it.toSExp() }.joinToString(" "))
+        assertEquals("(nu int) (x int) (y bool)", kappas[1].arguments.map { it.toSExp() }.joinToString(" "))
+        assertEquals(setOf("(@ <= nu x)", "(@ <= nu y)", "(@ <= nu (@ + x x))", "(@ <= nu (@ + x y))", "(@ <= nu (@ + y x))", "(@ <= nu (@ + y y))"),
+                kappas[0].qStar.map { it.toSExp() }.toSet())
+        assertEquals(setOf("(@ <= nu x)", "(@ = y true)"), kappas[1].qStar.map { it.toSExp() }.toSet())
+    }
+
+    @Test fun generateMus1() {
+        val p = parseVerificationUnit(getSExps(header))
+        val mus = p.muDeclarations.map {
+            generateMu(it, p.qISet, p.qESet, p.qIISet, p.qEESet, p.qLenSet)
+        }
+
+        val mu = mus[0]
+        assertEquals("mu1", mu.name)
+        assertEquals("(NU (array int)) (a (array int)) (x int) (y int) (z bool)", mu.arguments.map { it.toSExp() }.joinToString(" "))
+        assertEquals("_J_1", mu.boundVar1)
+        assertEquals("_J_2", mu.boundVar2)
+        assertEquals("(@ >= NU 0) (@ >= NU 3) (@ <= x NU) (@ <= y NU)", mu.qI.map { it.toSExp() }.joinToString(" "))
+        assertEquals("(@ >= (@ get-array NU _J_1) 0)[NU / int] (@ >= (@ get-array a _J_1) x)[a / int] (@ >= (@ get-array a _J_1) y)[a / int]",
+                mu.qE.map { "${it.qualifier.toSExp()}[${it.arrayNames.map { (v, t) -> "$v / ${t.toSExp()}" }.joinToString(" | ")}]" }.joinToString(" "))
+        assertEquals("(@ >= _J_2 0) (@ <= _J_1 _J_2) (@ <= x _J_2) (@ <= y _J_2)", mu.qII.map { it.toSExp() }.joinToString(" "))
+        assertEquals("(@ <= (@ get-array NU _J_1) (@ get-array a _J_2))[NU / int][a / int]",
+                mu.qEE.map { "${it.qualifier.toSExp()}[${it.arrayNames1.map { (v, t) -> "$v / ${t.toSExp()}" }.joinToString(" | ")}][${it.arrayNames2.map { (v, t) -> "$v / ${t.toSExp()}" }.joinToString(" | ")}]" }.joinToString(" "))
     }
 }

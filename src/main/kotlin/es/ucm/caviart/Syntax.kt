@@ -1,6 +1,7 @@
 package es.ucm.caviart
 
 import com.microsoft.z3.Expr
+import com.sun.istack.internal.Pool
 import kotlin.reflect.KProperty
 
 /**
@@ -210,6 +211,47 @@ class PropertyNotFoundException(val property: String) : RuntimeException("Proper
 class InvalidASTException(elem: ASTElem) : RuntimeException("Invalid AST element: ${elem.toString()}")
 
 
+fun BindingExpression.getVariables(): Set<String> = when(this) {
+    is Literal -> emptySet()
+
+    is Variable -> setOf(name)
+
+    is FunctionApplication -> arguments.flatMap { it.getVariables() }.toSet()
+
+    is ConstructorApplication -> arguments.flatMap { it.getVariables() }.toSet()
+
+    is Tuple -> arguments.flatMap { it.getVariables() }.toSet()
+
+    else -> throw InvalidASTException(this)
+}
+
+fun Assertion.getVariables(): Set<String> = when(this) {
+    is True -> emptySet()
+
+    is False -> emptySet()
+
+    is BooleanVariable -> setOf(name)
+
+    is BooleanEquality -> assertion1.getVariables().union(assertion2.getVariables())
+
+    is PredicateApplication -> arguments.flatMap { it.getVariables() }.toSet()
+
+    is Not -> assertion.getVariables()
+
+    is And -> conjuncts.flatMap { it.getVariables() }.toSet()
+
+    is Or -> disjuncts.flatMap { it.getVariables() }.toSet()
+
+    is Implication -> operands.flatMap { it.getVariables() }.toSet()
+
+    is Iff -> operands.flatMap { it.getVariables() }.toSet()
+
+    is ForAll -> assertion.getVariables() - boundVars.map { it.varName }
+
+    is Exists -> assertion.getVariables() - boundVars.map { it.varName }
+
+    else -> throw InvalidASTException(this)
+}
 
 
 

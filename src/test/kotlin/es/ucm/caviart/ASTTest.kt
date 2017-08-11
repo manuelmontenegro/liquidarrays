@@ -1,6 +1,7 @@
 package es.ucm.caviart
 
 import org.junit.Test
+import java.util.function.Predicate
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -36,4 +37,21 @@ class ASTTest {
         assertEquals(3, v.testProp)
         assertEquals("Pepe", v.secondaryProp)
     }
+
+    @Test fun getVariables1() {
+        val a = And(True(), False(), BooleanVariable("x"), BooleanEquality(BooleanVariable("z"), True()))
+        assertEquals(setOf("x", "z"), a.getVariables())
+    }
+
+    @Test fun getVariables2() {
+        val a = PredicateApplication("fu", listOf(Literal("5", ConstrType("int")), Variable("x"), Variable("z")))
+        assertEquals(setOf("x", "z"), a.getVariables())
+    }
+
+    @Test fun getVariables3() {
+        val a = ForAll(listOf(HMTypedVar("i", ConstrType("int")), HMTypedVar("j", ConstrType("int"))),
+            PredicateApplication("p", listOf(Variable("x"), Variable("z"), Variable("i"), Variable("j"))))
+        assertEquals(setOf("x", "z"), a.getVariables())
+    }
 }
+

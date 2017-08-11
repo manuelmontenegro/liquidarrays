@@ -348,7 +348,7 @@ fun parseAssertion(sexp: SExp): Assertion = when (sexp) {
 fun parseAtomicExpression(sexp: SExp): Atomic = when (sexp) {
     is ParenSExp -> {
         expectCompoundGreaterOrEqual(sexp, 1)
-        expectKeyword(sexp.children[0], "the")
+        expectKeyword(sexp.children[0], "the", "@", "@@", "tuple", "let", "letfun", "case")
         expectCompound(sexp, 3)
         val type = parseHMType(sexp.children[1])
         val literal = expectSimple(sexp.children[2])
