@@ -5,7 +5,15 @@ import java.util.*
 class Goal(val description: String,
            val assumptions: List<Assertion>,
            val conclusion: Assertion,
-           val environment: Map<String, HMType>)
+           val environment: Map<String, HMType>) {
+    override fun toString(): String =
+            "GOAL: ${description}\n" +
+                    "Assuming:\n" +
+                    "${assumptions.map { "  " + it.toSExp() }.joinToString("\n")}\n" +
+                    "Prove:\n" +
+                    "  ${conclusion.toSExp()}"
+
+}
 
 
 private fun Type.toQualType(): QualType = when (this) {
@@ -29,7 +37,7 @@ fun generateForAtomic(atomic: Atomic, localEnvironment: Map<String, HMType>): Qu
 }
 
 fun generateForBindingExpression(expression: BindingExpression,
-                                 lastEntry: EnvironmentEntry,
+                                 lastEntry: EnvironmentEntry?,
                                  globalEnvironment: GlobalEnvironment,
                                  localEnvironment: Map<String, HMType>,
                                  generatedGoals: MutableList<Goal>): List<QualType> = when (expression) {
@@ -48,18 +56,25 @@ fun generateForBindingExpression(expression: BindingExpression,
             if (parameter.type is QualType) {
                 val conclusion = parameter.type.qualifier.applySubstitution(substitution + (parameter.type.nu to Variable(typeArgument.nu)))
                 val description = "Precondition of parameter ${parameter.varName} in call to ${expression.name}"
-                generatedGoals.add(entryToGoal(AssertionEntry(typeArgument.qualifier, lastEntry), conclusion, description))
+                generatedGoals.add(entryToGoal(VariableEntry(typeArgument.nu, typeArgument, lastEntry), conclusion, description))
             }
         }
 
+        var currentSubstitution = substitution
         signature.output.map {
             val nuVar = FreshNameGenerator.nextName("_NU")
             if (it.type is QualType) {
-                it.type.copy(nu = nuVar, qualifier = it.type.qualifier.applySubstitution(substitution + (it.type.nu to Variable(nuVar))))
+                val newQualifier = it.type.qualifier.applySubstitution(currentSubstitution + (it.type.nu to Variable(nuVar)))
+                currentSubstitution += it.varName to Variable(nuVar)
+                it.type.copy(nu = nuVar, qualifier = newQualifier)
             } else {
                 QualType(nuVar, it.type.hmType, True())
             }
         }
+    }
+
+    is Tuple -> {
+        expression.arguments.map { generateForAtomic(it, localEnvironment) }
     }
 
     is ConstructorApplication -> {
@@ -74,30 +89,43 @@ fun generateForBindingExpression(expression: BindingExpression,
 
 fun generateForExpression(functionName: String,
                           expression: Term,
-                          lastEntry: EnvironmentEntry,
+                          lastEntry: EnvironmentEntry?,
                           globalEnvironment: GlobalEnvironment,
                           localEnvironment: Map<String, HMType>,
                           generatedGoals: MutableList<Goal>,
-                          expectedResults: List<QualType>) {
+                          expectedResults: List<TypedVar>) {
     when (expression) {
         is BindingExpression -> {
             val types = generateForBindingExpression(expression, lastEntry, globalEnvironment, localEnvironment, generatedGoals)
+            val substitution: Substitution = expectedResults.map { it.varName }.zip(types.map { Variable(it.nu) }).toMap()
+            var currentEntry = lastEntry
             types.zip(expectedResults).forEachIndexed { index, (type, expected) ->
-                val description = "The type of ${expression.toSExp()} must match the type of the result #$index of $functionName"
-                val conclusion = expected.qualifier.applySubstitution(mapOf(expected.nu to Variable(type.nu)))
-                generatedGoals.add(
-                        entryToGoal(AssertionEntry(type.qualifier, lastEntry), conclusion, description)
-                )
+                if (expected.type is QualType) {
+                    val description = "The type of ${expression.toSExp()} must match the type of the result #${index + 1} of $functionName"
+                    val conclusion = expected.type.qualifier.applySubstitution(substitution + mapOf(expected.type.nu to Variable(type.nu)))
+                    currentEntry = VariableEntry(type.nu, type, currentEntry)
+                    generatedGoals.add(
+                            entryToGoal(currentEntry, conclusion, description)
+                    )
+
+                }
             }
         }
 
 
         is Let -> {
             val bindingTypes = generateForBindingExpression(expression.bindingExpression, lastEntry, globalEnvironment, localEnvironment, generatedGoals)
+            var currentSubst: Substitution = mapOf()
             val nextEntry = expression.bindings.zip(bindingTypes).fold(lastEntry) { lEntry, (binding, type) ->
-                VariableEntry(binding.varName, type, lEntry)
+                val newType = if (type is QualType) {
+                    val newQualifier = type.qualifier.applySubstitution(currentSubst)
+                    currentSubst += type.nu to Variable(binding.varName)
+                    type.copy(qualifier = newQualifier)
+                } else type
+                VariableEntry(binding.varName, newType, lEntry)
             }
-            generateForExpression(functionName, expression.mainExpression, nextEntry, globalEnvironment, localEnvironment, generatedGoals, expectedResults)
+            val newBindings = expression.bindings.map { it.varName to it.HMType }.toMap()
+            generateForExpression(functionName, expression.mainExpression, nextEntry, globalEnvironment, localEnvironment + newBindings, generatedGoals, expectedResults)
         }
 
         is LetFun -> {
@@ -146,13 +174,13 @@ fun generateForExpression(functionName: String,
 
 
 fun generateForDefinition(definition: FunctionDefinition,
-                          lastEntry: EnvironmentEntry,
+                          lastEntry: EnvironmentEntry?,
                           globalEnvironment: GlobalEnvironment,
                           localEnvironment: Map<String, HMType>,
                           generatedGoals: MutableList<Goal>) {
     val nextEntry = definition.inputParams.fold(lastEntry) { entry, inputParam ->
         val qualType = inputParam.type.toQualType()
-        val conclusion = qualType.qualifier
+        val conclusion = qualType.qualifier.applySubstitution(mapOf(qualType.nu to Variable(inputParam.varName)))
         val description = "Precondition of ${definition.name} must imply the qualifier of its parameter ${inputParam.varName}"
         val newGoal = entryToGoal(AssertionEntry(definition.precondition, entry), conclusion, description)
         generatedGoals.add(newGoal)
@@ -170,11 +198,11 @@ fun generateForDefinition(definition: FunctionDefinition,
     val newBindings = definition.inputParams.map { it.varName to it.type.hmType }.toMap()
 
     generateForExpression(definition.name, definition.body, nextEntry, globalEnvironment,
-            localEnvironment + newBindings, generatedGoals, definition.outputParams.map { it.type.toQualType() })
+            localEnvironment + newBindings, generatedGoals, definition.outputParams)
 
 }
 
-fun entryToGoal(entry: EnvironmentEntry, conclusion: Assertion, description: String): Goal {
+fun entryToGoal(entry: EnvironmentEntry?, conclusion: Assertion, description: String): Goal {
     val entryStack = Stack<EnvironmentEntry>()
 
     var currentEntry: EnvironmentEntry? = entry

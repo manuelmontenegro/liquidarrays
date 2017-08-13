@@ -182,20 +182,24 @@ class TypeCheckerTest {
     }
 
     @Test fun checkFill() {
-        checkFunctionDefinition(program.definitions[0], initialEnvironment, emptyMap())
+        val myEnvironment = initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap())
+        checkFunctionDefinition(program.definitions[0], myEnvironment, emptyMap())
     }
 
     @Test fun checkInsert() {
-        checkFunctionDefinition(program.definitions[1], initialEnvironment, emptyMap())
+        val myEnvironment = initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap())
+        checkFunctionDefinition(program.definitions[1], myEnvironment, emptyMap())
     }
 
     @Test fun checkSelSort() {
-        checkFunctionDefinition(program.definitions[2], initialEnvironment, emptyMap())
+        val myEnvironment = initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap())
+        checkFunctionDefinition(program.definitions[2], myEnvironment, emptyMap())
     }
 
     @Test fun checkOutOfScope() {
+        val myEnvironment = initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap())
         try {
-            checkFunctionDefinition(program.definitions[3], initialEnvironment, emptyMap())
+            checkFunctionDefinition(program.definitions[3], myEnvironment, emptyMap())
             fail("x must be reported as undefined")
         } catch(e: UndefinedVariableException) {
             assertEquals("x", e.variable)

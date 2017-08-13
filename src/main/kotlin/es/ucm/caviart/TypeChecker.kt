@@ -283,6 +283,20 @@ fun checkType(type: Type,
     }
 }
 
+fun checkVerificationUnit(verificationUnit: VerificationUnit, globalEnvironment: GlobalEnvironment) {
+    verificationUnit.external.forEach { (name, type) ->
+        globalEnvironment.programFunctions.put(name, type)
+    }
+
+    verificationUnit.definitions.forEach {
+        globalEnvironment.programFunctions.put(it.name, FunctionalType(it.inputParams, it.outputParams))
+    }
+
+    verificationUnit.definitions.forEach {
+        checkFunctionDefinition(it, globalEnvironment, mapOf())
+    }
+}
+
 
 class UndefinedConstructorException(val line: Int, val column: Int, val constrName: String) :
         RuntimeException("In L$line, C$column: Undefined constructor $constrName")
