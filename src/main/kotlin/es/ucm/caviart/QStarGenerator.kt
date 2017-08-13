@@ -5,7 +5,7 @@ fun instantiateGenericQualifier(nuVar: HMTypedVar, parameters: List<HMTypedVar>,
     val instantiation = findInstanceOf(genericQualifier.nu.HMType, nuVar.HMType) ?: return emptySet()
 
     return matchParameters(instantiation, emptyMap(), genericQualifier.markers, parameters).map {
-        genericQualifier.assertion.applySubstitution(it + (genericQualifier.nu.varName to nuVar.varName))
+        genericQualifier.assertion.applySubstitution(it + (genericQualifier.nu.varName to Variable(nuVar.varName)))
     }.toSet()
 }
 
@@ -13,11 +13,11 @@ fun instantiateGenericSingleQualifier(nuVar: HMTypedVar, parameters: List<HMType
     val instantiation = findInstanceOf(genericSingleQualifier.nu.HMType, nuVar.HMType) ?: return emptySet()
 
     return matchParameters(instantiation, emptyMap(), genericSingleQualifier.markers, parameters).map {
-        val boundVarBinding = if (genericSingleQualifier.boundVar in it.values) {
-            mapOf(genericSingleQualifier.boundVar to FreshNameGenerator.nextName("_J"))
+        val boundVarBinding = if (genericSingleQualifier.boundVar in it.values.filter { it is Variable }.map { (it as Variable).name }) {
+            mapOf(genericSingleQualifier.boundVar to Variable(FreshNameGenerator.nextName("_J")))
         } else emptyMap()
-        SingleQualifier(boundVarBinding[genericSingleQualifier.boundVar] ?: genericSingleQualifier.boundVar,
-                genericSingleQualifier.assertion.applySubstitution(it + (genericSingleQualifier.nu.varName to nuVar.varName) + boundVarBinding)
+        SingleQualifier(boundVarBinding[genericSingleQualifier.boundVar]?.name ?: genericSingleQualifier.boundVar,
+                genericSingleQualifier.assertion.applySubstitution(it + (genericSingleQualifier.nu.varName to Variable(nuVar.varName)) + boundVarBinding)
         )
     }.toSet()
 }
@@ -26,15 +26,15 @@ fun instantiateGenericDoubleQualifier(nuVar: HMTypedVar, parameters: List<HMType
     val instantiation = findInstanceOf(genericDoubleQualifier.nu.HMType, nuVar.HMType) ?: return emptySet()
 
     return matchParameters(instantiation, emptyMap(), genericDoubleQualifier.markers, parameters).map {
-        val boundVar1Binding = if (genericDoubleQualifier.boundVar1 in it.values) {
-            mapOf(genericDoubleQualifier.boundVar1 to FreshNameGenerator.nextName("_J"))
+        val boundVar1Binding = if (genericDoubleQualifier.boundVar1 in it.values.filter { it is Variable }.map { (it as Variable).name }) {
+            mapOf(genericDoubleQualifier.boundVar1 to Variable(FreshNameGenerator.nextName("_J")))
         } else emptyMap()
-        val boundVar2Binding = if (genericDoubleQualifier.boundVar2 in it.values) {
-            mapOf(genericDoubleQualifier.boundVar2 to FreshNameGenerator.nextName("_J"))
+        val boundVar2Binding = if (genericDoubleQualifier.boundVar2 in it.values.filter { it is Variable }.map { (it as Variable).name }) {
+            mapOf(genericDoubleQualifier.boundVar2 to Variable(FreshNameGenerator.nextName("_J")))
         } else emptyMap()
-        DoubleQualifier(boundVar1Binding[genericDoubleQualifier.boundVar1] ?: genericDoubleQualifier.boundVar1,
-                boundVar2Binding[genericDoubleQualifier.boundVar2] ?: genericDoubleQualifier.boundVar2,
-                genericDoubleQualifier.assertion.applySubstitution(it + (genericDoubleQualifier.nu.varName to nuVar.varName) + boundVar1Binding + boundVar2Binding)
+        DoubleQualifier(boundVar1Binding[genericDoubleQualifier.boundVar1]?.name ?: genericDoubleQualifier.boundVar1,
+                boundVar2Binding[genericDoubleQualifier.boundVar2]?.name ?: genericDoubleQualifier.boundVar2,
+                genericDoubleQualifier.assertion.applySubstitution(it + (genericDoubleQualifier.nu.varName to Variable(nuVar.varName)) + boundVar1Binding + boundVar2Binding)
         )
     }.toSet()
 }
@@ -51,7 +51,7 @@ fun matchParameters(instantiation: Map<String, HMType>, currentSubst: Substituti
                 if (newInstantation == null || !compatibleInstantiations(instantiation, newInstantation))
                     emptySet()
                 else
-                    matchParameters(instantiation + newInstantation, currentSubst + (head.varName to it.varName), tail, parameters)
+                    matchParameters(instantiation + newInstantation, currentSubst + (head.varName to Variable(it.varName)), tail, parameters)
             }.toSet()
         }
 
@@ -83,10 +83,10 @@ fun generateMu(muDeclaration: MuDeclaration, qI: Set<GenericSingleQualifier>, qE
     val boundVar2 = FreshNameGenerator.nextName("_J")
 
     val qIStar = if (muDeclaration.qISet != null) {
-        muDeclaration.qISet.map { it.assertion.applySubstitution(mapOf(it.boundVar to boundVar1)) }
+        muDeclaration.qISet.map { it.assertion.applySubstitution(mapOf(it.boundVar to Variable(boundVar1))) }
     } else {
         qI.map {
-            it.copy(boundVar = boundVar1, assertion = it.assertion.applySubstitution(mapOf(it.boundVar to boundVar1)))
+            it.copy(boundVar = boundVar1, assertion = it.assertion.applySubstitution(mapOf(it.boundVar to Variable(boundVar1))))
         }.flatMap {
             instantiateGenericSingleQualifier(muDeclaration.nuVar, muDeclaration.parameters, it)
         }.map { it.assertion }
@@ -94,10 +94,10 @@ fun generateMu(muDeclaration: MuDeclaration, qI: Set<GenericSingleQualifier>, qE
 
     val qEStar = if (muDeclaration.qESet != null) {
         muDeclaration.qESet
-                .map { it.assertion.applySubstitution(mapOf(it.boundVar to boundVar1)) }
+                .map { it.assertion.applySubstitution(mapOf(it.boundVar to Variable(boundVar1))) }
     } else {
         qE.map {
-            val newAssertion = it.assertion.applySubstitution(mapOf(it.boundVar to boundVar1))
+            val newAssertion = it.assertion.applySubstitution(mapOf(it.boundVar to Variable(boundVar1)))
             it.copy(boundVar = boundVar1, assertion = newAssertion)
         }.flatMap {
             instantiateGenericSingleQualifier(muDeclaration.nuVar, muDeclaration.parameters, it)
@@ -108,22 +108,22 @@ fun generateMu(muDeclaration: MuDeclaration, qI: Set<GenericSingleQualifier>, qE
     }
 
     val qIIStar = if (muDeclaration.qIISet != null) {
-        muDeclaration.qIISet.map { it.assertion.applySubstitution(mapOf(it.boundVar1 to boundVar1)) }
+        muDeclaration.qIISet.map { it.assertion.applySubstitution(mapOf(it.boundVar1 to Variable(boundVar1))) }
     } else {
         qII.map {
             it.copy(boundVar1 = boundVar1, boundVar2 = boundVar2,
-                    assertion = it.assertion.applySubstitution(mapOf(it.boundVar1 to boundVar1, it.boundVar2 to boundVar2)))
+                    assertion = it.assertion.applySubstitution(mapOf(it.boundVar1 to Variable(boundVar1), it.boundVar2 to Variable(boundVar2))))
         }.flatMap {
             instantiateGenericDoubleQualifier(muDeclaration.nuVar, muDeclaration.parameters, it)
         }.map { it.assertion }
     }
 
     val qEEStar = if (muDeclaration.qEESet != null) {
-        muDeclaration.qEESet.map { it.assertion.applySubstitution(mapOf(it.boundVar1 to boundVar1, it.boundVar2 to boundVar2)) }
+        muDeclaration.qEESet.map { it.assertion.applySubstitution(mapOf(it.boundVar1 to Variable(boundVar1), it.boundVar2 to Variable(boundVar2))) }
     } else {
         qEE.map {
             it.copy(boundVar1 = boundVar1, boundVar2 = boundVar2,
-                    assertion = it.assertion.applySubstitution(mapOf(it.boundVar1 to boundVar1, it.boundVar2 to boundVar2)))
+                    assertion = it.assertion.applySubstitution(mapOf(it.boundVar1 to Variable(boundVar1), it.boundVar2 to Variable(boundVar2))))
         }.flatMap {
             instantiateGenericDoubleQualifier(muDeclaration.nuVar, muDeclaration.parameters, it)
         }.map { it.assertion }

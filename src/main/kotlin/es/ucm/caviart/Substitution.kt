@@ -1,6 +1,6 @@
 package es.ucm.caviart
 
-typealias Substitution = Map<String, String>
+typealias Substitution = Map<String, Atomic>
 
 fun rebind(variables: List<String>, substitution: Substitution, prefix: String): Pair<List<String>, Substitution> {
     var currentSubst = substitution
@@ -8,9 +8,9 @@ fun rebind(variables: List<String>, substitution: Substitution, prefix: String):
         if (it in substitution.keys) {
             currentSubst -= it
         }
-        if (it in substitution.values) {
+        if (it in substitution.values.filter { it is Variable }.map { (it as Variable).name }) {
             val fresh = FreshNameGenerator.nextName(prefix)
-            currentSubst += it to fresh
+            currentSubst += it to Variable(fresh)
             fresh
         } else {
             it
@@ -25,7 +25,27 @@ fun Assertion.applySubstitution(substitution: Substitution) : Assertion = when(t
 
     is False -> this
 
-    is BooleanVariable -> BooleanVariable(substitution[this.name] ?: this.name)
+    is BooleanVariable -> {
+        val replacement = substitution[this.name]
+        if (replacement == null) {
+            BooleanVariable(this.name)
+        } else {
+            when (replacement) {
+                is Literal -> {
+                    when (replacement.value) {
+                        "true" -> True()
+                        "false" -> False()
+                        else -> throw InvalidASTException(replacement)
+                    }
+                }
+
+                is Variable -> BooleanVariable(replacement.name)
+
+                else -> throw InvalidASTException(replacement)
+            }
+
+        }
+    }
 
     is BooleanEquality -> BooleanEquality(assertion1.applySubstitution(substitution), assertion2.applySubstitution(substitution))
 
@@ -58,7 +78,7 @@ fun Assertion.applySubstitution(substitution: Substitution) : Assertion = when(t
 fun Atomic.applySubstitution(substitution: Substitution): Atomic = when(this) {
     is Literal -> this
 
-    is Variable -> Variable(substitution[name] ?: name)
+    is Variable -> substitution[name] ?: this
 
     else -> throw InvalidASTException(this)
 }

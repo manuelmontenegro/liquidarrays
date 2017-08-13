@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Test functions for the Goals.kt module
+ * Test functions for the Z3Goals.kt module
  *
  * Created by manuel on 14/06/17.
  */
@@ -25,7 +25,7 @@ class KappasTest {
     val conclusion2 = PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("xp")))
     val wrongConclusion = PredicateApplication("<", listOf(Literal("1", ConstrType("int")), Variable("xp")))
 
-    val G1 = Goal(
+    val G1 = Z3Goal(
             "G1",
             listOf(assertion1, assertion2),
             conclusion,
@@ -35,7 +35,7 @@ class KappasTest {
             mapOf("kappa1" to UninterpretedFunctionType(listOf(ConstrType("int"), ConstrType("int")), ConstrType("bool")))
     )
 
-    val G2 = Goal(
+    val G2 = Z3Goal(
             "G2",
             listOf(assertion1, assertion2),
             conclusion2,
@@ -45,7 +45,7 @@ class KappasTest {
             mapOf("kappa1" to UninterpretedFunctionType(listOf(ConstrType("int"), ConstrType("int")), ConstrType("bool")))
     )
 
-    val G3 = Goal(
+    val G3 = Z3Goal(
             "G3",
             listOf(assertion1, assertion2),
             wrongConclusion,

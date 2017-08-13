@@ -58,12 +58,12 @@ data class Variable(val name: String) : Atomic()
 abstract class BindingExpression : Term()
 
 data class FunctionApplication(val name: String,
-                               val arguments: List<BindingExpression> = listOf()) : BindingExpression()
+                               val arguments: List<Atomic> = listOf()) : BindingExpression()
 
 data class Tuple(val arguments: List<Atomic>) : BindingExpression()
 
 data class ConstructorApplication(val name: String,
-                                  val arguments: List<BindingExpression> = listOf()) : BindingExpression()
+                                  val arguments: List<Atomic> = listOf()) : BindingExpression()
 
 
 abstract class Term : ASTElem()

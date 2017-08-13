@@ -33,21 +33,21 @@ class QStarGeneratorTest {
         val params = listOf(HMTypedVar("x1", ConstrType("int")), HMTypedVar("x2", VarType("'a")))
         val result = matchParameters(emptyMap(), emptyMap(), listOf(HMTypedVar("*", ConstrType("int"))), params)
 
-        assertEquals(setOf(mapOf("*" to "x1")), result)
+        assertEquals(setOf(mapOf("*" to Variable("x1"))), result)
     }
 
     @Test fun matchParams3() {
         val params = listOf(HMTypedVar("x1", ConstrType("int")), HMTypedVar("x2", VarType("'a")))
         val result = matchParameters(emptyMap(), emptyMap(), listOf(HMTypedVar("*", ConstrType("int")), HMTypedVar("**", VarType("'b"))), params)
 
-        assertEquals(setOf(mapOf("*" to "x1", "**" to "x1"), mapOf("*" to "x1", "**" to "x2")), result)
+        assertEquals(setOf(mapOf("*" to Variable("x1"), "**" to Variable("x1")), mapOf("*" to Variable("x1"), "**" to Variable("x2"))), result)
     }
 
     @Test fun matchParams4() {
         val params = listOf(HMTypedVar("x1", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("x2", ConstrType("int")))
         val result = matchParameters(emptyMap(), emptyMap(), listOf(HMTypedVar("*", ConstrType("array", listOf(VarType("'a")))), HMTypedVar("**", VarType("'a"))), params)
 
-        assertEquals(setOf(mapOf("*" to "x1", "**" to "x2")), result)
+        assertEquals(setOf(mapOf("*" to Variable("x1"), "**" to Variable("x2"))), result)
     }
 
     @Test fun matchParams5() {
@@ -61,7 +61,7 @@ class QStarGeneratorTest {
         val params = listOf(HMTypedVar("x1", ConstrType("array", listOf(VarType("'b")))), HMTypedVar("x2", VarType("'b")), HMTypedVar("x3", VarType("'b")))
         val result = matchParameters(emptyMap(), emptyMap(), listOf(HMTypedVar("*", ConstrType("array", listOf(VarType("'a")))), HMTypedVar("**", VarType("'a"))), params)
 
-        assertEquals(setOf(mapOf("*" to "x1", "**" to "x2"), mapOf("*" to "x1", "**" to "x3")), result)
+        assertEquals(setOf(mapOf("*" to Variable("x1"), "**" to Variable("x2")), mapOf("*" to Variable("x1"), "**" to Variable("x3"))), result)
     }
 
     @Test fun instantiateQualifier1() {

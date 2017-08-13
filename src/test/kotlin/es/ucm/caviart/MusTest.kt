@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
  */
 
 class MusTest {
-    val G1 = Goal(
+    val G1 = Z3Goal(
             "G1",
             listOf(
                     PredicateApplication(">=", listOf(Variable("n"), Literal("0", ConstrType("int")))),
@@ -40,15 +40,16 @@ class MusTest {
             mapOf("mu1" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int"))), ConstrType("int")), ConstrType("bool")))
     )
 
-    val G2 = Goal(
+    val G2 = Z3Goal(
             "G2",
             listOf(
                     PredicateApplication(">", listOf(Variable("n"), Literal("0", ConstrType("int")))),
                     PredicateApplication("mu1", listOf(Variable("a"), Variable("n"))),
-                    PredicateApplication("<=", listOf(FunctionApplication("get-array", listOf(Variable("a"), FunctionApplication("-", listOf(Variable("n"), Literal("1", ConstrType("int")))))), FunctionApplication("get-array", listOf(Variable("a"), Variable("n")))))
+                    PredicateApplication("=", listOf(Variable("k"), FunctionApplication("-", listOf(Variable("n"), Literal("1", ConstrType("int")))))),
+                    PredicateApplication("<=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("k"))), FunctionApplication("get-array", listOf(Variable("a"), Variable("n")))))
             ),
             PredicateApplication("mu1", listOf(Variable("a"), FunctionApplication("+", listOf(Variable("n"), Literal("1", ConstrType("int")))))),
-            mapOf("a" to ConstrType("array", listOf(ConstrType("int"))), "n" to ConstrType("int")),
+            mapOf("a" to ConstrType("array", listOf(ConstrType("int"))), "n" to ConstrType("int"), "k" to ConstrType("int")),
             mapOf(),
             mapOf("mu1" to Mu(
                     "mu1",
@@ -74,7 +75,7 @@ class MusTest {
             mapOf("mu1" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int"))), ConstrType("int")), ConstrType("bool")))
     )
 
-    val G3 = Goal(
+    val G3 = Z3Goal(
             "G3",
             listOf(
                     PredicateApplication("mu1", listOf(Variable("a"), Variable("m")))
@@ -129,7 +130,7 @@ class MusTest {
     val declarationMapG4 = mapOf("len" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int")))), ConstrType("int")),
             "mu1" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int"))), ConstrType("int")), ConstrType("bool")))
 
-    val G4 = Goal("G4",
+    val G4 = Z3Goal("G4",
             assumptionsG4,
             conclusionG4,
             environmentG4,
@@ -153,7 +154,7 @@ class MusTest {
             declarationMapG4
     )
 
-    val G5 = Goal("G5",
+    val G5 = Z3Goal("G5",
             assumptionsG4,
             conclusionG4,
             environmentG4,
@@ -262,7 +263,7 @@ class MusTest {
     }
 
 
-    val auxG6 = { qii: List<Assertion> -> Goal("G6",
+    val auxG6 = { qii: List<Assertion> -> Z3Goal("G6",
             listOf(
                     ForAll(
                             listOf(HMTypedVar("i", ConstrType("int")), HMTypedVar("j", ConstrType("int"))),

@@ -11,13 +11,13 @@ import com.microsoft.z3.*
 
 val debug = true
 
-class Goal(val name: String,
-           assumptions: List<Assertion>,
-           conclusion: Assertion,
-           environment: Map<String, HMType>,
-           val kappas: Map<String, Kappa>,
-           val mus: Map<String, Mu>,
-           declarationMap: Map<String, UninterpretedFunctionType>) {
+class Z3Goal(val name: String,
+             assumptions: List<Assertion>,
+             conclusion: Assertion,
+             environment: Map<String, HMType>,
+             val kappas: Map<String, Kappa>,
+             val mus: Map<String, Mu>,
+             declarationMap: Map<String, UninterpretedFunctionType>) {
 
     class MuInfo(val boundVar1: Symbol,
                  val boundVar2: Symbol,
