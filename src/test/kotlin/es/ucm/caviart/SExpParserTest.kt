@@ -6,6 +6,10 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class SExpParserTest {
+    private fun assertEqualsSExp(sexp1: SExp, sexp2: SExp) {
+        assertEquals(sexp1.toString(), sexp2.toString())
+    }
+
     @Test fun emptySExp() {
         val sexps = getSExps("")
         assertEquals(0, sexps.size, "The list of S-Exps should be empty given an empty string")
@@ -14,13 +18,13 @@ class SExpParserTest {
     @Test fun singletonSExp() {
         val sexps = getSExps("pepe")
         assertEquals(1, sexps.size, "The list of S-Exps should be of size one")
-        assertEquals(TokenSExp(1, 1, "pepe"), sexps[0])
+        assertEqualsSExp(TokenSExp(1, 1, "pepe"), sexps[0])
     }
 
     @Test fun parenSExp() {
         val sexps = getSExps("(pepe 4 5)")
         assertEquals(1, sexps.size, "The list of S-Exps should be of size one")
-        assertEquals(
+        assertEqualsSExp(
                 ParenSExp(1, 1,
                         TokenSExp(1, 2, "pepe"),
                         TokenSExp(1, 7, "4"),
@@ -31,7 +35,7 @@ class SExpParserTest {
     @Test fun nestedSExps() {
         val sexps = getSExps("(pepe 4 \n(let x 1) 5 (let 2))")
         assertEquals(1, sexps.size, "The list of S-Exps should be of size one")
-        assertEquals(
+        assertEqualsSExp(
                 ParenSExp(1, 1,
                         TokenSExp(1, 2, "pepe"),
                         TokenSExp(1, 7, "4"),
@@ -51,8 +55,8 @@ class SExpParserTest {
     @Test fun twoSExps() {
         val sexps = getSExps("() (())")
         assertEquals(2, sexps.size, "The list of S-Exps should be of size one")
-        assertEquals(ParenSExp(1, 1), sexps[0])
-        assertEquals(ParenSExp(1, 4, ParenSExp(1, 5)), sexps[1])
+        assertEqualsSExp(ParenSExp(1, 1), sexps[0])
+        assertEqualsSExp(ParenSExp(1, 4, ParenSExp(1, 5)), sexps[1])
     }
 
     @Test fun unbalancedExpRight() {
