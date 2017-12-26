@@ -91,6 +91,34 @@ class LexerTest {
             assertEquals(1, e.line)
             assertEquals(3, e.column)
         }
+    }
 
+    @Test fun IgnoredComments() {
+        val tokens = readTokens(StringReader(";; This is a comment"))
+        assertEquals(0, tokens.size, "A single comment has no tokens")
+    }
+
+    @Test fun SingleSemicolonNoComment() {
+        val tokens = readTokens(StringReader("; This is NOT a comment"))
+        assertEquals(6, tokens.size, "A single semicolon is not a comment")
+    }
+
+    @Test fun TokenBeforeComment() {
+        val tokens = readTokens(StringReader("bubu;; This is a comment"))
+        assertEquals(1, tokens.size, "Token before comment")
+        assertEqualsToken(TokenLiteral(1, 1, "bubu"), tokens[0])
+    }
+
+    @Test fun TokenAfterComment() {
+        val tokens = readTokens(StringReader(";; This is a comment\nbubu"))
+        assertEquals(1, tokens.size, "Token after comment")
+        assertEqualsToken(TokenLiteral(2, 1, "bubu"), tokens[0])
+    }
+
+    @Test fun TokenBeforeAndAfterComment() {
+        val tokens = readTokens(StringReader("baba;; This is a comment\nbubu"))
+        assertEquals(2, tokens.size, "Token after comment")
+        assertEqualsToken(TokenLiteral(1, 1, "baba"), tokens[0])
+        assertEqualsToken(TokenLiteral(2, 1, "bubu"), tokens[1])
     }
 }

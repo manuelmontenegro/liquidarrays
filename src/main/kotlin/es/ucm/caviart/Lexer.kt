@@ -32,6 +32,7 @@ private const val RIGHT_PAREN = ')'.toInt()
 private const val QUOTE = '"'.toInt()
 private const val LF = '\n'.toInt()
 private const val CR = '\r'.toInt()
+private const val SEMICOLON = ';'.toInt()
 private const val UTF8_BOM = 0xFEFF
 
 
@@ -119,26 +120,57 @@ fun readTokens(reader: Reader): List<Token> {
     // Whether the previous character was a CR symbol
     var lastCR = false
 
+    // Whether the previous character was a semicolon (we need two in a row to enable comment mode)
+    var lastSemicolon = false
+
+    // Whether we are in a comment
+    var comment = false
+
     // If the first character of the file is a BOM mark, we simply
     // discard it
     if (currentChar == UTF8_BOM) currentChar = reader.read()
 
 
 
+
+
     while (currentChar != -1) {
         when {
+
+            // If we are in a comment, we skip this part
+            comment -> {
+                /* do nothing */
+            }
 
             // If we are inside a quoted string, we add the current character to the current word
             // or finish the word, if the character is a quote mark
 
-            currentChar != QUOTE && betweenQuotes ->
+            betweenQuotes && currentChar != QUOTE ->
                 currentWord.appendCodePoint(currentChar)
 
-            currentChar == QUOTE && betweenQuotes -> {
+            betweenQuotes && currentChar == QUOTE -> {
                 result.add(TokenLiteral(line, beginningColumnToken, currentWord.toString()))
                 currentWord = StringBuffer()
                 betweenQuotes = false
             }
+
+
+            // If we have two semicolons in a row, we start a comment until
+            // the next line
+
+            lastSemicolon && currentChar == SEMICOLON -> {
+                if (currentWord.endsWith(";")) {
+                    currentWord.deleteCharAt(currentWord.length - 1)
+                }
+
+                if (!currentWord.isEmpty()) {
+                    result.add(TokenLiteral(line, beginningColumnToken, currentWord.toString()))
+                    currentWord = StringBuffer()
+                }
+
+                comment = true
+            }
+
 
 
             // Starting quoted string, if we are not within a word.
@@ -194,19 +226,26 @@ fun readTokens(reader: Reader): List<Token> {
             currentChar == CR -> {
                 line++
                 column = 1
-                lastCR = true
+                comment = false
             }
 
             currentChar == LF && !lastCR -> {
                 line++
                 column = 1
-                lastCR = false
+                comment = false
             }
 
             else -> {
                 column++
-                lastCR = false
             }
+        }
+
+        // We set the auxiliary variables based on the last character
+        lastCR = false
+        lastSemicolon = false
+        when (currentChar) {
+            CR -> lastCR = true
+            SEMICOLON -> lastSemicolon = true
         }
 
         currentChar = reader.read()
@@ -219,4 +258,9 @@ fun readTokens(reader: Reader): List<Token> {
     return result
 }
 
+/**
+ * Exception thrown when a quote symbol follows directly a token symbol. For example, as in `hello"symb"`.
+ *
+ * There must be a space in between, as in `hello "symb"`.
+ */
 class UnexpectedQuoteException(val line: Int, val column: Int) : Exception("Unexpected quote symbol: line $line, column $column")
