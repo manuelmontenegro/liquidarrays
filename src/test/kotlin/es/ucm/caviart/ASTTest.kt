@@ -1,7 +1,7 @@
 package es.ucm.caviart
 
+import es.ucm.caviart.ast.*
 import org.junit.Test
-import java.util.function.Predicate
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -24,7 +24,7 @@ class ASTTest {
 
     @Test fun initiallyEmpty() {
         val l = Literal("5", ConstrType("int"))
-        assertFailsWith(PropertyNotFoundException::class) {
+        assertFailsWith(Exception::class) {
             val x = l.testProp
             println(x)
         }
@@ -39,7 +39,7 @@ class ASTTest {
     }
 
     @Test fun getVariables1() {
-        val a = And(True(), False(), BooleanVariable("x"), BooleanEquality(BooleanVariable("z"), True()))
+        val a = And(True(), False(), BooleanVariable("x"), Iff(BooleanVariable("z"), True()))
         assertEquals(setOf("x", "z"), a.getVariables())
     }
 
@@ -50,7 +50,7 @@ class ASTTest {
 
     @Test fun getVariables3() {
         val a = ForAll(listOf(HMTypedVar("i", ConstrType("int")), HMTypedVar("j", ConstrType("int"))),
-            PredicateApplication("p", listOf(Variable("x"), Variable("z"), Variable("i"), Variable("j"))))
+                PredicateApplication("p", listOf(Variable("x"), Variable("z"), Variable("i"), Variable("j"))))
         assertEquals(setOf("x", "z"), a.getVariables())
     }
 }
