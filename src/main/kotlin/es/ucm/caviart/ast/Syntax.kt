@@ -34,13 +34,19 @@ import kotlin.reflect.KProperty
  *
  * @param properties A map with the dynamically attached decorations of the AST element.
  */
-abstract class ASTElem(val properties: MutableMap<String, Any?> = mutableMapOf()) {
-    fun addPropertiesFrom(other: ASTElem): ASTElem {
-        properties.putAll(other.properties)
-        return this
-    }
-}
+abstract class ASTElem(val properties: MutableMap<String, Any?> = mutableMapOf())
 
+
+/**
+ * It copies the properties of a given AST element into another one.
+ *
+ * @param other The AST element from which gather the properties
+ * @return `this` object
+ */
+fun <T: ASTElem> T.addPropertiesFrom(other: ASTElem): T {
+    this.properties.putAll(other.properties)
+    return this
+}
 
 /**
  * An instance of [Type] represents both standard Hindley-Milner types as well as

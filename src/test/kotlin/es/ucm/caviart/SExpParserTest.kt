@@ -21,6 +21,7 @@
 */
 package es.ucm.caviart
 
+import es.ucm.caviart.ast.*
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

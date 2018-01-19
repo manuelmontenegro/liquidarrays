@@ -21,6 +21,7 @@
 */
 package es.ucm.caviart
 
+import es.ucm.caviart.ast.*
 import org.junit.Test
 import java.io.StringReader
 import kotlin.test.assertEquals
@@ -95,7 +96,7 @@ class LexerTest {
         assertEqualsToken(RightParen(1, 9), tokens[4])
     }
 
-    @Test fun Quotes() {
+    @Test fun quotes() {
         val tokens = readTokens(StringReader("(\"hello other\" guy)"))
         assertEquals(4, tokens.size, "Four tokens")
         assertEqualsToken(LeftParen(1, 1), tokens[0])
@@ -104,7 +105,7 @@ class LexerTest {
         assertEqualsToken(RightParen(1, 19), tokens[3])
     }
 
-    @Test fun QuotesAfterToken() {
+    @Test fun quotesAfterToken() {
         try {
             readTokens(StringReader("(d\"hello other\" guy)"))
             fail("No quote allowed after literal token")
@@ -114,29 +115,29 @@ class LexerTest {
         }
     }
 
-    @Test fun IgnoredComments() {
+    @Test fun ignoredComments() {
         val tokens = readTokens(StringReader(";; This is a comment"))
         assertEquals(0, tokens.size, "A single comment has no tokens")
     }
 
-    @Test fun SingleSemicolonNoComment() {
+    @Test fun singleSemicolonNoComment() {
         val tokens = readTokens(StringReader("; This is NOT a comment"))
         assertEquals(6, tokens.size, "A single semicolon is not a comment")
     }
 
-    @Test fun TokenBeforeComment() {
+    @Test fun tokenBeforeComment() {
         val tokens = readTokens(StringReader("bubu;; This is a comment"))
         assertEquals(1, tokens.size, "Token before comment")
         assertEqualsToken(TokenLiteral(1, 1, "bubu"), tokens[0])
     }
 
-    @Test fun TokenAfterComment() {
+    @Test fun tokenAfterComment() {
         val tokens = readTokens(StringReader(";; This is a comment\nbubu"))
         assertEquals(1, tokens.size, "Token after comment")
         assertEqualsToken(TokenLiteral(2, 1, "bubu"), tokens[0])
     }
 
-    @Test fun TokenBeforeAndAfterComment() {
+    @Test fun tokenBeforeAndAfterComment() {
         val tokens = readTokens(StringReader("baba;; This is a comment\nbubu"))
         assertEquals(2, tokens.size, "Token after comment")
         assertEqualsToken(TokenLiteral(1, 1, "baba"), tokens[0])
