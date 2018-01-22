@@ -212,4 +212,39 @@ class TypeCheckerTest {
             fail("Unexpected excepction")
         }
     }
+
+
+    @Test fun checkExternal() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :external  (f ((x int) (y (qual nu int (@ < nu x)))) ((z int) (v (qual nu int (@ < nu z))))))
+            """))
+        checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+    }
+
+    @Test fun checkExternalWrongInputParam() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :external  (f ((x int) (y (qual nu int (@ < nu z)))) ((z int) (v (qual nu int (@ < nu z))))))
+            """))
+        try {
+            checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+            fail("Should throw UndefinedVariableException")
+        } catch (e: UndefinedVariableException) {
+
+        }
+    }
+
+    @Test fun checkExternalWrongOutputParam() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :external  (f ((x int) (y (qual nu int (@ < nu x)))) ((z (qual nu int (@ < nu v))) (v (qual nu int (@ < nu x))))))
+            """))
+        try {
+            checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+            fail("Should throw UndefinedVariableException")
+        } catch (e: UndefinedVariableException) {
+
+        }
+    }
 }

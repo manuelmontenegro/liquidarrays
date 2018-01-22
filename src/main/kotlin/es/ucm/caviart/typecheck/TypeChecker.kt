@@ -414,6 +414,23 @@ fun checkType(type: Type,
     }
 }
 
+fun checkFunctionalType(
+            type: FunctionalType,
+            globalEnvironment: GlobalEnvironment) {
+
+    // We check the types of the input parameters and add them to the environment
+    val envWithInput = type.input.fold(emptyMap<String, HMType>()) { env, (v, type) ->
+        checkType(type, globalEnvironment, env)
+        env + (v to type.hmType)
+    }
+
+    type.output.fold(envWithInput) { env, (v, type) ->
+        checkType(type, globalEnvironment, env)
+        env + (v to type.hmType)
+    }
+
+}
+
 /**
  * It typechecks a whole verification unit.
  *
@@ -421,8 +438,12 @@ fun checkType(type: Type,
  * @param globalEnvironment Environment with the types of function definitions
  */
 fun checkVerificationUnit(verificationUnit: VerificationUnit, globalEnvironment: GlobalEnvironment) {
-    // TODO: check whether the external types are well-formed
+    verificationUnit.external.forEach {(_, funType) ->
+        checkFunctionalType(funType, globalEnvironment)
+    }
+
     // TODO: check QSets and kappas
+
     verificationUnit.external.forEach { (name, type) ->
         globalEnvironment.programFunctions[name] = type
     }
