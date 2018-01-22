@@ -1,25 +1,30 @@
 package es.ucm.caviart
 
+import es.ucm.caviart.ast.ConstrType
+import es.ucm.caviart.ast.VarType
+import es.ucm.caviart.ast.getSExps
+import es.ucm.caviart.ast.parseVerificationUnit
+import es.ucm.caviart.typecheck.*
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.fail
 
 class TypeCheckerTest {
-    val sourceCode = """
+    private val sourceCode = """
     (verification-unit fill)
-    (define fill ((xs (array 'a)) (elem 'a)) ((res (array 'a)))
+    (define fill ((xs (array int)) (elem int)) ((res (array int)))
     (declare
         (assertion
             (precd true)
             (postcd (forall ((i int)) (-> (@ <= (the int 0) i) (-> (@ < i (@ len res)) (@ = (@ get-array res i) elem)))))))
         (letfun (
-            (filln ((n int) (elem 'a) (xs (array 'a))) ((res (array 'a)))
+            (filln ((n int) (elem int) (xs (array int))) ((res (array int)))
                 (let ((l int)) (@ len xs)
                   (let ((b bool)) (@ >= n l)
                     (case b (
                         (true xs)
-                        (false (let ((xsp (array 'a))) (@ set-array xs n elem)
+                        (false (let ((xsp (array int))) (@ set-array xs n elem)
                                     (let ((n1 int)) (@ + n (the int 1)) (@ filln n1 elem xsp))))))))))
             (@ filln (the int 0) elem xs)))
 
@@ -104,7 +109,7 @@ class TypeCheckerTest {
     (define wrong1 ((n (qual nu int (@ < x (the int 0))))) ((res int)) (the int 0))
 """
 
-    val program = parseVerificationUnit(getSExps(sourceCode))
+    private val program = parseVerificationUnit(getSExps(sourceCode))
 
     @Test fun instance1() {
         assertEquals(mapOf(), findInstanceOf(ConstrType("int"), ConstrType("int")))
@@ -115,70 +120,70 @@ class TypeCheckerTest {
     }
 
     @Test fun instance3() {
-        assertEquals(mapOf("'a" to ConstrType("int")), findInstanceOf(VarType("'a"), ConstrType("int")))
+        assertEquals(mapOf("int" to ConstrType("int")), findInstanceOf(VarType("int"), ConstrType("int")))
     }
 
     @Test fun instance4() {
-        assertEquals(mapOf("'a" to VarType("'b")),
+        assertEquals(mapOf("int" to VarType("'b")),
                 findInstanceOf(
-                        ConstrType("map", listOf(VarType("'a"), ConstrType("int"))),
+                        ConstrType("map", listOf(VarType("int"), ConstrType("int"))),
                         ConstrType("map", listOf(VarType("'b"), ConstrType("int")))
                 ))
     }
 
     @Test fun instance5() {
-        assertEquals(mapOf("'a" to ConstrType("array", listOf(ConstrType("int")))),
+        assertEquals(mapOf("int" to ConstrType("array", listOf(ConstrType("int")))),
                 findInstanceOf(
-                        ConstrType("map", listOf(VarType("'a"), ConstrType("int"))),
+                        ConstrType("map", listOf(VarType("int"), ConstrType("int"))),
                         ConstrType("map", listOf(ConstrType("array", listOf(ConstrType("int"))), ConstrType("int")))
                 ))
     }
 
     @Test fun instance6() {
-        assertEquals(mapOf("'a" to ConstrType("array", listOf(ConstrType("bool")))),
+        assertEquals(mapOf("int" to ConstrType("array", listOf(ConstrType("bool")))),
                 findInstanceOf(
-                        ConstrType("map", listOf(VarType("'a"), ConstrType("int"))),
+                        ConstrType("map", listOf(VarType("int"), ConstrType("int"))),
                         ConstrType("map", listOf(ConstrType("array", listOf(ConstrType("bool"))), ConstrType("int")))
                 ))
     }
 
     @Test fun instance7() {
-        assertEquals(mapOf("'a" to ConstrType("int")),
+        assertEquals(mapOf("int" to ConstrType("int")),
                 findInstanceOf(
-                        ConstrType("map", listOf(VarType("'a"), VarType("'a"))),
+                        ConstrType("map", listOf(VarType("int"), VarType("int"))),
                         ConstrType("map", listOf(ConstrType("int"), ConstrType("int")))
                 ))
     }
 
     @Test fun instance8() {
         assertNull(findInstanceOf(
-                        ConstrType("map", listOf(VarType("'a"), VarType("'a"))),
-                        ConstrType("map", listOf(ConstrType("int"), ConstrType("bool")))
-                ))
+                ConstrType("map", listOf(VarType("int"), VarType("int"))),
+                ConstrType("map", listOf(ConstrType("int"), ConstrType("bool")))
+        ))
     }
 
     @Test fun instantiate1() {
-        assertEquals(ConstrType("int"), instantiate(ConstrType("int"), mapOf("'a" to ConstrType("bool"))))
+        assertEquals(ConstrType("int"), instantiate(ConstrType("int"), mapOf("int" to ConstrType("bool"))))
     }
 
     @Test fun instantiate2() {
-        assertEquals(ConstrType("bool"), instantiate(VarType("'a"), mapOf("'a" to ConstrType("bool"))))
+        assertEquals(ConstrType("bool"), instantiate(VarType("int"), mapOf("int" to ConstrType("bool"))))
     }
 
     @Test fun instantiate3() {
-        assertEquals(VarType("'b"), instantiate(VarType("'b"), mapOf("'a" to ConstrType("bool"))))
+        assertEquals(VarType("'b"), instantiate(VarType("'b"), mapOf("int" to ConstrType("bool"))))
     }
 
     @Test fun instantiate4() {
         assertEquals(ConstrType("map", listOf(ConstrType("int"), ConstrType("int"), ConstrType("bool"))),
-                instantiate(ConstrType("map", listOf(VarType("'a"), VarType("'a"), VarType("'b"))),
-                        mapOf("'a" to ConstrType("int"), "'b" to ConstrType("bool"))))
+                instantiate(ConstrType("map", listOf(VarType("int"), VarType("int"), VarType("'b"))),
+                        mapOf("int" to ConstrType("int"), "'b" to ConstrType("bool"))))
     }
 
     @Test fun instantiate5() {
         assertEquals(ConstrType("map", listOf(ConstrType("int"), VarType("'c"), ConstrType("bool"))),
-                instantiate(ConstrType("map", listOf(VarType("'a"), VarType("'c"), VarType("'b"))),
-                        mapOf("'a" to ConstrType("int"), "'b" to ConstrType("bool"))))
+                instantiate(ConstrType("map", listOf(VarType("int"), VarType("'c"), VarType("'b"))),
+                        mapOf("int" to ConstrType("int"), "'b" to ConstrType("bool"))))
     }
 
     @Test fun checkFill() {
