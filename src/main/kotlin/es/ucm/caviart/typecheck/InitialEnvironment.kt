@@ -20,7 +20,8 @@ private val logicPredicates = mapOf(
         ">" to listOf(ConstrType("int"), ConstrType("int")),
         "<=" to listOf(ConstrType("int"), ConstrType("int")),
         ">=" to listOf(ConstrType("int"), ConstrType("int")),
-        "=" to listOf(ConstrType("int"), ConstrType("int"))
+        "=" to listOf(ConstrType("int"), ConstrType("int")),
+        "=[]" to listOf(ConstrType("array", listOf(intType)), ConstrType("array", listOf(intType)))
 )
 
 val initialEnvironment = GlobalEnvironment(
@@ -44,4 +45,5 @@ val initialEnvironment = GlobalEnvironment(
                                     Iff(BooleanVariable("nu"), PredicateApplication(name, argNames.map { Variable(it) })))))
                     )
                 }).toMap().toMutableMap()
+
 )
