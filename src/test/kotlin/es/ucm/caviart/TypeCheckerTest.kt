@@ -1,9 +1,6 @@
 package es.ucm.caviart
 
-import es.ucm.caviart.ast.ConstrType
-import es.ucm.caviart.ast.VarType
-import es.ucm.caviart.ast.getSExps
-import es.ucm.caviart.ast.parseVerificationUnit
+import es.ucm.caviart.ast.*
 import es.ucm.caviart.typecheck.*
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -239,6 +236,137 @@ class TypeCheckerTest {
         val ast = parseVerificationUnit(getSExps("""
             (verification-unit my-verification
             :external  (f ((x int) (y (qual nu int (@ < nu x)))) ((z (qual nu int (@ < nu v))) (v (qual nu int (@ < nu x))))))
+            """))
+        try {
+            checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+            fail("Should throw UndefinedVariableException")
+        } catch (e: UndefinedVariableException) {
+
+        }
+    }
+
+    @Test fun checkGenericQualifier1() {
+        val qual = parseGenericQualifier(getSExps("(nu int ((* int)) (@ < * nu))")[0])
+        checkGenericQualifier(qual, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()), mapOf())
+    }
+
+    @Test fun checkGenericQualifier2() {
+        val qual = parseGenericQualifier(getSExps("(nu int ((* int) (** int)) (@ < * **))")[0])
+        checkGenericQualifier(qual, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()), mapOf())
+    }
+
+    @Test fun checkGenericQualifier3() {
+        try {
+            val qual = parseGenericQualifier(getSExps("(nu int ((* int) (** int)) (@ < x **))")[0])
+            checkGenericQualifier(qual, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()), mapOf())
+            fail("Should throw UndefinedVariableException")
+        } catch (e: UndefinedVariableException) {
+
+        }
+    }
+
+    @Test fun checkGenericQualifier4() {
+        val qual = parseGenericQualifier(getSExps("(nu int ((* int) (** int)) (@ < x **))")[0])
+        checkGenericQualifier(qual, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()), mapOf("x" to intType))
+    }
+
+    @Test fun checkGenericQSets() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (Q (nu int ((* int) (** int)) (@ < nu **))))
+            """))
+        checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+    }
+
+    @Test fun checkGenericQSetsWrong() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (Q (nu int ((* int) (** int)) (@ < x **))))
+            """))
+        try {
+            checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+            fail("Should throw UndefinedVariableException")
+        } catch (e: UndefinedVariableException) {
+
+        }
+    }
+
+    @Test fun checkGenericQISets() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (QI i (nu int ((* int) (** int)) (@ < nu i))))
+            """))
+        checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+    }
+
+    @Test fun checkGenericQISetsWrong() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (QI j (nu int ((* int) (** int)) (@ < x j))))
+            """))
+        try {
+            checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+            fail("Should throw UndefinedVariableException")
+        } catch (e: UndefinedVariableException) {
+
+        }
+    }
+
+    @Test fun checkGenericQESets() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (QE i (nu int ((* int) (** int)) (@ < nu i))))
+            """))
+        checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+    }
+
+    @Test fun checkGenericQESetsWrong() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (QE j (nu int ((* int) (** int)) (@ < x j))))
+            """))
+        try {
+            checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+            fail("Should throw UndefinedVariableException")
+        } catch (e: UndefinedVariableException) {
+
+        }
+    }
+
+
+    @Test fun checkGenericQIISets() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (QII i j (nu int ((* int) (** int)) (and (@ < nu i) (@ <= i j)))))
+            """))
+        checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+    }
+
+    @Test fun checkGenericQIISetsWrong() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (QII i j (nu int ((* int) (** int)) (@ < x k))))
+            """))
+        try {
+            checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+            fail("Should throw UndefinedVariableException")
+        } catch (e: UndefinedVariableException) {
+
+        }
+    }
+
+    @Test fun checkGenericQEESets() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (QEE i j (nu int ((* int) (** int)) (and (@ < nu i) (@ <= i j)))))
+            """))
+        checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))
+    }
+
+    @Test fun checkGenericQEESetsWrong() {
+        val ast = parseVerificationUnit(getSExps("""
+            (verification-unit my-verification
+            :qset (QEE i j (nu int ((* int) (** int)) (@ < x k))))
             """))
         try {
             checkVerificationUnit(ast, initialEnvironment.copy(programFunctions = initialEnvironment.programFunctions.toMutableMap()))

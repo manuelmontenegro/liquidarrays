@@ -414,6 +414,13 @@ fun checkType(type: Type,
     }
 }
 
+/**
+ * It checks whether the qualifiers of a functional type are correct
+ *
+ * @param type Type to check
+ * @param globalEnvironment Environment with the types of function definitions (even those that are not in scope)
+ *
+ */
 fun checkFunctionalType(
             type: FunctionalType,
             globalEnvironment: GlobalEnvironment) {
@@ -432,28 +439,108 @@ fun checkFunctionalType(
 }
 
 /**
+ * It checks whether a generic qualifier is well formed (i.e. all the variables in the qualifier are in scope)
+ *
+ * @param qualifier Generic Qualifier to check
+ * @param globalEnvironment Environment with the types of function definitions (even those that are not in scope)
+ *
+ */
+fun checkGenericQualifier(qualifier: GenericQualifier, globalEnvironment: GlobalEnvironment, localEnvironment: Map<String, HMType>) {
+    val newLocalEnv = localEnvironment + qualifier.markers.map { it.varName to it.HMType }.toMap() + mapOf(qualifier.nu.varName to qualifier.nu.HMType)
+    checkAssertion(qualifier.assertion, globalEnvironment, newLocalEnv)
+}
+
+/**
+ * It typechecks a kappa declaration
+ *
+ * @param kappaDeclaration Kappa declration to check
+ * @param globalEnvironment Environment with the types of function definitions
+ */
+fun checkKappaDeclaration(kappaDeclaration: KappaDeclaration, globalEnvironment: GlobalEnvironment): List<HMType> {
+    val localEnvironment = (kappaDeclaration.parameters + kappaDeclaration.nuVar).map { it.varName to it.HMType }.toMap()
+    kappaDeclaration.qSet?.forEach { checkAssertion(it, globalEnvironment, localEnvironment) }
+    return listOf(kappaDeclaration.nuVar.HMType) + kappaDeclaration.parameters.map { it.HMType }
+}
+
+/**
+ * It typechecks a mu declaration
+ *
+ * @param muDeclaration Kappa declration to check
+ * @param globalEnvironment Environment with the types of function definitions
+ */
+fun checkMuDeclaration(muDeclaration: MuDeclaration, globalEnvironment: GlobalEnvironment): List<HMType> {
+    val localEnvironment = (muDeclaration.parameters + muDeclaration.nuVar).map { it.varName to it.HMType }.toMap()
+    muDeclaration.qISet?.forEach { checkAssertion(it.assertion, globalEnvironment, localEnvironment + (it.boundVar to intType)) }
+    muDeclaration.qESet?.forEach { checkAssertion(it.assertion, globalEnvironment, localEnvironment + (it.boundVar to intType)) }
+    muDeclaration.qIISet?.forEach { checkAssertion(it.assertion, globalEnvironment, localEnvironment + (it.boundVar1 to intType) + (it.boundVar2 to intType)) }
+    muDeclaration.qEESet?.forEach { checkAssertion(it.assertion, globalEnvironment, localEnvironment + (it.boundVar1 to intType) + (it.boundVar2 to intType)) }
+    muDeclaration.qLenSet?.forEach { checkAssertion(it, globalEnvironment, localEnvironment) }
+    return listOf(muDeclaration.nuVar.HMType) + muDeclaration.parameters.map { it.HMType }
+}
+
+
+/**
  * It typechecks a whole verification unit.
  *
  * @param verificationUnit Verification unit to check
  * @param globalEnvironment Environment with the types of function definitions
  */
 fun checkVerificationUnit(verificationUnit: VerificationUnit, globalEnvironment: GlobalEnvironment) {
+
+    // We make a copy of the (mutable) global environment, so that different calls to checkVerificationUnit
+    // do not interfere with each other
+    val globalEnvironmentCopy = globalEnvironment.copy(programFunctions = globalEnvironment.programFunctions.toMutableMap())
+
+    // We check the types of external function definitions
     verificationUnit.external.forEach {(_, funType) ->
-        checkFunctionalType(funType, globalEnvironment)
+        checkFunctionalType(funType, globalEnvironmentCopy)
     }
 
-    // TODO: check QSets and kappas
-
+    // We add the types of external function definitions to the environment
     verificationUnit.external.forEach { (name, type) ->
-        globalEnvironment.programFunctions[name] = type
+        globalEnvironmentCopy.programFunctions[name] = type
     }
 
-    verificationUnit.definitions.forEach {
-        globalEnvironment.programFunctions[it.name] = FunctionalType(it.inputParams, it.outputParams)
+    // We check the generic sets: Q and QLen
+    verificationUnit.qSet.union(verificationUnit.qLenSet).forEach {
+        val localEnv = it.markers.map { typedVar -> typedVar.varName to typedVar.HMType }.toMap() + mapOf(it.nu.varName to it.nu.HMType)
+        checkAssertion(it.assertion, globalEnvironmentCopy, localEnv)
     }
 
+    // We check the generic singly-quantified sets: QI and QE
+    verificationUnit.qISet.union(verificationUnit.qESet).forEach {
+        val localEnv = it.markers.map { typedVar -> typedVar.varName to typedVar.HMType }.toMap() + mapOf(it.nu.varName to it.nu.HMType, it.boundVar to intType)
+        checkAssertion(it.assertion, globalEnvironmentCopy, localEnv)
+    }
+
+    // We check the generic doubly-quantified sets: QII and QEE
+    verificationUnit.qIISet.union(verificationUnit.qEESet).forEach {
+        val localEnv = it.markers.map { typedVar -> typedVar.varName to typedVar.HMType }.toMap() +
+                mapOf(it.nu.varName to it.nu.HMType, it.boundVar1 to intType, it.boundVar2 to intType)
+        checkAssertion(it.assertion, globalEnvironmentCopy, localEnv)
+    }
+
+    // We check the kappa definitions and obtain the types of their parameters
+    val kappaTypes = verificationUnit.kappaDeclarations.map {
+        it.name to checkKappaDeclaration(it, globalEnvironmentCopy)
+    }.toMap()
+
+    // We check the mu definitions and obtain the types of their parameters
+    val muTypes = verificationUnit.muDeclarations.map {
+        it.name to checkMuDeclaration(it, globalEnvironmentCopy)
+    }
+
+    // We add the types of the top-level function definitions to the environment
     verificationUnit.definitions.forEach {
-        checkFunctionDefinition(it, globalEnvironment, mapOf())
+        globalEnvironmentCopy.programFunctions[it.name] = FunctionalType(it.inputParams, it.outputParams)
+    }
+
+    // Now we add the user provided kappa and mu definitions to the environment
+    val newGlobalEnvironment = globalEnvironmentCopy.copy(logicPredicates = globalEnvironmentCopy.logicPredicates + kappaTypes.toMap() + muTypes.toMap())
+
+    // Finally, we typecheck the top-level function definitions
+    verificationUnit.definitions.forEach {
+        checkFunctionDefinition(it, newGlobalEnvironment, mapOf())
     }
 }
 

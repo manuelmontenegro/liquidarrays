@@ -78,6 +78,9 @@ data class ConstrType(val typeConstructor: String,
         get() = this
 }
 
+val intType = ConstrType("int")
+
+
 /**
  * Class for representing type variables (not supported yet)
  *
