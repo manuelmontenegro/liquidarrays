@@ -554,8 +554,8 @@ class NumResultsMismatchException(val line: Int, val column: Int, val expected: 
 
 class NoInstanceResultsException(val line: Int, val column: Int, val declared: List<HMType>, val inferred: List<HMType>) :
         TypeCheckerException("In L$line, C$column: Declared types must be equal or more specific than the inferred ones.\n" +
-                "Declared: ${declared.joinToString(" ") { it.toSExp() }}\n" +
-                "Inferred: ${inferred.joinToString(" ") { it.toSExp() }}")
+                "Declared: ${declared.map { it.toSExp() }.joinToString(" ")}\n" +
+                "Inferred: ${inferred.map { it.toSExp() }.joinToString(" ")}")
 
 class UndefinedVariableException(val line: Int, val column: Int, val variable: String) :
         TypeCheckerException("In L$line, C$column: Undefined variable $variable")
@@ -568,16 +568,16 @@ class WrongNumberArgumentsException(val line: Int, val column: Int, val function
 
 class InputTypeMismatchException(val line: Int, val column: Int, val function: String, val expected: List<HMType>, val given: List<HMType>) :
         TypeCheckerException("In L$line, C$column: input type parameter mismatch in application of $function\n" +
-                "Expected: ${expected.joinToString(" ") { it.toSExp() }}\n" +
-                "Given: ${given.joinToString(" ") { it.toSExp() }}")
+                "Expected: ${expected.map { it.toSExp() }.joinToString(" ")}\n" +
+                "Given: ${given.map { it.toSExp() }.joinToString(" ")}")
 
 class LetNumberBindingsMismatchException(val line: Int, val column: Int, val lhs: Int, val rhs: Int) :
         TypeCheckerException("In L$line, C$column: number of results of let expression do not match the number of bindings\nLeft: $lhs\nRight: $rhs")
 
 class LetTypeMismatchException(val line: Int, val column: Int, val lhs: List<HMType>, val rhs: List<HMType>) :
         TypeCheckerException("In L$line, C$column: let assignment type mismatch\n" +
-                "Left: ${lhs.joinToString(" ") { it.toSExp() }}\n" +
-                "Right: ${rhs.joinToString(" ") { it.toSExp() }}")
+                "Left: ${lhs.map { it.toSExp() }.joinToString(" ")}\n" +
+                "Right: ${rhs.map { it.toSExp() }.joinToString(" ")}")
 
 class MultipleOutputConstructorException(val line: Int, val column: Int, val constrName: String) :
         TypeCheckerException("In L$line, C$column: multiple-output constructor $constrName")
@@ -590,8 +590,8 @@ class PatternTypeMismatchException(val line: Int, val column: Int, val typePatte
 
 class IncompatibleCaseBranchesException(val line: Int, val column: Int, val branch1Type: List<HMType>, val branch2Type: List<HMType>) :
         TypeCheckerException("In L$line, C$column: incompatible case branches\n" +
-                "Branch: ${branch1Type.joinToString(" ") { it.toSExp() }}\n" +
-                "against: ${branch2Type.joinToString(" ") { it.toSExp() }}")
+                "Branch: ${branch1Type.map { it.toSExp() }.joinToString(" ")}\n" +
+                "against: ${branch2Type.map { it.toSExp() }.joinToString(" ")}")
 
 class NoBranchesException(val line: Int, val column: Int) :
         TypeCheckerException("In L$line, C$column: a case must have at least one non-default branch")
