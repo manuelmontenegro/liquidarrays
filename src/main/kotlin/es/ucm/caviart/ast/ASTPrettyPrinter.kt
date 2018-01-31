@@ -19,6 +19,8 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 */
+@file:Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
+
 package es.ucm.caviart.ast
 
 /*
@@ -26,25 +28,29 @@ package es.ucm.caviart.ast
  * element into its corresponding CLIR representation.
  */
 
-private const val UNDEFINED = "undefined!"
 
+
+private fun t(token: String) = TokenSExp(0, 0, token)
+private fun s(vararg children: SExp) = ParenSExp(0, 0, *children)
+
+private val UNDEFINED = t("undefined!")
 
 /**
  * It obtains the CLIR representation of the given type.
  */
-fun Type.toSExp(): String = when (this) {
+fun Type.toSExp(): SExp = when (this) {
 
     is ConstrType -> {
         when {
-            arguments.isEmpty() -> typeConstructor
-            else -> "($typeConstructor${arguments.joinToString("") { " " + it.toSExp() }})"
+            arguments.isEmpty() -> t(typeConstructor)
+            else -> s(t(typeConstructor), *arguments.map { it.toSExp() }.toTypedArray())
         }
     }
 
-    is VarType -> variable
+    is VarType -> t(variable)
 
     is QualType ->
-            "(qual $nu ${HMType.toSExp()} ${qualifier.toSExp()})"
+        s(t("qual"), t(nu), HMType.toSExp(), qualifier.toSExp())
 
     else -> UNDEFINED
 }
@@ -53,51 +59,54 @@ fun Type.toSExp(): String = when (this) {
  * It returns the CLIR representation of the given HM-typed variable
  * as a pair `(var type)`
  */
-fun HMTypedVar.toSExp(): String  = "($varName ${HMType.toSExp()})"
+fun HMTypedVar.toSExp(): SExp = s(t(varName), HMType.toSExp())
 
 /**
  * It returns the CLIR representation of the given typed variable
  * as a pair `(var type)`. The `type` might contain qualifiers.
  */
-fun TypedVar.toSExp(): String  = "($varName ${type.toSExp()})"
+fun TypedVar.toSExp(): SExp = s(t(varName), type.toSExp())
 
 /**
  * It returns the CLIR representation of the given function definition.
  */
-fun FunctionDefinition.toSExp(): String =
-        "($name (${inputParams.joinToString(" ") { it.toSExp() }}) (${outputParams.joinToString(" ") { it.toSExp() }}) " +
-                "(declare (assertion (precd ${precondition.toSExp()}) (postcd ${postcondition.toSExp()}))) ${body.toSExp()})"
+fun FunctionDefinition.toSExp(): SExp =
+        s(t(name), s(*inputParams.map { it.toSExp() }.toTypedArray()), s(*outputParams.map { it.toSExp() }.toTypedArray()),
+                s(t("declare"), s(t("assertion"), s(t("precd"), precondition.toSExp()),
+                        s(t("postcd"), postcondition.toSExp()))), body.toSExp())
 
 
 /**
  * It returns the CLIR representation of the given pattern
  */
-fun Pattern.toSExp(): String = when(this) {
-    is LiteralPattern -> literal
-    is ConstructorPattern -> "(@@ $constructorName${constructorArgs.joinToString(" ")})"
+fun Pattern.toSExp(): SExp = when (this) {
+    is LiteralPattern -> t(literal)
+    is ConstructorPattern -> s(t("@@"), t(constructorName), *constructorArgs.map { toSExp() }.toTypedArray())
     else -> UNDEFINED
 }
 
 /**
  * It returns the CLIR representation of the given case branch
  */
-fun CaseBranch.toSExp(): String = "(${pattern.toSExp()} ${expression.toSExp()})"
+fun CaseBranch.toSExp(): SExp = s(pattern.toSExp(), expression.toSExp())
 
 /**
  * It returns the CLIR representation of the given assertion
  */
-fun Assertion.toSExp(): String = when(this) {
-    is True -> "true"
-    is False -> "false"
-    is PredicateApplication -> "(@ $name${arguments.joinToString("") { " " + it.toSExp() }})"
-    is BooleanVariable -> name
-    is Not -> "(not ${assertion.toSExp()})"
-    is And -> "(and${conjuncts.joinToString("") { " " + it.toSExp() }})"
-    is Or -> "(or${disjuncts.joinToString("") { " " + it.toSExp() }})"
-    is Implication -> "(->${operands.joinToString("") { " " + it.toSExp() }})"
-    is Iff -> "(<->${operands.joinToString("") { " " + it.toSExp() }})"
-    is ForAll -> "(forall (${boundVars.joinToString(" ") { it.toSExp() }}) ${assertion.toSExp()})"
-    is Exists -> "(exists (${boundVars.joinToString(" ") { it.toSExp() }}) ${assertion.toSExp()})"
+fun Assertion.toSExp(): SExp = when (this) {
+    is True -> t("true")
+    is False -> t("false")
+    is PredicateApplication -> s(t("@"), t(name), *arguments.map { it.toSExp() }.toTypedArray())
+    is BooleanVariable -> t(name)
+    is Not -> s(t("not"), assertion.toSExp())
+    is And -> s(t("and"), *conjuncts.map { it.toSExp() }.toTypedArray())
+    is Or -> s(t("or"), *disjuncts.map { it.toSExp() }.toTypedArray())
+    is Implication -> s(t("->"), *operands.map { it.toSExp() }.toTypedArray())
+    is Iff -> s(t("<->"), *operands.map { it.toSExp() }.toTypedArray())
+    is ForAll ->
+        s(t("forall"), s(*boundVars.map { it.toSExp() }.toTypedArray()), assertion.toSExp())
+    is Exists ->
+        s(t("exists"), s(*boundVars.map { it.toSExp() }.toTypedArray()), assertion.toSExp())
     else -> UNDEFINED
 }
 
@@ -105,31 +114,195 @@ fun Assertion.toSExp(): String = when(this) {
 /**
  * It returns the CLIR representation of the given expression
  */
-fun Term.toSExp(): Any = when (this) {
+fun Term.toSExp(): SExp = when (this) {
     is Literal ->
-        "(the ${type.toSExp()} $value)"
+        s(t("the"), type.toSExp(), t(value))
 
     is Variable ->
-        name
+        t(name)
 
     is FunctionApplication ->
-        "(@ $name${arguments.joinToString("") { " " + it.toSExp() }})"
+        s(t("@"), t(name), *arguments.map { it.toSExp() }.toTypedArray())
 
     is ConstructorApplication ->
-        "(@@ $name${arguments.joinToString("") { " " + it.toSExp() }})"
+        s(t("@@"), t(name), *arguments.map { it.toSExp() }.toTypedArray())
 
     is Tuple ->
-        "(tuple${arguments.joinToString("") { " " + it.toSExp() }})"
+        s(t("tuple"), *arguments.map { it.toSExp() }.toTypedArray())
 
     is Let ->
-            "(let (${bindings.joinToString(" ") {it.toSExp()}}) ${bindingExpression.toSExp()} ${mainExpression.toSExp()})"
+        s(t("let"), s(*bindings.map { it.toSExp() }.toTypedArray()), bindingExpression.toSExp(), mainExpression.toSExp())
 
     is LetFun ->
-            "(letfun (${defs.joinToString(" ") {it.toSExp()}}) ${mainExpression.toSExp()})"
+        s(t("letfun"), s(*defs.map { it.toSExp() }.toTypedArray()), mainExpression.toSExp())
 
     is Case ->
-            "(case ${discriminant.toSExp()} (${branches.joinToString(" ") { it.toSExp() }})${defaultBranch?.toSExp() ?: ""})"
+        if (defaultBranch != null) {
+            s(t("case"), discriminant.toSExp(), s(*branches.map { it.toSExp() }.toTypedArray()), defaultBranch.toSExp())
+        } else {
+            s(t("case"), discriminant.toSExp(), s(*branches.map { it.toSExp() }.toTypedArray()))
+        }
 
     else -> UNDEFINED
 }
+
+/**
+ * It returns the CLIR representation of the given kappa declaration
+ */
+fun KappaDeclaration.toSExp(): SExp = when {
+    this.qSet != null ->
+        s(t(this.name),
+                s(this.nuVar.toSExp(), *this.parameters.map { it.toSExp() }.toTypedArray()),
+                s(t("Q"), *this.qSet.map { it.toSExp() }.toTypedArray()))
+    else ->
+        s(t(this.name),
+                s(this.nuVar.toSExp(), *this.parameters.map { it.toSExp() }.toTypedArray()))
+}
+
+/**
+ * It returns the CLIR representation of the given mu declaration
+ */
+fun MuDeclaration.toSExp(): SExp {
+    val qSets = mutableListOf<SExp>()
+
+    fun getSingle(name: String, qSet: Set<SingleQualifier>): SExp {
+        val boundVars = qSet.map { it.boundVar }.toSet()
+        if (boundVars.size > 1)
+            throw InvalidQualifierSet(this.line, this.column, boundVars)
+
+        return s(t(name), t(boundVars.first()), *(qSet.map { it.assertion.toSExp() }.toTypedArray()))
+    }
+
+    fun getDouble(name: String, qSet: Set<DoubleQualifier>): SExp {
+        val boundVars1 = qSet.map { it.boundVar1 }.toSet()
+        if (boundVars1.size > 1)
+            throw InvalidQualifierSet(this.line, this.column, boundVars1)
+
+        val boundVars2 = qSet.map { it.boundVar2 }.toSet()
+        if (boundVars2.size > 1)
+            throw InvalidQualifierSet(this.line, this.column, boundVars2)
+
+        return s(t(name), t(boundVars1.first()), t(boundVars2.first()), *(qSet.map { it.assertion.toSExp() }.toTypedArray()))
+    }
+
+    if (this.qISet != null) {
+        qSets.add(getSingle("QI", this.qISet))
+    }
+
+    if (this.qESet != null) {
+        qSets.add(getSingle("QE", this.qESet))
+    }
+
+    if (this.qIISet != null) {
+        qSets.add(getDouble("QII", this.qIISet))
+    }
+
+    if (this.qEESet != null) {
+        qSets.add(getDouble("QEE", this.qEESet))
+    }
+
+    if (this.qLenSet != null) {
+        qSets.add(s(t("QLen"), *this.qLenSet.map { it.toSExp() }.toTypedArray()))
+    }
+
+    return s(t(this.name), s(this.nuVar.toSExp(), *this.parameters.map { it.toSExp() }.toTypedArray()), *qSets.toTypedArray())
+}
+
+/**
+ * It returns the CLIR representation of a verification unit
+ */
+fun VerificationUnit.toSExpList(): List<SExp> {
+    val externalDefinitions: List<Pair<String, SExp>> = this.external.map { (funName, type) ->
+        ":external" to
+                s(t(funName),
+                        s(*type.input.map { it.toSExp() }.toTypedArray()),
+                        s(*type.output.map { it.toSExp() }.toTypedArray())
+                )
+    }
+
+
+    /*
+     * It returns the directives corresponding to Q and QLen
+     */
+    fun handleUnquantifiedGenericQualifiedSet(name: String, qSet: Set<GenericQualifier>) : List<Pair<String, SExp>> =
+        if (qSet.isEmpty())
+            listOf()
+        else
+            listOf(":qset" to s(t(name),
+                    *qSet.map {
+                        s(t(it.nu.varName), it.nu.HMType.toSExp(),
+                                s(*it.markers.map { it.toSExp() }.toTypedArray()), it.assertion.toSExp())
+                    }.toTypedArray()
+            ))
+
+    val setQ: List<Pair<String, SExp>> = handleUnquantifiedGenericQualifiedSet("Q", this.qSet)
+    val setQLen: List<Pair<String, SExp>> = handleUnquantifiedGenericQualifiedSet("Q", this.qLenSet)
+
+
+    /*
+     * It returns the directives corresponding to QI and QE
+     */
+    fun handleSingleGenericQualifiedSet(name: String, qSet: Set<GenericSingleQualifier>): List<Pair<String, SExp>> =
+        if (qSet.isEmpty()) {
+            listOf()
+        } else {
+            val boundVars = qSet.map { it.boundVar }.toSet()
+            if (boundVars.size > 1) {
+                throw InvalidQualifierSet(0, 0, boundVars)
+            }
+            listOf(":qset" to s(t(name), t(boundVars.first()),
+                    *qSet.map {
+                        s(t(it.nu.varName), it.nu.HMType.toSExp(), s(*it.markers.map { it.toSExp() }.toTypedArray()), it.assertion.toSExp())
+                    }.toTypedArray()
+            ))
+        }
+
+
+    val setQI = handleSingleGenericQualifiedSet("QI", this.qISet)
+    val setQE = handleSingleGenericQualifiedSet("QE", this.qESet)
+
+    /*
+     * It returns the directives corresponding to QII and QEE
+     */
+    fun handleDoubleGenericQualifiedSet(name: String, qSet: Set<GenericDoubleQualifier>): List<Pair<String, SExp>> {
+        if (qSet.isEmpty()) {
+            return listOf()
+        } else {
+            val boundVars1 = qSet.map { it.boundVar1 }.toSet()
+            if (boundVars1.size > 1) {
+                throw InvalidQualifierSet(0, 0, boundVars1)
+            }
+            val boundVars2 = qSet.map { it.boundVar1 }.toSet()
+            if (boundVars2.size > 1) {
+                throw InvalidQualifierSet(0, 0, boundVars2)
+            }
+            return listOf(":qset" to s(t(name), t(boundVars2.first()),
+                    *qSet.map {
+                        s(t(it.nu.varName), it.nu.HMType.toSExp(), s(*it.markers.map { it.toSExp() }.toTypedArray()), it.assertion.toSExp())
+                    }.toTypedArray()
+            ))
+        }
+    }
+
+    val setQII = handleDoubleGenericQualifiedSet("QII", this.qIISet)
+    val setQEE = handleDoubleGenericQualifiedSet("QEE", this.qEESet)
+
+
+    val kappaDecls = this.kappaDeclarations.map { ":kappa" to it.toSExp() }
+    val muDecls = this.muDeclarations.map { ":mu" to it.toSExp() }
+
+    val directives: List<Pair<String, SExp>>
+            = externalDefinitions + setQ + setQI + setQE + setQII + setQEE + setQLen + kappaDecls + muDecls
+
+    val header = s(t("verification-unit"), t(this.name),
+            *directives.flatMap { (name, value) -> listOf(t(name), value) }.toTypedArray()
+            )
+
+    return listOf(header, *definitions.map {
+        s(t("define"), *(it.toSExp() as ParenSExp).children.toTypedArray())
+    }.toTypedArray<SExp>())
+}
+
+class InvalidQualifierSet(val line: Int, val column: Int, variables: Set<String>)
+    : RuntimeException("In L$line, C$column: all the variables in the qualifier must be the same. Found: $variables")
 

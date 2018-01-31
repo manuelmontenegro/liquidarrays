@@ -316,12 +316,24 @@ abstract class Assertion : ASTElem()
 /**
  * Atomic assertion that always holds.
  */
-class True : Assertion()
+class True : Assertion() {
+    override fun toString(): String = "True()"
+    override fun equals(other: Any?): Boolean = other is True
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
+}
 
 /**
  * Atomic assertion that never holds.
  */
-class False : Assertion()
+class False : Assertion() {
+    override fun toString(): String = "False()"
+    override fun equals(other: Any?): Boolean = other is False
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
+}
 
 /**
  * Variable denoting an assertion

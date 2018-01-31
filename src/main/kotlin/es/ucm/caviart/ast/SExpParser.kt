@@ -32,7 +32,23 @@ import java.util.*
  * @property line Line in which the S-Expression starts
  * @property column column in which the S-Expression starts
  */
-abstract class SExp(val line: Int, val column: Int)
+abstract class SExp(val line: Int, val column: Int) {
+    /**
+     * It returns an indented representation of a S-expression, assuming that
+     * the current cursor position is `margin` and that each line of the result
+     * must not have more than `maxWidth - margin` characters.
+     */
+    abstract fun prettyPrint(margin: Int, maxWidth: Int = 80): String
+
+    /**
+     * It returns an indented representation of a S-expression, in which each
+     * line of the result does not have more than `margin` characters.
+     *
+     * @param maxWidth Maximum number of characters per line
+     * @return Pretty-printed representation of the string.
+     */
+    fun prettyPrint(maxWidth: Int = 80): String = prettyPrint(0, maxWidth)
+}
 
 
 /**
@@ -42,13 +58,14 @@ abstract class SExp(val line: Int, val column: Int)
  * @param column column in which the S-Expression starts
  * @property value Text of the atomic expression
  */
-class TokenSExp(line: Int, column: Int, val value: String): SExp(line, column) {
+class TokenSExp(line: Int, column: Int, val value: String) : SExp(line, column) {
+    override fun prettyPrint(margin: Int, maxWidth: Int): String = this.toString()
 
     /**
      * It returns a string representation of an S-expression
      */
     override fun toString(): String =
-        if (value.contains(Regex("\\s"))) "\"$value\"" else value
+            if (value.contains(Regex("\\s"))) "\"$value\"" else value
 
 }
 
@@ -61,7 +78,23 @@ class TokenSExp(line: Int, column: Int, val value: String): SExp(line, column) {
  * @property children S-Expressions contained within the `this` object
  *
  */
-class ParenSExp(line: Int, column: Int, val children: List<SExp>): SExp(line, column) {
+class ParenSExp(line: Int, column: Int, val children: List<SExp>) : SExp(line, column) {
+    override fun prettyPrint(margin: Int, maxWidth: Int): String {
+        val childrenStrs = children.map { it.prettyPrint(margin + 1, maxWidth) }
+        val totalLength = margin + 1 + childrenStrs.map { it.length + 1 }.sum()
+
+        return if (totalLength > maxWidth || childrenStrs.any { it.contains("\n") }) {
+            if (childrenStrs.isNotEmpty()) {
+                "(" + childrenStrs[0] + childrenStrs.subList(1, childrenStrs.size).joinToString("") { "\n" + " ".repeat(margin + 2) + it } + ")"
+            } else {
+                "()"
+            }
+
+        } else {
+            "(" + childrenStrs.joinToString(" ") + ")"
+        }
+    }
+
     constructor (line: Int, column: Int, vararg children: SExp) : this(line, column, children.toList())
 
     /**
@@ -93,13 +126,13 @@ fun getSExps(tokens: List<Token>): List<SExp> {
 
     for (token in tokens) {
         when (token) {
-            // A left parenthesis starts a new open S-expression
+        // A left parenthesis starts a new open S-expression
             is LeftParen -> {
                 stack.push(StackElement(mutableListOf(), token.line, token.column))
             }
 
-            // A right parenthesis ends the current S-expression and adds it to
-            // the children its parent.
+        // A right parenthesis ends the current S-expression and adds it to
+        // the children its parent.
             is RightParen -> {
                 val element = stack.pop()
                 if (stack.empty()) {
@@ -109,7 +142,7 @@ fun getSExps(tokens: List<Token>): List<SExp> {
                 }
             }
 
-            // A single token is inserted into the innermost currently open S-expression
+        // A single token is inserted into the innermost currently open S-expression
             is TokenLiteral -> {
                 stack.peek().sExps.add(TokenSExp(token.line, token.column, token.value))
             }
