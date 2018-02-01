@@ -1,5 +1,13 @@
 package es.ucm.caviart
 
+import es.ucm.caviart.ast.getSExps
+import es.ucm.caviart.ast.parseVerificationUnit
+import es.ucm.caviart.ast.readTokens
+import es.ucm.caviart.ast.toSExpList
+import es.ucm.caviart.typecheck.TypeCheckerException
+import es.ucm.caviart.typecheck.checkVerificationUnit
+import es.ucm.caviart.typecheck.initialEnvironment
+import es.ucm.caviart.typecheck.qualifyVeriticationUnit
 import es.ucm.caviart.utils.asDarkGray
 import es.ucm.caviart.utils.asGreen
 import es.ucm.caviart.utils.asRed
@@ -24,7 +32,6 @@ fun<T> runPhase(description: String, action: () -> T): T {
     } catch (e: Exception) {
         print(" ".repeat(WIDTH - initCad.length))
         println("ERROR".asRed())
-        print(e.message)
         throw e
     }
 }
@@ -39,18 +46,42 @@ fun main(args: Array<String>) {
 
     try {
         val reader = FileReader(filename)
+
         val tokens = runPhase("Running lexer") {
             readTokens(reader)
         }
         val sexps = runPhase("Running S-expression parser") {
             getSExps(tokens)
         }
-        println(sexps)
+        val verificationUnit = runPhase("Running parser") {
+            parseVerificationUnit(sexps)
+        }
+        runPhase("Running type checker") {
+            checkVerificationUnit(verificationUnit, initialEnvironment)
+        }
+
+        val numberKappas = verificationUnit.kappaDeclarations.size
+        val numberMus = verificationUnit.muDeclarations.size
+
+        val verificationUnitDecorated = runPhase("Generating qualified types") {
+            qualifyVeriticationUnit(verificationUnit)
+        }
+
+        val newKappas = verificationUnitDecorated.kappaDeclarations.size - numberKappas
+        println("     Number of template variables (kappa): ${verificationUnitDecorated.kappaDeclarations.size} ($newKappas newly generated)")
+        val newMus = verificationUnitDecorated.muDeclarations.size - numberMus
+        println("     Number of template variables (mu): ${verificationUnitDecorated.muDeclarations.size} ($newMus newly generated)")
+
+        val sexpAgain = verificationUnitDecorated.toSExpList()
+        sexpAgain.forEach {
+            println(it.prettyPrint(100))
+        }
+
 
     } catch (e: IOException) {
         println("Error:".asRed() + " " + e.message)
-    } catch (e: Exception) {
-
+    } catch (e: TypeCheckerException) {
+        println(("Type checker error: ".asRed()) + " " + e.message)
     }
 
 
