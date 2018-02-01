@@ -170,7 +170,11 @@ fun MuDeclaration.toSExp(): SExp {
         if (boundVars.size > 1)
             throw InvalidQualifierSet(this.line, this.column, boundVars)
 
-        return s(t(name), t(boundVars.first()), *(qSet.map { it.assertion.toSExp() }.toTypedArray()))
+        return if (qSet.isEmpty()) {
+            s(t(name), t(if (boundVars.isEmpty()) "i" else boundVars.first()))
+        } else {
+            s(t(name), t(if (boundVars.isEmpty()) "i" else boundVars.first()), *(qSet.map { it.assertion.toSExp() }.toTypedArray()))
+        }
     }
 
     fun getDouble(name: String, qSet: Set<DoubleQualifier>): SExp {
@@ -182,7 +186,12 @@ fun MuDeclaration.toSExp(): SExp {
         if (boundVars2.size > 1)
             throw InvalidQualifierSet(this.line, this.column, boundVars2)
 
-        return s(t(name), t(boundVars1.first()), t(boundVars2.first()), *(qSet.map { it.assertion.toSExp() }.toTypedArray()))
+        return if (qSet.isEmpty()) {
+            s(t(name), t(if (boundVars1.isEmpty()) "i" else boundVars1.first()), t(if (boundVars2.isEmpty()) "j" else boundVars2.first()))
+        } else {
+            s(t(name), t(if (boundVars1.isEmpty()) "i" else boundVars1.first()), t(if (boundVars2.isEmpty()) "j" else boundVars2.first()), *(qSet.map { it.assertion.toSExp() }.toTypedArray()))
+        }
+
     }
 
     if (this.qISet != null) {
@@ -224,10 +233,7 @@ fun VerificationUnit.toSExpList(): List<SExp> {
     /*
      * It returns the directives corresponding to Q and QLen
      */
-    fun handleUnquantifiedGenericQualifiedSet(name: String, qSet: Set<GenericQualifier>) : List<Pair<String, SExp>> =
-        if (qSet.isEmpty())
-            listOf()
-        else
+    fun handleUnquantifiedGenericQualifiedSet(name: String, qSet: Set<GenericQualifier>): List<Pair<String, SExp>> =
             listOf(":qset" to s(t(name),
                     *qSet.map {
                         s(t(it.nu.varName), it.nu.HMType.toSExp(),
@@ -236,26 +242,23 @@ fun VerificationUnit.toSExpList(): List<SExp> {
             ))
 
     val setQ: List<Pair<String, SExp>> = handleUnquantifiedGenericQualifiedSet("Q", this.qSet)
-    val setQLen: List<Pair<String, SExp>> = handleUnquantifiedGenericQualifiedSet("Q", this.qLenSet)
+    val setQLen: List<Pair<String, SExp>> = handleUnquantifiedGenericQualifiedSet("QLen", this.qLenSet)
 
 
     /*
      * It returns the directives corresponding to QI and QE
      */
-    fun handleSingleGenericQualifiedSet(name: String, qSet: Set<GenericSingleQualifier>): List<Pair<String, SExp>> =
-        if (qSet.isEmpty()) {
-            listOf()
-        } else {
-            val boundVars = qSet.map { it.boundVar }.toSet()
-            if (boundVars.size > 1) {
-                throw InvalidQualifierSet(0, 0, boundVars)
-            }
-            listOf(":qset" to s(t(name), t(boundVars.first()),
-                    *qSet.map {
-                        s(t(it.nu.varName), it.nu.HMType.toSExp(), s(*it.markers.map { it.toSExp() }.toTypedArray()), it.assertion.toSExp())
-                    }.toTypedArray()
-            ))
+    fun handleSingleGenericQualifiedSet(name: String, qSet: Set<GenericSingleQualifier>): List<Pair<String, SExp>> {
+        val boundVars = qSet.map { it.boundVar }.toSet()
+        if (boundVars.size > 1) {
+            throw InvalidQualifierSet(0, 0, boundVars)
         }
+        return listOf(":qset" to s(t(name), t(if (boundVars.isEmpty()) "i" else boundVars.first()),
+                *qSet.map {
+                    s(t(it.nu.varName), it.nu.HMType.toSExp(), s(*it.markers.map { it.toSExp() }.toTypedArray()), it.assertion.toSExp())
+                }.toTypedArray()
+        ))
+    }
 
 
     val setQI = handleSingleGenericQualifiedSet("QI", this.qISet)
@@ -265,23 +268,19 @@ fun VerificationUnit.toSExpList(): List<SExp> {
      * It returns the directives corresponding to QII and QEE
      */
     fun handleDoubleGenericQualifiedSet(name: String, qSet: Set<GenericDoubleQualifier>): List<Pair<String, SExp>> {
-        if (qSet.isEmpty()) {
-            return listOf()
-        } else {
-            val boundVars1 = qSet.map { it.boundVar1 }.toSet()
-            if (boundVars1.size > 1) {
-                throw InvalidQualifierSet(0, 0, boundVars1)
-            }
-            val boundVars2 = qSet.map { it.boundVar1 }.toSet()
-            if (boundVars2.size > 1) {
-                throw InvalidQualifierSet(0, 0, boundVars2)
-            }
-            return listOf(":qset" to s(t(name), t(boundVars2.first()),
-                    *qSet.map {
-                        s(t(it.nu.varName), it.nu.HMType.toSExp(), s(*it.markers.map { it.toSExp() }.toTypedArray()), it.assertion.toSExp())
-                    }.toTypedArray()
-            ))
+        val boundVars1 = qSet.map { it.boundVar1 }.toSet()
+        if (boundVars1.size > 1) {
+            throw InvalidQualifierSet(0, 0, boundVars1)
         }
+        val boundVars2 = qSet.map { it.boundVar1 }.toSet()
+        if (boundVars2.size > 1) {
+            throw InvalidQualifierSet(0, 0, boundVars2)
+        }
+        return listOf(":qset" to s(t(name), t(if (boundVars1.isEmpty()) "i" else boundVars1.first()), t(if (boundVars2.isEmpty()) "j" else boundVars2.first()),
+                *qSet.map {
+                    s(t(it.nu.varName), it.nu.HMType.toSExp(), s(*it.markers.map { it.toSExp() }.toTypedArray()), it.assertion.toSExp())
+                }.toTypedArray()
+        ))
     }
 
     val setQII = handleDoubleGenericQualifiedSet("QII", this.qIISet)
@@ -291,12 +290,11 @@ fun VerificationUnit.toSExpList(): List<SExp> {
     val kappaDecls = this.kappaDeclarations.map { ":kappa" to it.toSExp() }
     val muDecls = this.muDeclarations.map { ":mu" to it.toSExp() }
 
-    val directives: List<Pair<String, SExp>>
-            = externalDefinitions + setQ + setQI + setQE + setQII + setQEE + setQLen + kappaDecls + muDecls
+    val directives: List<Pair<String, SExp>> = externalDefinitions + setQ + setQI + setQE + setQII + setQEE + setQLen + kappaDecls + muDecls
 
     val header = s(t("verification-unit"), t(this.name),
             *directives.flatMap { (name, value) -> listOf(t(name), value) }.toTypedArray()
-            )
+    )
 
     return listOf(header, *definitions.map {
         s(t("define"), *(it.toSExp() as ParenSExp).children.toTypedArray())
