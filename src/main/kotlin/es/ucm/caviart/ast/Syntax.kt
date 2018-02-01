@@ -643,7 +643,66 @@ fun Assertion.getVariables(): Set<String> = when(this) {
 }
 
 
+/*
+fun BindingExpression.findArrayAccesses(indexVar: String, environment: Map<String, HMType>): Set<Pair<String, HMType>> = when (this) {
+    is Literal -> emptySet()
 
+    is Variable -> emptySet()
+
+    is FunctionApplication -> {
+        if (this.name == "get-array" || this.name == "set-array") {
+            val arrayName = (this.arguments[0] as Variable).name
+            val indexName = (this.arguments[1] as Variable).name
+            if (indexVar == indexName) {
+                val arrayType = environment[arrayName]
+                if (arrayType == null || arrayType !is ConstrType || arrayType.typeConstructor != "array") {
+                    throw RuntimeException("get-array applied to $arrayName of non-array type, but it has not been caught before (?)")
+                } else {
+                    setOf(arrayName to arrayType.arguments[0])
+                }
+            } else {
+                emptySet()
+            }
+        } else {
+            emptySet()
+        }
+    }
+
+    is ConstructorApplication -> emptySet()
+
+    is Tuple -> emptySet()
+
+    else -> throw InvalidASTException(this)
+}
+*/
+
+/*
+fun Assertion.findArrayAccesses(indexVar: String, environment: Map<String, HMType>): Set<Pair<String, HMType>> = when (this) {
+    is True -> emptySet()
+
+    is False -> emptySet()
+
+    is BooleanVariable -> emptySet()
+
+    is PredicateApplication -> arguments.flatMap { it.findArrayAccesses(indexVar, environment) }.toSet()
+
+    is Not -> assertion.findArrayAccesses(indexVar, environment)
+
+    is And -> conjuncts.flatMap { it.findArrayAccesses(indexVar, environment) }.toSet()
+
+    is Or -> disjuncts.flatMap { it.findArrayAccesses(indexVar, environment) }.toSet()
+
+    is Implication -> operands.flatMap { it.findArrayAccesses(indexVar, environment) }.toSet()
+
+    is Iff -> operands.flatMap { it.findArrayAccesses(indexVar, environment) }.toSet()
+
+    is ForAll -> assertion.findArrayAccesses(indexVar, environment + boundVars.map { it.varName to it.HMType })
+
+    is Exists -> assertion.findArrayAccesses(indexVar, environment + boundVars.map { it.varName to it.HMType })
+
+    else -> throw InvalidASTException(this)
+
+}*/
 
 
 
