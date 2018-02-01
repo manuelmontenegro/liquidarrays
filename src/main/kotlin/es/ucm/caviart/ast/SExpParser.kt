@@ -80,18 +80,50 @@ class TokenSExp(line: Int, column: Int, val value: String) : SExp(line, column) 
  */
 class ParenSExp(line: Int, column: Int, val children: List<SExp>) : SExp(line, column) {
     override fun prettyPrint(margin: Int, maxWidth: Int): String {
-        val childrenStrs = children.map { it.prettyPrint(margin + 1, maxWidth) }
-        val totalLength = margin + 1 + childrenStrs.map { it.length + 1 }.sum()
-
-        return if (totalLength > maxWidth || childrenStrs.any { it.contains("\n") }) {
-            if (childrenStrs.isNotEmpty()) {
-                "(" + childrenStrs[0] + childrenStrs.subList(1, childrenStrs.size).joinToString("") { "\n" + " ".repeat(margin + 2) + it } + ")"
-            } else {
-                "()"
-            }
-
+        if (children.isEmpty()) {
+            return "()"
         } else {
-            "(" + childrenStrs.joinToString(" ") + ")"
+            return buildString {
+                // Whether we have to insert a new line before the next expression
+                var insertNLBefore = false
+                // Whether the next expression to print will be the first in its line
+                var isFirstInCurrentLine = true
+                // The next expression to print
+                var nextExpression = ""
+                // The number of characters remaining in the current line
+                var spaceRemaining = maxWidth - (margin + 1)
+                append("(")
+                children.forEach {
+                    if (insertNLBefore) {
+                        append("\n" + " ".repeat(margin + 2))
+                    }
+                    append(nextExpression)
+
+                    // We assign the parameters for the next expression to be printed
+                    val pprinted = it.prettyPrint(margin + 2, maxWidth)
+                    if (!pprinted.contains("\n") && pprinted.length <= spaceRemaining) {
+                        // It fits in the current line
+                        if (!isFirstInCurrentLine) {
+                            append(" ")
+                        } else {
+                            isFirstInCurrentLine = false
+                        }
+                        insertNLBefore = false
+                        spaceRemaining = spaceRemaining - 2 - pprinted.length
+                    } else {
+                        // It does not fit in the current line
+                        insertNLBefore = true
+                        isFirstInCurrentLine = true
+                        spaceRemaining = margin + 2
+                    }
+                    nextExpression = pprinted
+                }
+                if (insertNLBefore) {
+                    append("\n" + " ".repeat(margin + 2))
+                }
+                append(nextExpression)
+                append(")")
+            }
         }
     }
 
