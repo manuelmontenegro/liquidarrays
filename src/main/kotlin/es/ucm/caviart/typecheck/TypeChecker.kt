@@ -485,7 +485,7 @@ fun checkMuDeclaration(muDeclaration: MuDeclaration, globalEnvironment: GlobalEn
  * @param verificationUnit Verification unit to check
  * @param globalEnvironment Environment with the types of function definitions
  */
-fun checkVerificationUnit(verificationUnit: VerificationUnit, globalEnvironment: GlobalEnvironment) {
+fun checkVerificationUnit(verificationUnit: VerificationUnit, globalEnvironment: GlobalEnvironment): GlobalEnvironment {
 
     // We make a copy of the (mutable) global environment, so that different calls to checkVerificationUnit
     // do not interfere with each other
@@ -542,6 +542,8 @@ fun checkVerificationUnit(verificationUnit: VerificationUnit, globalEnvironment:
     verificationUnit.definitions.forEach {
         checkFunctionDefinition(it, newGlobalEnvironment, mapOf())
     }
+
+    return newGlobalEnvironment
 }
 
 open class TypeCheckerException(message: String) : RuntimeException(message)
