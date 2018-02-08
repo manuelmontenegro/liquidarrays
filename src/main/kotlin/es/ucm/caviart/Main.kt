@@ -1,9 +1,9 @@
 package es.ucm.caviart
 
-import es.ucm.caviart.ast.getSExps
-import es.ucm.caviart.ast.parseVerificationUnit
-import es.ucm.caviart.ast.readTokens
-import es.ucm.caviart.ast.toSExpList
+import es.ucm.caviart.ast.*
+import es.ucm.caviart.goal.Goal
+import es.ucm.caviart.goal.generateForDefinition
+import es.ucm.caviart.qstar.instantiateVerificationUnit
 import es.ucm.caviart.typecheck.TypeCheckerException
 import es.ucm.caviart.typecheck.checkVerificationUnit
 import es.ucm.caviart.typecheck.initialEnvironment
@@ -36,6 +36,13 @@ fun<T> runPhase(description: String, action: () -> T): T {
     }
 }
 
+fun Goal.isTrivial() =
+    this.conclusion is True || this.assumptions.any { it is False }
+
+fun Goal.prune() =
+        this.copy(assumptions = this.assumptions.filterNot { it is True })
+
+
 fun main(args: Array<String>) {
     if (args.size != 1) {
         println("Error:".asRed() + " no input file given")
@@ -56,7 +63,7 @@ fun main(args: Array<String>) {
         val verificationUnit = runPhase("Running parser") {
             parseVerificationUnit(sexps)
         }
-        runPhase("Running type checker") {
+        val newEnvironment = runPhase("Running type checker") {
             checkVerificationUnit(verificationUnit, initialEnvironment)
         }
 
@@ -72,7 +79,25 @@ fun main(args: Array<String>) {
         val newMus = verificationUnitDecorated.muDeclarations.size - numberMus
         println("     Number of template variables (mu): ${verificationUnitDecorated.muDeclarations.size} ($newMus newly generated)")
 
-        val sexpAgain = verificationUnitDecorated.toSExpList()
+        val verificationUnitDecorated2 = runPhase("Generating qualifier instances") {
+            instantiateVerificationUnit(verificationUnitDecorated)
+        }
+
+
+        val generatedGoals: List<Goal> = runPhase("Generating goals") {
+            val result = mutableListOf<Goal>()
+            verificationUnitDecorated2.definitions.map {
+                generateForDefinition(it, listOf(), newEnvironment, result)
+            }
+            result
+        }
+
+        println("     Number of goals: ${generatedGoals.size}")
+        val prunedGoals = generatedGoals.filterNot { it.isTrivial() }.map { it.prune() }
+        println("     Trivial goals removed: ${generatedGoals.size - prunedGoals.size}")
+
+
+        val sexpAgain = verificationUnitDecorated2.toSExpList()
         sexpAgain.forEach {
             println(it.prettyPrint(100))
         }
