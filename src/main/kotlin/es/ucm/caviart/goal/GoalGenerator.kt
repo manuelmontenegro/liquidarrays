@@ -48,11 +48,11 @@ import es.ucm.caviart.typecheck.GlobalEnvironment
  * @param conclusion Assertion to be proved from the assumptions
  * @param environment Hindley Milner types of all the variables occurring in the goal
  */
-class Goal(val name: String,
-           val description: String,
-           val assumptions: List<Assertion>,
-           val conclusion: Assertion,
-           val environment: Map<String, HMType>) {
+data class Goal(val name: String,
+                val description: String,
+                val assumptions: List<Assertion>,
+                val conclusion: Assertion,
+                val environment: Map<String, HMType>) {
     override fun toString(): String =
             "GOAL $name: $description\n" +
                     "Assuming:\n" +
