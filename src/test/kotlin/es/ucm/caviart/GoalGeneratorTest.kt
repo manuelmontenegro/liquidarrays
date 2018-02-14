@@ -6,6 +6,7 @@ import es.ucm.caviart.goal.generateForDefinition
 import es.ucm.caviart.typecheck.GlobalEnvironment
 import es.ucm.caviart.typecheck.checkVerificationUnit
 import es.ucm.caviart.typecheck.initialEnvironment
+import es.ucm.caviart.utils.FreshNameGenerator
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals

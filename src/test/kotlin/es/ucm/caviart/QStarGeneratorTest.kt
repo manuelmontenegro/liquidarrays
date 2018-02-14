@@ -2,6 +2,7 @@ package es.ucm.caviart
 
 import es.ucm.caviart.ast.*
 import es.ucm.caviart.qstar.*
+import es.ucm.caviart.utils.FreshNameGenerator
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
