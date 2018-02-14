@@ -21,8 +21,8 @@
 */
 package es.ucm.caviart.qstar
 
-import es.ucm.caviart.*
 import es.ucm.caviart.ast.*
+import es.ucm.caviart.utils.FreshNameGenerator
 
 /**
  * It generates all the possible well-typed instantiations of a generic

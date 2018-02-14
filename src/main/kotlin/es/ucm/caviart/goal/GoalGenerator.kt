@@ -33,7 +33,7 @@ package es.ucm.caviart.goal
  */
 
 
-import es.ucm.caviart.FreshNameGenerator
+import es.ucm.caviart.utils.FreshNameGenerator
 import es.ucm.caviart.ast.*
 import es.ucm.caviart.qstar.Substitution
 import es.ucm.caviart.qstar.applySubstitution

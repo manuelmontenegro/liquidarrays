@@ -21,7 +21,7 @@
 */
 package es.ucm.caviart.qstar
 
-import es.ucm.caviart.FreshNameGenerator
+import es.ucm.caviart.utils.FreshNameGenerator
 import es.ucm.caviart.ast.*
 
 /**

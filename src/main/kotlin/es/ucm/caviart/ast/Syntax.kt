@@ -43,7 +43,7 @@ abstract class ASTElem(val properties: MutableMap<String, Any?> = mutableMapOf()
  * @param other The AST element from which gather the properties
  * @return `this` object
  */
-fun <T: ASTElem> T.addPropertiesFrom(other: ASTElem): T {
+fun <T : ASTElem> T.addPropertiesFrom(other: ASTElem): T {
     this.properties.putAll(other.properties)
     return this
 }
@@ -73,7 +73,7 @@ abstract class HMType : Type()
  * @property arguments Hindley-Milner types to which the constructor is applied
  */
 data class ConstrType(val typeConstructor: String,
-                  val arguments: List<HMType> = listOf()) : HMType() {
+                      val arguments: List<HMType> = listOf()) : HMType() {
     override val hmType: HMType
         get() = this
 }
@@ -149,7 +149,6 @@ abstract class BindingExpression : Term()
  */
 data class Literal(val value: String,
                    val type: HMType) : Atomic()
-
 
 
 /**
@@ -420,7 +419,7 @@ data class Implication(val operands: List<Assertion>) : Assertion() {
  * @property [operands] List of child assertions
  */
 data class Iff(val operands: List<Assertion>) : Assertion() {
-    constructor (lhs: Assertion, rhs: Assertion): this(listOf(lhs, rhs))
+    constructor (lhs: Assertion, rhs: Assertion) : this(listOf(lhs, rhs))
 }
 
 /**
@@ -523,7 +522,10 @@ data class DoubleQualifier(val boundVar1: String, val boundVar2: String, val ass
  * @property parameters Rest of the kappa parameters (variables in scope)
  * @property qSet (Optional) set of allowed refinements (Q*). If not specified, the generic set Q defined in the verification unit will be applied.
  */
-data class KappaDeclaration(val name: String, val nuVar: HMTypedVar, val parameters: List<HMTypedVar>, val qSet: Set<Assertion>?) : ASTElem()
+data class KappaDeclaration(val name: String,
+                            val nuVar: HMTypedVar,
+                            val parameters: List<HMTypedVar>,
+                            val qSet: Set<Assertion>?) : ASTElem()
 
 /**
  * Explicit declaration of a mu variable with its allowed refinements
@@ -597,7 +599,7 @@ class InvalidASTException(elem: ASTElem) : RuntimeException("Invalid AST element
  *
  * @return Set of variable names of the expression
  */
-fun BindingExpression.getVariables(): Set<String> = when(this) {
+fun BindingExpression.getVariables(): Set<String> = when (this) {
     is Literal -> emptySet()
 
     is Variable -> setOf(name)
@@ -616,7 +618,7 @@ fun BindingExpression.getVariables(): Set<String> = when(this) {
  *
  * @return Set of free variable names
  */
-fun Assertion.getVariables(): Set<String> = when(this) {
+fun Assertion.getVariables(): Set<String> = when (this) {
     is True -> emptySet()
 
     is False -> emptySet()
