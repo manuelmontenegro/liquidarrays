@@ -1,7 +1,12 @@
+
 package es.ucm.caviart
 
 import com.microsoft.z3.*
 import com.microsoft.z3.enumerations.Z3_ast_kind
+import es.ucm.caviart.ast.*
+import es.ucm.caviart.iterativeweakening.z3.toZ3BoolExpr
+import es.ucm.caviart.iterativeweakening.z3.toZ3Expr
+import es.ucm.caviart.iterativeweakening.z3.toZ3Sort
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -24,10 +29,6 @@ class Z3ASTTest {
         assertEquals("(Array Int Int)", ConstrType("array", listOf(ConstrType("int"))).toZ3Sort(ctx).sExpr)
     }
 
-    @Test fun varTypeToAST() {
-        assertEquals("a", ConstrType("'a").toZ3Sort(ctx).sExpr)
-    }
-
     @Test fun literalToAST() {
         val ast = Literal("5", ConstrType("int")).toZ3Expr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(ast.astKind == Z3_ast_kind.Z3_NUMERAL_AST, "5 must be a Z3 literal")
@@ -37,7 +38,7 @@ class Z3ASTTest {
     @Test fun variableToAST() {
         val ast = Variable("x").toZ3Expr(ctx, mapOf("x" to ctx.mkSymbol("x")), mapOf(), mapOf("x" to ctx.mkIntSort()))
         assertTrue(ast.isExpr, "x must be a Z3 AST expression")
-        assertTrue((ast as Expr).isConst, "x must be a Z3 variable")
+        assertTrue(ast.isConst, "x must be a Z3 variable")
         assertEquals("x", ast.sExpr)
     }
 
@@ -62,7 +63,7 @@ class Z3ASTTest {
                 typeEnv = mapOf("x" to arraySort)
         )
         assertTrue(ast.isExpr, "(f 5 x) must be a Z3 AST expression")
-        assertTrue((ast as Expr).isApp, "(f 5 x) must be a Z3 application")
+        assertTrue(ast.isApp, "(f 5 x) must be a Z3 application")
         assertEquals("(f 5 x)", ast.sExpr)
     }
 
@@ -173,22 +174,22 @@ class Z3ASTTest {
     }
 
     @Test fun forAllAST() {
-        val ast = ForAll("x", ConstrType("int"), PredicateApplication(">=", listOf(Variable("x"), Literal("0", ConstrType("int")))))
+        val ast = ForAll(listOf(HMTypedVar("x", ConstrType("int"))), PredicateApplication(">=", listOf(Variable("x"), Literal("0", ConstrType("int")))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isQuantifier, "(forall ((x int)) (>= x 0)) is a quantified expression")
         assertEquals("(forall ((x Int)) (>= x 0))", z3.sExpr)
     }
 
     @Test fun existsAST() {
-        val ast = Exists("x", ConstrType("int"), PredicateApplication(">=", listOf(Variable("x"), Literal("0", ConstrType("int")))))
+        val ast = Exists(listOf(HMTypedVar("x", ConstrType("int"))), PredicateApplication(">=", listOf(Variable("x"), Literal("0", ConstrType("int")))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isQuantifier, "(exists ((x int)) (>= x 0)) is a quantified expression")
         assertEquals("(exists ((x Int)) (>= x 0))", z3.sExpr)
     }
 
     @Test fun orderingProperty() {
-        val symbolMap = mapOf("n" to ctx.mkSymbol("n"), "a" to ctx.mkSymbol("a"))
-        val typeEnvironment = mapOf("n" to ctx.mkIntSort(), "a" to ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort()))
+        val symbolMap = mapOf("n" to ctx.mkSymbol("n"), "a" to ctx.mkSymbol("a"), "n1" to ctx.mkSymbol("n1"))
+        val typeEnvironment = mapOf("n" to ctx.mkIntSort(), "n1" to ctx.mkIntSort(), "a" to ctx.mkArraySort(ctx.mkIntSort(), ctx.mkIntSort()))
 
         val ord1 = ForAll(listOf(HMTypedVar("j1", ConstrType("int")), HMTypedVar("j2", ConstrType("int"))), Implication(
                 And(
@@ -202,9 +203,12 @@ class Z3ASTTest {
                 ))
         )).toZ3BoolExpr(ctx, symbolMap, mapOf(), typeEnvironment)
 
-        val ord2 = PredicateApplication("<=", listOf(
-                FunctionApplication("get-array", listOf(Variable("a"), FunctionApplication("-", listOf(Variable("n"), Literal("1", ConstrType("int")))))),
-                FunctionApplication("get-array", listOf(Variable("a"), Variable("n")))
+        val ord2 = ForAll(listOf(HMTypedVar("n1", intType)), Implication(
+                PredicateApplication("=", listOf(Variable("n1"), FunctionApplication("-", listOf(Variable("n"), Literal("1", intType))))),
+                PredicateApplication("<=", listOf(
+                        FunctionApplication("get-array", listOf(Variable("a"), Variable("n1"))),
+                        FunctionApplication("get-array", listOf(Variable("a"), Variable("n")))
+                ))
         )).toZ3BoolExpr(ctx, symbolMap, mapOf(), typeEnvironment)
 
         val ord3 = Not(ForAll(listOf(HMTypedVar("j3", ConstrType("int")), HMTypedVar("j4", ConstrType("int"))), Implication(
@@ -219,10 +223,6 @@ class Z3ASTTest {
                 ))
         ))).toZ3BoolExpr(ctx, symbolMap, mapOf(), typeEnvironment)
 
-        println(ord1.sExpr)
-        println(ord2.sExpr)
-        println(ord3.sExpr)
-
         val s = ctx.mkSolver()
         s.add(ord1)
         s.add(ord2)
@@ -234,10 +234,10 @@ class Z3ASTTest {
     @Test fun compareBooleans() {
         val symbolMap = mapOf("b" to ctx.mkSymbol("b"))
         val typeEnv = mapOf("b" to ctx.mkBoolSort())
-        val b1 = BooleanEquality(BooleanVariable("b"),
+        val b1 = Iff(BooleanVariable("b"),
                     PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Literal("1", ConstrType("int"))))
         )
-        val b2 = PredicateApplication("=", listOf(Variable("b"), Literal("true", ConstrType("bool"))))
+        val b2 = Iff(listOf(BooleanVariable("b"), True()))
 
         val s = ctx.mkSolver()
         s.add(b1.toZ3BoolExpr(ctx, symbolMap, mapOf(), typeEnv))
