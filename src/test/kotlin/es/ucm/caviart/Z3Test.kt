@@ -14,7 +14,7 @@ import kotlin.test.assertEquals
 class Z3Test {
     @Test fun checkVersion() {
         assertEquals(4, Version.getMajor())
-        assertEquals(5, Version.getMinor())
+        assertEquals(6, Version.getMinor())
     }
 
     @Test fun assertTrue() {
@@ -144,4 +144,5 @@ class Z3Test {
         val status = s.check()
         assertEquals(Status.UNSATISFIABLE, status)
     }
+
 }
