@@ -900,6 +900,12 @@ fun SExp.trim(): String {
     } else str
 }
 
+
+fun String.toAssertion(): Assertion {
+    val sexps = getSExps(this)
+    return parseAssertion(sexps[0])
+}
+
 class MissingHeaderException : Exception("Missing 'verification-unit' header")
 class InvalidHeaderNoName : Exception("Invalid 'verification-unit' header. No varName given")
 class DanglingExpression(sexp: SExp) : Exception("Expression ${sexp.trim()} is not preceeded by a directive")

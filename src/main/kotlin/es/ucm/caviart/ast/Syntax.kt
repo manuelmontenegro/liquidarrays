@@ -80,6 +80,9 @@ data class ConstrType(val typeConstructor: String,
 
 val intType = ConstrType("int")
 
+fun arrayType(t: HMType): HMType = ConstrType("array", listOf(t))
+
+
 
 /**
  * Class for representing type variables (not supported yet)
@@ -645,7 +648,7 @@ fun Assertion.getVariables(): Set<String> = when (this) {
 }
 
 
-/*
+
 fun BindingExpression.findArrayAccesses(indexVar: String, environment: Map<String, HMType>): Set<Pair<String, HMType>> = when (this) {
     is Literal -> emptySet()
 
@@ -676,9 +679,9 @@ fun BindingExpression.findArrayAccesses(indexVar: String, environment: Map<Strin
 
     else -> throw InvalidASTException(this)
 }
-*/
 
-/*
+
+
 fun Assertion.findArrayAccesses(indexVar: String, environment: Map<String, HMType>): Set<Pair<String, HMType>> = when (this) {
     is True -> emptySet()
 
@@ -704,7 +707,7 @@ fun Assertion.findArrayAccesses(indexVar: String, environment: Map<String, HMTyp
 
     else -> throw InvalidASTException(this)
 
-}*/
+}
 
 
 
