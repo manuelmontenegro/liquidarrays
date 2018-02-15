@@ -3,6 +3,8 @@ package es.ucm.caviart
 import es.ucm.caviart.ast.*
 import es.ucm.caviart.goal.Goal
 import es.ucm.caviart.goal.generateForDefinition
+import es.ucm.caviart.iterativeweakening.fromKappaDeclaration
+import es.ucm.caviart.iterativeweakening.fromMuDeclaration
 import es.ucm.caviart.qstar.instantiateVerificationUnit
 import es.ucm.caviart.typecheck.TypeCheckerException
 import es.ucm.caviart.typecheck.checkVerificationUnit
@@ -94,8 +96,14 @@ fun main(args: Array<String>) {
 
         println("     Number of goals: ${generatedGoals.size}")
         val prunedGoals = generatedGoals.filterNot { it.isTrivial() }.map { it.prune() }
-        println("     Trivial goals removed: ${generatedGoals.size - prunedGoals.size}")
+        println("     Non-trivial: ${prunedGoals.size}")
 
+
+        val kappas = verificationUnitDecorated2.kappaDeclarations.map { fromKappaDeclaration(it) }
+        val mus = verificationUnitDecorated2.muDeclarations.map { fromMuDeclaration(it) }
+
+        println(kappas)
+        println(mus)
 
         val sexpAgain = verificationUnitDecorated2.toSExpList()
         sexpAgain.forEach {

@@ -29,9 +29,9 @@
 
 package es.ucm.caviart.iterativeweakening
 
-import es.ucm.caviart.ast.Assertion
-import es.ucm.caviart.ast.HMType
-import es.ucm.caviart.ast.HMTypedVar
+import es.ucm.caviart.ast.*
+import es.ucm.caviart.qstar.applySubstitution
+import es.ucm.caviart.utils.FreshNameGenerator
 
 /**
  * Kappa template predicates
@@ -44,6 +44,19 @@ import es.ucm.caviart.ast.HMTypedVar
 data class Kappa(val name: String,
                  val arguments: List<HMTypedVar>,
                  val qStar: List<Assertion>)
+
+/**
+ * It converts a kappa declaration into an object of the `Kappa` class.
+ */
+fun fromKappaDeclaration(kappaDeclaration: KappaDeclaration): Kappa {
+    if (kappaDeclaration.qSet == null) {
+        throw RuntimeException("Kappa declaration does not have qSet")
+    }
+    return Kappa(kappaDeclaration.name,
+            listOf(kappaDeclaration.nuVar) + kappaDeclaration.parameters,
+            kappaDeclaration.qSet.toList()
+    )
+}
 
 /**
  * Mu template predicates
@@ -67,6 +80,67 @@ data class Mu(val name: String,
               val qII: List<Assertion>,
               val qEE: List<QEEStarElement>,
               val qLen: List<Assertion>)
+
+/**
+ * It converts a mu declaration into an object of the `Kappa` class.
+ */
+fun fromMuDeclaration(muDeclaration: MuDeclaration): Mu {
+    if (muDeclaration.qISet == null) {
+        throw RuntimeException("Mu declaration does not have qI set")
+    }
+
+    if (muDeclaration.qESet == null) {
+        throw RuntimeException("Mu declaration does not have qE set")
+    }
+
+    if (muDeclaration.qIISet == null) {
+        throw RuntimeException("Mu declaration does not have qII set")
+    }
+
+    if (muDeclaration.qEESet == null) {
+        throw RuntimeException("Mu declaration does not have qEE set")
+    }
+
+    if (muDeclaration.qLenSet == null) {
+        throw RuntimeException("Mu declaration does not have qLen set")
+    }
+
+    val environment = listOf(muDeclaration.nuVar) + muDeclaration.parameters
+    val environmentMap = environment.map { it.varName to it.HMType }.toMap()
+
+    // The Kappa and Mu classes have a single index variable in all the qualifiers.
+    // But in the KappaDeclaration and MuDeclaration, each qualifier may have its
+    // own index variables, so we choose two arbitrary names for each index and rename
+    // the variables of all qualifiers in the KappaDeclaration
+
+    // We prefer the names 'i' and 'j', but if they are already taken, we generate
+    // fresh names
+    val boundVar1 = if ("i" !in environmentMap.keys) "i" else FreshNameGenerator.nextName("_I")
+    val boundVar2 = if ("j" !in environmentMap.keys) "j" else FreshNameGenerator.nextName("_J")
+
+    val newQEs = muDeclaration.qESet.map { it.assertion.applySubstitution(mapOf(it.boundVar to Variable(boundVar1))) }
+    val newQEEs = muDeclaration.qEESet.map { it.assertion.applySubstitution(mapOf(it.boundVar1 to Variable(boundVar1), it.boundVar2 to Variable(boundVar2))) }
+
+    return Mu(
+            name = muDeclaration.name,
+            arguments = environment,
+            boundVar1 = boundVar1,
+            boundVar2 = boundVar2,
+            qI = muDeclaration.qISet.map { it.assertion.applySubstitution(mapOf(it.boundVar to Variable(boundVar1))) },
+            qE = newQEs.map {
+                val arrayAccess = it.findArrayAccesses(boundVar1, environmentMap)
+                QEStarElement(it, arrayAccess.toList())
+            },
+            qII = muDeclaration.qIISet.map { it.assertion.applySubstitution(mapOf(it.boundVar1 to Variable(boundVar1), it.boundVar2 to Variable(boundVar2))) },
+            qEE = newQEEs.map {
+                val arrayAccess1 = it.findArrayAccesses(boundVar1, environmentMap)
+                val arrayAccess2 = it.findArrayAccesses(boundVar2, environmentMap)
+                QEEStarElement(it, arrayAccess1.toList(), arrayAccess2.toList())
+            },
+            qLen = muDeclaration.qLenSet.toList()
+    )
+}
+
 
 /**
  * This class contains a qualifier plus all the array accesses that the qualifier involves.
