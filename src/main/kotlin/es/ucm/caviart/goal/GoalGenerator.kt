@@ -359,9 +359,12 @@ fun generateForDefinition(definition: FunctionDefinition,
                           globalEnvironment: GlobalEnvironment,
                           generatedGoals: MutableList<Goal>) {
 
+    val preliminaryEnvironment: List<EnvironmentEntry> =
+            localEnvironment + definition.inputParams.map { VariableEntry(it.varName, (it.type as QualType).copy(qualifier = True())) }
+
     // We add the function parameters to the environment and generate
     // the goals `precondition ==> qualifier of the parameter`
-    val nextEnvironment = definition.inputParams.fold(localEnvironment) { env, inputParam ->
+    val nextEnvironment = definition.inputParams.fold(preliminaryEnvironment) { env, inputParam ->
         // We replace the nu variable in the qualifier by the name of the
         // coresponding parameter, obtaining a `conclusion`
         val qualType = inputParam.type.toQualType()
