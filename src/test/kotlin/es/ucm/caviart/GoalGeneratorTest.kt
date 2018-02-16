@@ -66,8 +66,8 @@ class GoalGeneratorTest {
 
 """
 
-    lateinit var parsedProg: VerificationUnit
-    lateinit var globalEnvironment: GlobalEnvironment
+    private lateinit var parsedProg: VerificationUnit
+    private lateinit var globalEnvironment: GlobalEnvironment
 
     @Before
     fun parseAndReset() {
@@ -1081,22 +1081,5 @@ The type of (the int -4) must match the type of the result #1 of f7
 
     }
 
-
-    val fill = """
-    (verification-unit fill)
-    (define fill ((xs (array 'a)) (elem 'a)) ((res (array 'a)))
-    (declare
-        (assertion
-            (precd true)
-            (postcd (forall ((i int)) (-> (@ <= (the int 0) i) (-> (@ < i (@ len res)) (@ = (@ get-array res i) elem)))))))
-        (letfun (
-            (filln ((n int) (elem 'a) (xs (array 'a))) ((res (array 'a)))
-                (let ((l int)) (@ len xs)
-                  (let ((b bool)) (@ >= n l)
-                    (case b (
-                        (true xs)
-                        (false (let ((xsp (array 'a))) (@ set-array xs n elem)
-                                    (let ((n1 int)) (@ + n (the int 1)) (@ filln n1 elem xsp))))))))))
-            (@ filln (the int 0) elem xs)))"""
 
 }
