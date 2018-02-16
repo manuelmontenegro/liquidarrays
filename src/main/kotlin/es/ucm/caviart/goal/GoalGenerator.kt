@@ -53,13 +53,35 @@ data class Goal(val name: String,
                 val assumptions: List<Assertion>,
                 val conclusion: Assertion,
                 val environment: Map<String, HMType>) {
-    override fun toString(): String =
-            "GOAL $name: $description\n" +
-                    "Assuming:\n" +
-                    "${assumptions.joinToString("\n") { "  " + it.toSExp() }}\n" +
-                    "Prove:\n" +
-                    "  ${conclusion.toSExp()}"
+    override fun toString(): String {
+        val envStr = if (environment.isEmpty()) ""
+        else """
+            |
+            |
+            |**For all**:
+            |
+            ${environment.toList().joinToString("\n") { "|  * `${it.first}` of type `${it.second.toSExp().toString()}`" }}
+        """.trimMargin("|")
 
+        val assumptionsStr = if (assumptions.isEmpty()) ""
+        else """
+            |
+            |
+            |**such that**:
+            |
+            ${assumptions.toList().joinToString("\n") { "|  * `${it.toSExp().toString()}`" }}
+        """.trimMargin("|")
+
+        return """
+            |## Goal `$name`
+            |
+            |$description
+            """.trimMargin() + envStr + assumptionsStr + """
+            |
+            |
+            |**Prove:** `${conclusion.toSExp().toString()}`
+        """.trimMargin("|")
+    }
 }
 
 
@@ -387,6 +409,11 @@ fun environmentToGoal(localEnvironment: List<EnvironmentEntry>, conclusion: Asse
                 // qualifier by the name of the variable.
                 assumptions.add(qualType.qualifier.applySubstitution(mapOf(qualType.nu to Variable(it.variable))))
 
+                /*
+                // REMOVED: This is a Z3 specific detail. It should not be here
+                // The Z3WeakeningAlgorithm module will take care of this
+                //
+
                 // If the current variable (say `x`) is of an array type, we have to add a suplementary
                 // _x_len variable to hold its length. This variable is assumed to be greater than 0
                 if (qualType.HMType is ConstrType && qualType.HMType.typeConstructor == "array") {
@@ -394,6 +421,7 @@ fun environmentToGoal(localEnvironment: List<EnvironmentEntry>, conclusion: Asse
                     environmentHM[lenVar] = ConstrType("int")
                     assumptions.add(PredicateApplication(">=", listOf(Variable(lenVar), Literal("0", ConstrType("int")))))
                 }
+                */
             }
 
             is AssertionEntry -> {
