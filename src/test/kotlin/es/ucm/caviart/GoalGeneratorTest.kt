@@ -90,17 +90,33 @@ class GoalGeneratorTest {
         val goals = mutableListOf<Goal>()
         generateForDefinition(f0, listOf(), globalEnvironment, goals)
         val expectedGoals = """
-        GOAL G_1: The qualified type of the result of f0 must imply its postcondition
-Assuming:
-  (@ kappa1 res)
-Prove:
-  (@ = res (the int 4))
+## Goal `G_1`
 
-GOAL G_2: The type of (the int 4) must match the type of the result #1 of f0
-Assuming:
-  (@ = _X_1 (the int 4))
-Prove:
-  (@ kappa1 _X_1)
+The qualified type of the result of f0 must imply its postcondition
+
+**For all**:
+
+  * `res` of type `int`
+
+**such that**:
+
+  * `(@ kappa1 res)`
+
+**Prove:** `(@ = res (the int 4))`
+
+## Goal `G_2`
+
+The type of (the int 4) must match the type of the result #1 of f0
+
+**For all**:
+
+  * `_X_1` of type `int`
+
+**such that**:
+
+  * `(@ = _X_1 (the int 4))`
+
+**Prove:** `(@ kappa1 _X_1)`
         """.trim()
         assertEquals(expectedGoals, goals.joinToString("\n\n"))
     }
@@ -112,39 +128,88 @@ Prove:
         generateForDefinition(f1, listOf(), globalEnvironment, goals)
 
         val expectedGoals = """
-        GOAL G_1: Precondition of f1 must imply the qualifier of its parameter x
-Assuming:
-  (@ >= x (the int 0))
-Prove:
-  (@ >= x (the int 0))
+        ## Goal `G_1`
 
-GOAL G_2: The qualified type of the result of f1 must imply its postcondition
-Assuming:
-  (@ >= x (the int 0))
-  (@ = res (@ + x (the int 1)))
-Prove:
-  (@ = (@ + x (the int 1)) res)
+Precondition of f1 must imply the qualifier of its parameter x
 
-GOAL G_3: Precondition of parameter x_0 in call to +
-Assuming:
-  (@ >= x (the int 0))
-  (@ = _NU_1 x)
-Prove:
-  true
+**For all**:
 
-GOAL G_4: Precondition of parameter x_1 in call to +
-Assuming:
-  (@ >= x (the int 0))
-  (@ = _NU_2 (the int 1))
-Prove:
-  true
+  * `x` of type `int`
 
-GOAL G_5: The type of (@ + x (the int 1)) must match the type of the result #1 of f1
-Assuming:
-  (@ >= x (the int 0))
-  (@ = _X_1 (@ + x (the int 1)))
-Prove:
-  (@ = _X_1 (@ + x (the int 1)))""".trim()
+**such that**:
+
+  * `true`
+  * `(@ >= x (the int 0))`
+
+**Prove:** `(@ >= x (the int 0))`
+
+## Goal `G_2`
+
+The qualified type of the result of f1 must imply its postcondition
+
+**For all**:
+
+  * `x` of type `int`
+  * `res` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ >= x (the int 0))`
+  * `(@ = res (@ + x (the int 1)))`
+
+**Prove:** `(@ = (@ + x (the int 1)) res)`
+
+## Goal `G_3`
+
+Precondition of parameter x_0 in call to +
+
+**For all**:
+
+  * `x` of type `int`
+  * `_NU_1` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ >= x (the int 0))`
+  * `(@ = _NU_1 x)`
+
+**Prove:** `true`
+
+## Goal `G_4`
+
+Precondition of parameter x_1 in call to +
+
+**For all**:
+
+  * `x` of type `int`
+  * `_NU_2` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ >= x (the int 0))`
+  * `(@ = _NU_2 (the int 1))`
+
+**Prove:** `true`
+
+## Goal `G_5`
+
+The type of (@ + x (the int 1)) must match the type of the result #1 of f1
+
+**For all**:
+
+  * `x` of type `int`
+  * `_X_1` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ >= x (the int 0))`
+  * `(@ = _X_1 (@ + x (the int 1)))`
+
+**Prove:** `(@ = _X_1 (@ + x (the int 1)))`""".trim()
 
         assertEquals(expectedGoals, goals.joinToString("\n\n"))
     }
@@ -155,25 +220,54 @@ Prove:
         val goals = mutableListOf<Goal>()
         generateForDefinition(f2, listOf(), globalEnvironment, goals)
         val expectedGoals = """
-        GOAL G_1: Precondition of f2 must imply the qualifier of its parameter x
-Assuming:
-  (@ > x (the int 0))
-Prove:
-  (@ kappa1 x)
+        ## Goal `G_1`
 
-GOAL G_2: The qualified type of the result of f2 must imply its postcondition
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 res x)
-Prove:
-  (@ >= res (the int 0))
+Precondition of f2 must imply the qualifier of its parameter x
 
-GOAL G_3: The type of x must match the type of the result #1 of f2
-Assuming:
-  (@ kappa1 x)
-  (@ = _X_1 x)
-Prove:
-  (@ kappa2 _X_1 x)""".trim()
+**For all**:
+
+  * `x` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ > x (the int 0))`
+
+**Prove:** `(@ kappa1 x)`
+
+## Goal `G_2`
+
+The qualified type of the result of f2 must imply its postcondition
+
+**For all**:
+
+  * `x` of type `int`
+  * `res` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 res x)`
+
+**Prove:** `(@ >= res (the int 0))`
+
+## Goal `G_3`
+
+The type of x must match the type of the result #1 of f2
+
+**For all**:
+
+  * `x` of type `int`
+  * `_X_1` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ = _X_1 x)`
+
+**Prove:** `(@ kappa2 _X_1 x)`""".trim()
         assertEquals(expectedGoals, goals.joinToString("\n\n"))
     }
 
@@ -184,39 +278,88 @@ Prove:
         val goals = mutableListOf<Goal>()
         generateForDefinition(f3, listOf(), globalEnvironment, goals)
         val expectedGoals = """
-        GOAL G_1: Precondition of f3 must imply the qualifier of its parameter x
-Assuming:
-  (@ > x (the int 3))
-Prove:
-  (@ kappa1 x)
+        ## Goal `G_1`
 
-GOAL G_2: The qualified type of the result of f3 must imply its postcondition
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 res x)
-Prove:
-  (@ >= res (the int 0))
+Precondition of f3 must imply the qualifier of its parameter x
 
-GOAL G_3: Precondition of parameter x in call to sub
-Assuming:
-  (@ kappa1 x)
-  (@ = _NU_1 x)
-Prove:
-  (@ >= _NU_1 (the int 0))
+**For all**:
 
-GOAL G_4: Precondition of parameter y in call to sub
-Assuming:
-  (@ kappa1 x)
-  (@ = _NU_2 (the int 3))
-Prove:
-  (@ <= _NU_2 x)
+  * `x` of type `int`
 
-GOAL G_5: The type of (@ sub x (the int 3)) must match the type of the result #1 of f3
-Assuming:
-  (@ kappa1 x)
-  (@ = _X_1 (@ - x (the int 3)))
-Prove:
-  (@ kappa2 _X_1 x)""".trim()
+**such that**:
+
+  * `true`
+  * `(@ > x (the int 3))`
+
+**Prove:** `(@ kappa1 x)`
+
+## Goal `G_2`
+
+The qualified type of the result of f3 must imply its postcondition
+
+**For all**:
+
+  * `x` of type `int`
+  * `res` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 res x)`
+
+**Prove:** `(@ >= res (the int 0))`
+
+## Goal `G_3`
+
+Precondition of parameter x in call to sub
+
+**For all**:
+
+  * `x` of type `int`
+  * `_NU_1` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ = _NU_1 x)`
+
+**Prove:** `(@ >= _NU_1 (the int 0))`
+
+## Goal `G_4`
+
+Precondition of parameter y in call to sub
+
+**For all**:
+
+  * `x` of type `int`
+  * `_NU_2` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ = _NU_2 (the int 3))`
+
+**Prove:** `(@ <= _NU_2 x)`
+
+## Goal `G_5`
+
+The type of (@ sub x (the int 3)) must match the type of the result #1 of f3
+
+**For all**:
+
+  * `x` of type `int`
+  * `_X_1` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ = _X_1 (@ - x (the int 3)))`
+
+**Prove:** `(@ kappa2 _X_1 x)`""".trim()
         assertEquals(expectedGoals, goals.joinToString("\n\n"))
     }
 
@@ -226,50 +369,120 @@ Prove:
         val goals = mutableListOf<Goal>()
         generateForDefinition(f4, listOf(), globalEnvironment, goals)
         val expectedGoals = """
-        GOAL G_1: Precondition of f4 must imply the qualifier of its parameter x
-Assuming:
-  (@ > x (the int 4))
-Prove:
-  (@ kappa1 x)
+        ## Goal `G_1`
 
-GOAL G_2: Precondition of f4 must imply the qualifier of its parameter y
-Assuming:
-  (@ kappa1 x)
-  (@ > x (the int 4))
-Prove:
-  (@ kappa4 y x)
+Precondition of f4 must imply the qualifier of its parameter x
 
-GOAL G_3: The qualified type of the result of f4 must imply its postcondition
-Assuming:
-  (@ kappa1 x)
-  (@ kappa4 y x)
-  (@ kappa3 res x y)
-Prove:
-  (@ =L res (@@ cons x y))
+**For all**:
 
-GOAL G_4: Precondition of parameter x in call to cons
-Assuming:
-  (@ kappa1 x)
-  (@ kappa4 y x)
-  (@ = _NU_1 x)
-Prove:
-  true
+  * `x` of type `int`
+  * `y` of type `(list int)`
 
-GOAL G_5: Precondition of parameter xs in call to cons
-Assuming:
-  (@ kappa1 x)
-  (@ kappa4 y x)
-  (@ = _NU_2 y)
-Prove:
-  true
+**such that**:
 
-GOAL G_6: The type of (@@ cons x y) must match the type of the result #1 of f4
-Assuming:
-  (@ kappa1 x)
-  (@ kappa4 y x)
-  (@ =L _X_1 (@@ cons x y))
-Prove:
-  (@ kappa3 _X_1 x y)""".trim()
+  * `true`
+  * `true`
+  * `(@ > x (the int 4))`
+
+**Prove:** `(@ kappa1 x)`
+
+## Goal `G_2`
+
+Precondition of f4 must imply the qualifier of its parameter y
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `(list int)`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ > x (the int 4))`
+
+**Prove:** `(@ kappa4 y x)`
+
+## Goal `G_3`
+
+The qualified type of the result of f4 must imply its postcondition
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `(list int)`
+  * `res` of type `(list int)`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa4 y x)`
+  * `(@ kappa3 res x y)`
+
+**Prove:** `(@ =L res (@@ cons x y))`
+
+## Goal `G_4`
+
+Precondition of parameter x in call to cons
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `(list int)`
+  * `_NU_1` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa4 y x)`
+  * `(@ = _NU_1 x)`
+
+**Prove:** `true`
+
+## Goal `G_5`
+
+Precondition of parameter xs in call to cons
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `(list int)`
+  * `_NU_2` of type `(list int)`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa4 y x)`
+  * `(@ = _NU_2 y)`
+
+**Prove:** `true`
+
+## Goal `G_6`
+
+The type of (@@ cons x y) must match the type of the result #1 of f4
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `(list int)`
+  * `_X_1` of type `(list int)`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa4 y x)`
+  * `(@ =L _X_1 (@@ cons x y))`
+
+**Prove:** `(@ kappa3 _X_1 x y)`""".trim()
         assertEquals(expectedGoals, goals.joinToString("\n\n"))
     }
 
@@ -280,75 +493,188 @@ Prove:
         val goals = mutableListOf<Goal>()
         generateForDefinition(f5, listOf(), globalEnvironment, goals)
         val expectedGoals = """
-        GOAL G_1: Precondition of f5 must imply the qualifier of its parameter x
-Assuming:
-  (@ > x (the int 4))
-Prove:
-  (@ kappa1 x)
+        ## Goal `G_1`
 
-GOAL G_2: Precondition of f5 must imply the qualifier of its parameter y
-Assuming:
-  (@ kappa1 x)
-  (@ > x (the int 4))
-Prove:
-  (@ kappa2 y x)
+Precondition of f5 must imply the qualifier of its parameter x
 
-GOAL G_3: Precondition of f5 must imply the qualifier of its parameter z
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ > x (the int 4))
-Prove:
-  (@ kappa5 z x y)
+**For all**:
 
-GOAL G_4: The qualified type of the result of f5 must imply its postcondition
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ kappa6 res1 x y z)
-  (@ kappa7 res2 x y z res1)
-Prove:
-  (and (@ = res1 (@ + x y)) (@ = res2 (@ - x y)))
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
 
-GOAL G_5: Precondition of parameter x_0 in call to +
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ = _NU_1 x)
-Prove:
-  true
+**such that**:
 
-GOAL G_6: Precondition of parameter x_1 in call to +
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ = _NU_2 y)
-Prove:
-  true
+  * `true`
+  * `true`
+  * `true`
+  * `(@ > x (the int 4))`
 
-GOAL G_7: The type of (tuple z k) must match the type of the result #1 of f5
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ = k (@ + x y))
-  (@ = _X_2 z)
-Prove:
-  (@ kappa6 _X_2 x y z)
+**Prove:** `(@ kappa1 x)`
 
-GOAL G_8: The type of (tuple z k) must match the type of the result #2 of f5
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ = k (@ + x y))
-  (@ = _X_2 z)
-  (@ = _X_3 k)
-Prove:
-  (@ kappa7 _X_3 x y z _X_2)""".trim()
+## Goal `G_2`
+
+Precondition of f5 must imply the qualifier of its parameter y
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ > x (the int 4))`
+
+**Prove:** `(@ kappa2 y x)`
+
+## Goal `G_3`
+
+Precondition of f5 must imply the qualifier of its parameter z
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ > x (the int 4))`
+
+**Prove:** `(@ kappa5 z x y)`
+
+## Goal `G_4`
+
+The qualified type of the result of f5 must imply its postcondition
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `res1` of type `int`
+  * `res2` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ kappa6 res1 x y z)`
+  * `(@ kappa7 res2 x y z res1)`
+
+**Prove:** `(and (@ = res1 (@ + x y)) (@ = res2 (@ - x y)))`
+
+## Goal `G_5`
+
+Precondition of parameter x_0 in call to +
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `_NU_1` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ = _NU_1 x)`
+
+**Prove:** `true`
+
+## Goal `G_6`
+
+Precondition of parameter x_1 in call to +
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `_NU_2` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ = _NU_2 y)`
+
+**Prove:** `true`
+
+## Goal `G_7`
+
+The type of (tuple z k) must match the type of the result #1 of f5
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `k` of type `int`
+  * `_X_2` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ = k (@ + x y))`
+  * `(@ = _X_2 z)`
+
+**Prove:** `(@ kappa6 _X_2 x y z)`
+
+## Goal `G_8`
+
+The type of (tuple z k) must match the type of the result #2 of f5
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `k` of type `int`
+  * `_X_2` of type `int`
+  * `_X_3` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ = k (@ + x y))`
+  * `(@ = _X_2 z)`
+  * `(@ = _X_3 k)`
+
+**Prove:** `(@ kappa7 _X_3 x y z _X_2)`""".trim()
         assertEquals(expectedGoals, goals.joinToString("\n\n"))
     }
 
@@ -358,73 +684,184 @@ Prove:
         val goals = mutableListOf<Goal>()
         generateForDefinition(f6, listOf(), globalEnvironment, goals)
         val expectedGoals = """
-        GOAL G_1: Precondition of f6 must imply the qualifier of its parameter x
-Assuming:
-  (@ > x (the int 4))
-Prove:
-  (@ kappa1 x)
+        ## Goal `G_1`
 
-GOAL G_2: Precondition of f6 must imply the qualifier of its parameter y
-Assuming:
-  (@ kappa1 x)
-  (@ > x (the int 4))
-Prove:
-  (@ kappa2 y x)
+Precondition of f6 must imply the qualifier of its parameter x
 
-GOAL G_3: Precondition of f6 must imply the qualifier of its parameter z
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ > x (the int 4))
-Prove:
-  (@ kappa5 z x y)
+**For all**:
 
-GOAL G_4: The qualified type of the result of f6 must imply its postcondition
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ kappa6 res x y z)
-Prove:
-  (@ = res (@ + x y))
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
 
-GOAL G_5: Precondition of parameter x in call to f5
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ = _NU_1 x)
-Prove:
-  (@ kappa1 _NU_1)
+**such that**:
 
-GOAL G_6: Precondition of parameter y in call to f5
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ = _NU_2 (the int 1))
-Prove:
-  (@ kappa2 _NU_2 x)
+  * `true`
+  * `true`
+  * `true`
+  * `(@ > x (the int 4))`
 
-GOAL G_7: Precondition of parameter z in call to f5
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ = _NU_3 z)
-Prove:
-  (@ kappa5 _NU_3 x (the int 1))
+**Prove:** `(@ kappa1 x)`
 
-GOAL G_8: The type of m must match the type of the result #1 of f6
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 y x)
-  (@ kappa5 z x y)
-  (@ kappa6 k x (the int 1) z)
-  (@ kappa7 m x (the int 1) z k)
-  (@ = _X_3 m)
-Prove:
-  (@ kappa6 _X_3 x y z)""".trim()
+## Goal `G_2`
+
+Precondition of f6 must imply the qualifier of its parameter y
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ > x (the int 4))`
+
+**Prove:** `(@ kappa2 y x)`
+
+## Goal `G_3`
+
+Precondition of f6 must imply the qualifier of its parameter z
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ > x (the int 4))`
+
+**Prove:** `(@ kappa5 z x y)`
+
+## Goal `G_4`
+
+The qualified type of the result of f6 must imply its postcondition
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `res` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ kappa6 res x y z)`
+
+**Prove:** `(@ = res (@ + x y))`
+
+## Goal `G_5`
+
+Precondition of parameter x in call to f5
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `_NU_1` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ = _NU_1 x)`
+
+**Prove:** `(@ kappa1 _NU_1)`
+
+## Goal `G_6`
+
+Precondition of parameter y in call to f5
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `_NU_2` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ = _NU_2 (the int 1))`
+
+**Prove:** `(@ kappa2 _NU_2 x)`
+
+## Goal `G_7`
+
+Precondition of parameter z in call to f5
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `_NU_3` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ = _NU_3 z)`
+
+**Prove:** `(@ kappa5 _NU_3 x (the int 1))`
+
+## Goal `G_8`
+
+The type of m must match the type of the result #1 of f6
+
+**For all**:
+
+  * `x` of type `int`
+  * `y` of type `int`
+  * `z` of type `int`
+  * `k` of type `int`
+  * `m` of type `int`
+  * `_X_3` of type `int`
+
+**such that**:
+
+  * `true`
+  * `true`
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 y x)`
+  * `(@ kappa5 z x y)`
+  * `(@ kappa6 k x (the int 1) z)`
+  * `(@ kappa7 m x (the int 1) z k)`
+  * `(@ = _X_3 m)`
+
+**Prove:** `(@ kappa6 _X_3 x y z)`""".trim()
         assertEquals(expectedGoals, goals.joinToString("\n\n"))
 
     }
@@ -436,94 +873,210 @@ Prove:
         val goals = mutableListOf<Goal>()
         generateForDefinition(f7, listOf(), globalEnvironment, goals)
         val expectedGoals = """
-GOAL G_1: Precondition of f7 must imply the qualifier of its parameter x
-Assuming:
-  (@ > x (the int 4))
-Prove:
-  (@ kappa1 x)
+## Goal `G_1`
 
-GOAL G_2: The qualified type of the result of f7 must imply its postcondition
-Assuming:
-  (@ kappa1 x)
-  (@ kappa2 res x)
-Prove:
-  (@ = res x)
+Precondition of f7 must imply the qualifier of its parameter x
 
-GOAL G_3: Precondition of parameter x_0 in call to >
-Assuming:
-  (@ kappa1 x)
-  (@ = _NU_1 x)
-Prove:
-  true
+**For all**:
 
-GOAL G_4: Precondition of parameter x_1 in call to >
-Assuming:
-  (@ kappa1 x)
-  (@ = _NU_2 (the int 0))
-Prove:
-  true
+  * `x` of type `int`
 
-GOAL G_5: Precondition of parameter x_0 in call to +
-Assuming:
-  (@ kappa1 x)
-  (<-> b (@ > x (the int 0)))
-  b
-  (@ = _NU_4 (the int 1))
-Prove:
-  true
+**such that**:
 
-GOAL G_6: Precondition of parameter x_1 in call to +
-Assuming:
-  (@ kappa1 x)
-  (<-> b (@ > x (the int 0)))
-  b
-  (@ = _NU_5 x)
-Prove:
-  true
+  * `true`
+  * `(@ > x (the int 4))`
 
-GOAL G_7: The type of (@ + (the int 1) x) must match the type of the result #1 of f7
-Assuming:
-  (@ kappa1 x)
-  (<-> b (@ > x (the int 0)))
-  b
-  (@ = _X_2 (@ + (the int 1) x))
-Prove:
-  (@ kappa2 _X_2 x)
+**Prove:** `(@ kappa1 x)`
 
-GOAL G_8: Precondition of parameter x_0 in call to +
-Assuming:
-  (@ kappa1 x)
-  (<-> b (@ > x (the int 0)))
-  (not b)
-  (@ = _NU_6 (the int 2))
-Prove:
-  true
+## Goal `G_2`
 
-GOAL G_9: Precondition of parameter x_1 in call to +
-Assuming:
-  (@ kappa1 x)
-  (<-> b (@ > x (the int 0)))
-  (not b)
-  (@ = _NU_7 x)
-Prove:
-  true
+The qualified type of the result of f7 must imply its postcondition
 
-GOAL G_10: The type of (@ + (the int 2) x) must match the type of the result #1 of f7
-Assuming:
-  (@ kappa1 x)
-  (<-> b (@ > x (the int 0)))
-  (not b)
-  (@ = _X_3 (@ + (the int 2) x))
-Prove:
-  (@ kappa2 _X_3 x)
+**For all**:
 
-GOAL G_11: The type of (the int -4) must match the type of the result #1 of f7
-Assuming:
-  (@ kappa1 x)
-  (<-> b (@ > x (the int 0)))
-  (@ = _X_4 (the int -4))
-Prove:
-  (@ kappa2 _X_4 x)""".trim()
+  * `x` of type `int`
+  * `res` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ kappa2 res x)`
+
+**Prove:** `(@ = res x)`
+
+## Goal `G_3`
+
+Precondition of parameter x_0 in call to >
+
+**For all**:
+
+  * `x` of type `int`
+  * `_NU_1` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ = _NU_1 x)`
+
+**Prove:** `true`
+
+## Goal `G_4`
+
+Precondition of parameter x_1 in call to >
+
+**For all**:
+
+  * `x` of type `int`
+  * `_NU_2` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(@ = _NU_2 (the int 0))`
+
+**Prove:** `true`
+
+## Goal `G_5`
+
+Precondition of parameter x_0 in call to +
+
+**For all**:
+
+  * `x` of type `int`
+  * `b` of type `bool`
+  * `_NU_4` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(<-> b (@ > x (the int 0)))`
+  * `b`
+  * `(@ = _NU_4 (the int 1))`
+
+**Prove:** `true`
+
+## Goal `G_6`
+
+Precondition of parameter x_1 in call to +
+
+**For all**:
+
+  * `x` of type `int`
+  * `b` of type `bool`
+  * `_NU_5` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(<-> b (@ > x (the int 0)))`
+  * `b`
+  * `(@ = _NU_5 x)`
+
+**Prove:** `true`
+
+## Goal `G_7`
+
+The type of (@ + (the int 1) x) must match the type of the result #1 of f7
+
+**For all**:
+
+  * `x` of type `int`
+  * `b` of type `bool`
+  * `_X_2` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(<-> b (@ > x (the int 0)))`
+  * `b`
+  * `(@ = _X_2 (@ + (the int 1) x))`
+
+**Prove:** `(@ kappa2 _X_2 x)`
+
+## Goal `G_8`
+
+Precondition of parameter x_0 in call to +
+
+**For all**:
+
+  * `x` of type `int`
+  * `b` of type `bool`
+  * `_NU_6` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(<-> b (@ > x (the int 0)))`
+  * `(not b)`
+  * `(@ = _NU_6 (the int 2))`
+
+**Prove:** `true`
+
+## Goal `G_9`
+
+Precondition of parameter x_1 in call to +
+
+**For all**:
+
+  * `x` of type `int`
+  * `b` of type `bool`
+  * `_NU_7` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(<-> b (@ > x (the int 0)))`
+  * `(not b)`
+  * `(@ = _NU_7 x)`
+
+**Prove:** `true`
+
+## Goal `G_10`
+
+The type of (@ + (the int 2) x) must match the type of the result #1 of f7
+
+**For all**:
+
+  * `x` of type `int`
+  * `b` of type `bool`
+  * `_X_3` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(<-> b (@ > x (the int 0)))`
+  * `(not b)`
+  * `(@ = _X_3 (@ + (the int 2) x))`
+
+**Prove:** `(@ kappa2 _X_3 x)`
+
+## Goal `G_11`
+
+The type of (the int -4) must match the type of the result #1 of f7
+
+**For all**:
+
+  * `x` of type `int`
+  * `b` of type `bool`
+  * `_X_4` of type `int`
+
+**such that**:
+
+  * `true`
+  * `(@ kappa1 x)`
+  * `(<-> b (@ > x (the int 0)))`
+  * `(@ = _X_4 (the int -4))`
+
+**Prove:** `(@ kappa2 _X_4 x)`""".trim()
         assertEquals(expectedGoals, goals.joinToString("\n\n"))
 
     }
