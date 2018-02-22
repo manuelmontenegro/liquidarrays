@@ -906,6 +906,16 @@ fun String.toAssertion(): Assertion {
     return parseAssertion(sexps[0])
 }
 
+fun String.toTerm(): Term {
+    val sexps = getSExps(this)
+    return parseExpression(sexps[0])
+}
+
+fun String.toDef(): FunctionDefinition {
+    val sexps = getSExps(this)
+    return parseFunctionDefinition(sexps[0])
+}
+
 class MissingHeaderException : Exception("Missing 'verification-unit' header")
 class InvalidHeaderNoName : Exception("Invalid 'verification-unit' header. No varName given")
 class DanglingExpression(sexp: SExp) : Exception("Expression ${sexp.trim()} is not preceeded by a directive")
