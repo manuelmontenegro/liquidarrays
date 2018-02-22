@@ -81,7 +81,7 @@ fun FunctionDefinition.toSExp(): SExp =
  */
 fun Pattern.toSExp(): SExp = when (this) {
     is LiteralPattern -> t(literal)
-    is ConstructorPattern -> s(t("@@"), t(constructorName), *constructorArgs.map { toSExp() }.toTypedArray())
+    is ConstructorPattern -> s(t("@@"), t(constructorName), *constructorArgs.map { t(it) }.toTypedArray())
     else -> UNDEFINED
 }
 
