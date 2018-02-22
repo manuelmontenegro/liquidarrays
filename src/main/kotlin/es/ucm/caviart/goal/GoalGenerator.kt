@@ -164,7 +164,7 @@ fun generateForBindingExpression(expression: BindingExpression,
         }
 
         // Now we have to generate the type of the result. If the result is a tuple
-        // type, we must change the replace of the variables denoting each component
+        // type, we must replace of the variables denoting each component
         // of the tuple with fresh names. The variable `currentSubstitution` will maintain
         // the substitution with those new bindings.
         var currentSubstitution = substitution
