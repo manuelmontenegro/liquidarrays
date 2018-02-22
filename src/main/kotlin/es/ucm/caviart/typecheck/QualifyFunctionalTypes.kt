@@ -89,20 +89,23 @@ private fun toQualType(typedVar: TypedVar, defName: String, scope: List<HMTypedV
 private fun qualifyFunctionDefinition(
         definition: FunctionDefinition,
         scope: List<HMTypedVar>,
-        externals: Map<String, FunctionalType>): FunctionDefinition {
+        externals: Map<String, FunctionalType>,
+        globalEnvironment: GlobalEnvironment
+        ): FunctionDefinition {
 
     val (scopeWithInput, parameters) = definition.inputParams.mapAccumLeft(scope) { sc, parameter ->
         Pair(addToScope(sc, parameter.varName, parameter.type.hmType),
                 TypedVar(parameter.varName, toQualType(parameter, definition.name, sc)))
     }
 
-    val expression = qualifyExpression(definition.body, scopeWithInput, externals)
+    val expression = qualifyExpression(definition.body, scopeWithInput, externals, globalEnvironment)
 
     val (_, results) = definition.outputParams.mapAccumLeft(scopeWithInput) { sc, result ->
         Pair(addToScope(sc, result.varName, result.type.hmType),
                 TypedVar(result.varName, toQualType(result, definition.name, sc)))
     }
 
+    globalEnvironment.programFunctions[definition.name] = FunctionalType(input = parameters, output = results)
     return definition.copy(inputParams = parameters, outputParams = results, body = expression).addPropertiesFrom(definition)
 }
 
@@ -110,7 +113,7 @@ private fun qualifyFunctionDefinition(
  * It traverses the expression in order to qualify the types contained within the
  * letfuns.
  */
-private fun qualifyExpression(expression: Term, scope: List<HMTypedVar>, externals: Map<String, FunctionalType>): Term =
+private fun qualifyExpression(expression: Term, scope: List<HMTypedVar>, externals: Map<String, FunctionalType>, globalEnvironment: GlobalEnvironment): Term =
         when (expression) {
             is BindingExpression -> expression
 
@@ -118,15 +121,15 @@ private fun qualifyExpression(expression: Term, scope: List<HMTypedVar>, externa
                 val newScope = expression.bindings.fold(scope) { sc, binding ->
                     addToScope(sc, binding.varName, binding.HMType)
                 }
-                expression.copy(mainExpression = qualifyExpression(expression.mainExpression, newScope, externals)).addPropertiesFrom(expression)
+                expression.copy(mainExpression = qualifyExpression(expression.mainExpression, newScope, externals, globalEnvironment)).addPropertiesFrom(expression)
             }
 
             is LetFun -> {
                 expression.copy(
                         defs = expression.defs.map {
-                            qualifyFunctionDefinition(it, scope, externals)
+                            qualifyFunctionDefinition(it, scope, externals, globalEnvironment)
                         },
-                        mainExpression = qualifyExpression(expression.mainExpression, scope, externals)
+                        mainExpression = qualifyExpression(expression.mainExpression, scope, externals, globalEnvironment)
                 ).addPropertiesFrom(expression)
             }
 
@@ -142,9 +145,9 @@ private fun qualifyExpression(expression: Term, scope: List<HMTypedVar>, externa
                             } else {
                                 scope
                             }
-                            CaseBranch(pat, qualifyExpression(exp, newScope, externals))
+                            CaseBranch(pat, qualifyExpression(exp, newScope, externals, globalEnvironment))
                         },
-                        defaultBranch = if (expression.defaultBranch != null) qualifyExpression(expression.defaultBranch, scope, externals) else null
+                        defaultBranch = if (expression.defaultBranch != null) qualifyExpression(expression.defaultBranch, scope, externals, globalEnvironment) else null
                 ).addPropertiesFrom(expression)
             }
 
@@ -161,12 +164,12 @@ private fun qualifyExpression(expression: Term, scope: List<HMTypedVar>, externa
  * @return Verification unit with the transformed definitions and the generated
  *         kappa and mu declarations.
  */
-fun qualifyVeriticationUnit(verificationUnit: VerificationUnit): VerificationUnit {
+fun qualifyVeriticationUnit(verificationUnit: VerificationUnit, globalEnvironment: GlobalEnvironment): VerificationUnit {
     kappaGenerated = mutableSetOf()
     muGenerated = mutableSetOf()
 
 
-    val newDefs = verificationUnit.definitions.map { qualifyFunctionDefinition(it, listOf(), verificationUnit.external) }
+    val newDefs = verificationUnit.definitions.map { qualifyFunctionDefinition(it, listOf(), verificationUnit.external, globalEnvironment) }
 
     return verificationUnit.copy(
             kappaDeclarations = verificationUnit.kappaDeclarations + kappaGenerated,
