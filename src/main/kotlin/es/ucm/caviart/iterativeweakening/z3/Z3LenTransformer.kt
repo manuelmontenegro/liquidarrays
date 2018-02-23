@@ -85,8 +85,10 @@ fun getArrayParams(arguments: List<HMTypedVar>): Set<Int> = arguments.mapIndexed
  * @param kappaIndices A map that gives, for each kappa, the positions of the parameters that have array type
  * @param muIndices A map that gives, for each mu, the positions of the parameters that have array type
  *
+ * @return The updated kappa together with the newly generated parameters
+ *
  */
-fun Kappa.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set<Int>>): Kappa {
+fun Kappa.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set<Int>>): Pair<Kappa, List<HMTypedVar>> {
 
     val arrayLenVars =
             this.arguments
@@ -96,7 +98,7 @@ fun Kappa.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, 
     return this.copy(
             arguments = this.arguments + arrayLenVars,
             qStar = this.qStar.map { it.removeLen(kappaIndices, muIndices) }
-    )
+    ) to arrayLenVars
 }
 
 /**
@@ -105,8 +107,10 @@ fun Kappa.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, 
  * @param kappaIndices A map that gives, for each kappa, the positions of the parameters that have array type
  * @param muIndices A map that gives, for each mu, the positions of the parameters that have array type
  *
+ * @return The updated mu together with the newly generated parameters
+ *
  */
-fun Mu.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set<Int>>): Mu {
+fun Mu.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set<Int>>): Pair<Mu, List<HMTypedVar>> {
     val arrayLenVars =
             this.arguments
                     .filter { (_, type) -> type is ConstrType && type.typeConstructor == "array" }
@@ -118,7 +122,7 @@ fun Mu.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set
             qE = this.qE.map { it.copy(qualifier = it.qualifier.removeLen(kappaIndices, muIndices), arrayNames = it.arrayNames.map { it.toLenVar() }) },
             qII = this.qII.map { it.removeLen(kappaIndices, muIndices) },
             qEE = this.qEE.map { it.copy(qualifier = it.qualifier.removeLen(kappaIndices, muIndices), arrayNames1 = it.arrayNames1.map { it.toLenVar() }, arrayNames2 = it.arrayNames2.map { it.toLenVar() }) }
-    )
+    ) to arrayLenVars
 }
 
 
