@@ -1,7 +1,10 @@
 package es.ucm.caviart
 
 import es.ucm.caviart.ast.*
-import es.ucm.caviart.typecheck.qualifyVeriticationUnit
+import es.ucm.caviart.typecheck.GlobalEnvironment
+import es.ucm.caviart.typecheck.initialEnvironment
+import es.ucm.caviart.typecheck.qualifyVerificationUnit
+import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -33,8 +36,16 @@ class QualifyFunctionalTypesTest {
   ) 0))
 """
 
+    private lateinit var env: GlobalEnvironment
+
+    @Before fun copyEnvironment() {
+        env = initialEnvironment.copy(
+                programFunctions = initialEnvironment.programFunctions.toMutableMap()
+        )
+    }
+
     @Test fun qualify1() {
-        val p = qualifyVeriticationUnit(parseVerificationUnit(getSExps(example1)))
+        val p = qualifyVerificationUnit(parseVerificationUnit(getSExps(example1)), env)
         assertEquals(1, p.definitions.size)
         assertEquals(listOf("(xs (qual nu (array int) (@ _mu_fill_xs nu)))", "(elem (qual nu int (@ _kappa_fill_elem nu xs)))"), p.definitions[0].inputParams.map { it.toSExp().toString() })
         assertEquals(listOf("(res (qual nu (array int) (@ _mu_fill_res nu xs elem)))"), p.definitions[0].outputParams.map { it.toSExp().toString() })
@@ -49,7 +60,7 @@ class QualifyFunctionalTypesTest {
     }
 
     @Test fun qualify2() {
-        val p = qualifyVeriticationUnit(parseVerificationUnit(getSExps(example2)))
+        val p = qualifyVerificationUnit(parseVerificationUnit(getSExps(example2)), env)
         assertEquals(1, p.definitions.size)
         assertEquals(
                 listOf("(x (qual nu int (@ _kappa_insert_x nu)))", "(m (qual nu int (@ _kappa_insert_m nu x)))", "(a (qual nu (array int) (@ _mu_insert_a nu x m)))"),

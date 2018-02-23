@@ -164,7 +164,7 @@ private fun qualifyExpression(expression: Term, scope: List<HMTypedVar>, externa
  * @return Verification unit with the transformed definitions and the generated
  *         kappa and mu declarations.
  */
-fun qualifyVeriticationUnit(verificationUnit: VerificationUnit, globalEnvironment: GlobalEnvironment): VerificationUnit {
+fun qualifyVerificationUnit(verificationUnit: VerificationUnit, globalEnvironment: GlobalEnvironment): VerificationUnit {
     kappaGenerated = mutableSetOf()
     muGenerated = mutableSetOf()
 
