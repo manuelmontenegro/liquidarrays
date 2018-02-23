@@ -80,6 +80,9 @@ data class ConstrType(val typeConstructor: String,
 
 val intType = ConstrType("int")
 
+val boolType = ConstrType("bool")
+
+
 fun arrayType(t: HMType): HMType = ConstrType("array", listOf(t))
 
 
@@ -649,7 +652,7 @@ fun Assertion.getVariables(): Set<String> = when (this) {
 
 
 
-fun BindingExpression.findArrayAccesses(indexVar: String, environment: Map<String, HMType>): Set<Pair<String, HMType>> = when (this) {
+fun BindingExpression.findArrayAccesses(indexVar: String, environment: Map<String, HMType>): Set<String> = when (this) {
     is Literal -> emptySet()
 
     is Variable -> emptySet()
@@ -663,7 +666,7 @@ fun BindingExpression.findArrayAccesses(indexVar: String, environment: Map<Strin
                 if (arrayType == null || arrayType !is ConstrType || arrayType.typeConstructor != "array") {
                     throw RuntimeException("get-array applied to $arrayName of non-array type, but it has not been caught before (?)")
                 } else {
-                    setOf(arrayName to arrayType.arguments[0])
+                    setOf(arrayName)
                 }
             } else {
                 emptySet()
@@ -682,7 +685,7 @@ fun BindingExpression.findArrayAccesses(indexVar: String, environment: Map<Strin
 
 
 
-fun Assertion.findArrayAccesses(indexVar: String, environment: Map<String, HMType>): Set<Pair<String, HMType>> = when (this) {
+fun Assertion.findArrayAccesses(indexVar: String, environment: Map<String, HMType>): Set<String> = when (this) {
     is True -> emptySet()
 
     is False -> emptySet()
