@@ -24,6 +24,8 @@ package es.ucm.caviart.iterativeweakening.z3
 
 import es.ucm.caviart.ast.*
 import es.ucm.caviart.goal.Goal
+import es.ucm.caviart.iterativeweakening.Kappa
+import es.ucm.caviart.iterativeweakening.Mu
 
 /**
  * This module replaces all the calls to len() function in goals
@@ -37,8 +39,12 @@ fun String.toLenVar() = "${this}_length"
 /**
  * It adds the `x_length` variables to the goal in order to replace
  * all the occurrences of `len` in the given goal
+ *
+ * @param kappaIndices A map that gives, for each kappa, the positions of the parameters that have array type
+ * @param muIndices A map that gives, for each mu, the positions of the parameters that have array type
+ *
  */
-fun Goal.removeLen(): Goal {
+fun Goal.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set<Int>>): Goal {
 
     // Given the variables with an array type,
     // we create an environment with the new length variables, each one of type int
@@ -54,15 +60,71 @@ fun Goal.removeLen(): Goal {
             arrayVars.keys.map { PredicateApplication(">=", listOf(Variable(it), Literal("0", intType))) }
 
     return this.copy(
-            assumptions = lenAssumptions + this.assumptions.map { it.removeLen() },
-            conclusion = this.conclusion.removeLen(),
+            assumptions = lenAssumptions + this.assumptions.map { it.removeLen(kappaIndices, muIndices) },
+            conclusion = this.conclusion.removeLen(kappaIndices, muIndices),
             environment = this.environment + arrayVars
+    )
+}
+
+/**
+ * Given a list of typed variables, it returns a list with the indices
+ * of those variables with an array type.
+ *
+ *
+ */
+fun getArrayParams(arguments: List<HMTypedVar>): Set<Int> = arguments.mapIndexed { idx, elem -> idx to elem }
+        .filter { (_, hmvar) -> hmvar.HMType is ConstrType && hmvar.HMType.typeConstructor == "array" }
+        .map { (idx, _) -> idx }
+        .toSet()
+
+
+/**
+ * The same as `Goal.removeLen()`, but it adds fresh arguments to the parameters
+ * of a Kappa (as many as parameters of array type).
+ *
+ * @param kappaIndices A map that gives, for each kappa, the positions of the parameters that have array type
+ * @param muIndices A map that gives, for each mu, the positions of the parameters that have array type
+ *
+ */
+fun Kappa.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set<Int>>): Kappa {
+
+    val arrayLenVars =
+            this.arguments
+                    .filter { (_, type) -> type is ConstrType && type.typeConstructor == "array" }
+                    .map { HMTypedVar(it.varName.toLenVar(), intType) }
+
+    return this.copy(
+            arguments = this.arguments + arrayLenVars,
+            qStar = this.qStar.map { it.removeLen(kappaIndices, muIndices) }
+    )
+}
+
+/**
+ * The same as `Kappa.removeLen()`, but applied to Mu.
+ *
+ * @param kappaIndices A map that gives, for each kappa, the positions of the parameters that have array type
+ * @param muIndices A map that gives, for each mu, the positions of the parameters that have array type
+ *
+ */
+fun Mu.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set<Int>>): Mu {
+    val arrayLenVars =
+            this.arguments
+                    .filter { (_, type) -> type is ConstrType && type.typeConstructor == "array" }
+                    .map { HMTypedVar(it.varName.toLenVar(), intType) }
+
+    return this.copy(
+            arguments = this.arguments + arrayLenVars,
+            qI = this.qI.map { it.removeLen(kappaIndices, muIndices) },
+            qE = this.qE.map { it.copy(qualifier = it.qualifier.removeLen(kappaIndices, muIndices)) },
+            qII = this.qII.map { it.removeLen(kappaIndices, muIndices) },
+            qEE = this.qEE.map { it.copy(qualifier = it.qualifier.removeLen(kappaIndices, muIndices)) }
     )
 }
 
 
 /**
  * This function changes the applications of len(x) by the x_length variable
+ *
  */
 private fun BindingExpression.removeLen(): BindingExpression = when {
 
@@ -71,25 +133,53 @@ private fun BindingExpression.removeLen(): BindingExpression = when {
         Variable(argument.name.toLenVar())
     }
 
+
     else -> this
 }
 
-private fun Assertion.removeLen(): Assertion = when (this) {
-    is PredicateApplication -> PredicateApplication(this.name, this.arguments.map { it.removeLen() })
+/**
+ * This function changes the applications of len(x) by the x_length variable
+ *
+ * @param kappaIndices A map that gives, for each kappa, the positions of the parameters that have array type
+ * @param muIndices A map that gives, for each mu, the positions of the parameters that have array type
+ */
+private fun Assertion.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set<Int>>): Assertion = when {
 
-    is Not -> Not(this.assertion.removeLen())
+    this is PredicateApplication && kappaIndices[this.name] != null -> {
+        val indices = kappaIndices[this.name]!!
+        val arrayArguments =
+                this.arguments
+                        .filterIndexed { idx, _ -> idx in indices }
+                        .map { (it as Variable).name }
+        this.copy(arguments = this.arguments + arrayArguments.map { Variable(it.toLenVar()) })
+    }
 
-    is And -> And(this.conjuncts.map { it.removeLen() })
+    this is PredicateApplication && muIndices[this.name] != null -> {
+        val indices = muIndices[this.name]!!
+        val arrayArguments =
+                this.arguments
+                        .filterIndexed { idx, _ -> idx in indices }
+                        .map { (it as Variable).name }
 
-    is Or -> Or(this.disjuncts.map { it.removeLen() })
+        this.copy(arguments = this.arguments + arrayArguments.map { Variable(it.toLenVar()) })
+    }
 
-    is Implication -> Implication(this.operands.map { it.removeLen() })
+    this is PredicateApplication -> PredicateApplication(this.name, this.arguments.map { it.removeLen() })
 
-    is Iff -> Iff(this.operands.map { it.removeLen() })
 
-    is ForAll -> ForAll(this.boundVars, this.assertion.removeLen())
+    this is Not -> Not(this.assertion.removeLen(kappaIndices, muIndices))
 
-    is Exists -> Exists(this.boundVars, this.assertion.removeLen())
+    this is And -> And(this.conjuncts.map { it.removeLen(kappaIndices, muIndices) })
+
+    this is Or -> Or(this.disjuncts.map { it.removeLen(kappaIndices, muIndices) })
+
+    this is Implication -> Implication(this.operands.map { it.removeLen(kappaIndices, muIndices) })
+
+    this is Iff -> Iff(this.operands.map { it.removeLen(kappaIndices, muIndices) })
+
+    this is ForAll -> ForAll(this.boundVars, this.assertion.removeLen(kappaIndices, muIndices))
+
+    this is Exists -> Exists(this.boundVars, this.assertion.removeLen(kappaIndices, muIndices))
 
     else -> this
 
