@@ -144,9 +144,11 @@ fun fromMuDeclaration(muDeclaration: MuDeclaration): Mu {
 
 /**
  * This class contains a qualifier plus all the array accesses that the qualifier involves.
- * Each array is associated with the type of its elements.
+ *
+ * Warning! After the Z3 len removal phase, the arrayNames will be transformed into variables denoting
+ * the array lengths
  */
-data class QEStarElement(val qualifier: Assertion, val arrayNames: List<Pair<String, HMType>>)
+data class QEStarElement(val qualifier: Assertion, val arrayNames: List<String>)
 
 /**
  * This class contains a qualifier plus all the array accesses that the qualifier involves.
@@ -154,9 +156,10 @@ data class QEStarElement(val qualifier: Assertion, val arrayNames: List<Pair<Str
  * `arrayNames1` contains the accesses indexed by the first bound variable, and `arrayNames2` contains
  * the accesses indexed by the second bound variable.
  *
- * Each array is associated with the type of its elements.
+ * Warning! After the Z3 len removal phase, the arrayNames will be transformed into variables denoting
+ * the array lengths
  */
-data class QEEStarElement(val qualifier: Assertion, val arrayNames1: List<Pair<String, HMType>>, val arrayNames2: List<Pair<String, HMType>>)
+data class QEEStarElement(val qualifier: Assertion, val arrayNames1: List<String>, val arrayNames2: List<String>)
 
 
 /**
