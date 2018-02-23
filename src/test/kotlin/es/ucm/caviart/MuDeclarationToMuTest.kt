@@ -91,8 +91,8 @@ class MuDeclarationToMuTest {
         assertEquals(2, mu.qE.size)
         assertEquals("(@ = (@ get-array nu i) (the int 0))", mu.qE[0].qualifier.toSExp().toString())
         assertEquals("(@ = (@ get-array nu i) (the int 0))", mu.qE[1].qualifier.toSExp().toString())
-        assertEquals(listOf("nu" to intType), mu.qE[0].arrayNames)
-        assertEquals(listOf("nu" to intType), mu.qE[1].arrayNames)
+        assertEquals(listOf("nu"), mu.qE[0].arrayNames)
+        assertEquals(listOf("nu"), mu.qE[1].arrayNames)
         assert(mu.qII.isEmpty())
         assert(mu.qEE.isEmpty())
         assert(mu.qLen.isEmpty())
@@ -129,7 +129,7 @@ class MuDeclarationToMuTest {
         assertEquals("(@ >= _I_1 i)", mu.qI[0].toSExp().toString())
         assertEquals(1, mu.qE.size)
         assertEquals("(@ = (@ get-array nu _I_1) (the int 0))", mu.qE[0].qualifier.toSExp().toString())
-        assertEquals(listOf("nu" to intType), mu.qE[0].arrayNames)
+        assertEquals(listOf("nu"), mu.qE[0].arrayNames)
         assert(mu.qII.isEmpty())
         assert(mu.qEE.isEmpty())
         assert(mu.qLen.isEmpty())
@@ -149,8 +149,8 @@ class MuDeclarationToMuTest {
         assertEquals("(@ < _I_1 (the int 0))", mu.qII[1].toSExp().toString())
         assertEquals(1, mu.qEE.size)
         assertEquals("(@ < (@ get-array nu _I_1) (@ get-array a j))", mu.qEE[0].qualifier.toSExp().toString())
-        assertEquals(listOf("nu" to intType), mu.qEE[0].arrayNames1)
-        assertEquals(listOf("a" to intType), mu.qEE[0].arrayNames2)
+        assertEquals(listOf("nu"), mu.qEE[0].arrayNames1)
+        assertEquals(listOf("a"), mu.qEE[0].arrayNames2)
         assert(mu.qLen.isEmpty())
     }
 
@@ -168,8 +168,8 @@ class MuDeclarationToMuTest {
         assertEquals("(@ < _I_1 (the int 0))", mu.qII[1].toSExp().toString())
         assertEquals(1, mu.qEE.size)
         assertEquals("(@ < (@ get-array nu _I_1) (@ get-array a _J_1))", mu.qEE[0].qualifier.toSExp().toString())
-        assertEquals(listOf("nu" to intType), mu.qEE[0].arrayNames1)
-        assertEquals(listOf("a" to intType), mu.qEE[0].arrayNames2)
+        assertEquals(listOf("nu"), mu.qEE[0].arrayNames1)
+        assertEquals(listOf("a"), mu.qEE[0].arrayNames2)
         assert(mu.qLen.isEmpty())
     }
 
