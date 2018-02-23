@@ -1,5 +1,10 @@
 package es.ucm.caviart
 
+import es.ucm.caviart.ast.*
+import es.ucm.caviart.iterativeweakening.*
+import es.ucm.caviart.iterativeweakening.z3.Correct
+import es.ucm.caviart.iterativeweakening.z3.MuWeakened
+import es.ucm.caviart.iterativeweakening.z3.Z3Goal
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -9,19 +14,21 @@ import kotlin.test.assertTrue
  */
 
 class MusTest {
-    val G1 = Z3Goal(
+    private val goalG1 = Z3Goal(
             "G1",
+            "Goal for testing",
             listOf(
-                    PredicateApplication(">=", listOf(Variable("n"), Literal("0", ConstrType("int")))),
-                    PredicateApplication("mu1", listOf(Variable("a"), Variable("n"))),
-                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("n"))), Literal("0", ConstrType("int"))))
+                    PredicateApplication(">=", listOf(Variable("a_len"), Literal("0", intType))),
+                    PredicateApplication(">=", listOf(Variable("n"), Literal("0", intType))),
+                    PredicateApplication("mu1", listOf(Variable("a"), Variable("n"), Variable("a_len"))),
+                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("n"))), Literal("0", intType)))
             ),
-            PredicateApplication("mu1", listOf(Variable("a"), FunctionApplication("+", listOf(Variable("n"), Literal("1", ConstrType("int")))))),
-            mapOf("a" to ConstrType("array", listOf(ConstrType("int"))), "n" to ConstrType("int")),
+            PredicateApplication("mu1", listOf(Variable("a"), FunctionApplication("+", listOf(Variable("n"), Literal("1", intType))), Variable("a_len"))),
+            mapOf("a" to ConstrType("array", listOf(intType)), "n" to intType, "a_len" to intType),
             mapOf(),
             mapOf(
                     "mu1" to Mu("mu1",
-                            listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("m", ConstrType("int"))),
+                            listOf(HMTypedVar("nu", ConstrType("array", listOf(intType))), HMTypedVar("m", intType), HMTypedVar("nu_len", intType)),
                             "j1", "j2",
                             listOf(
                                     PredicateApplication("<", listOf(Variable("j1"), Variable("m"))),
@@ -29,31 +36,36 @@ class MusTest {
                                     PredicateApplication(">", listOf(Variable("j1"), Variable("m")))
                             ),
                             listOf(
-                                    QEStarElement(PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", ConstrType("int")))), listOf(Pair("nu", ConstrType("int")))),
-                                    QEStarElement(PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Variable("m"))), listOf(Pair("nu", ConstrType("int"))))
+                                    QEStarElement(PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", intType))), listOf("nu_len")),
+                                    QEStarElement(PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Variable("m"))), listOf("nu_len"))
                             ),
                             listOf(),
                             listOf(),
                             listOf()
                     )
             ),
-            mapOf("mu1" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int"))), ConstrType("int")), ConstrType("bool")))
+            mapOf(),
+            mapOf("mu1" to setOf(2)),
+            mapOf()
     )
 
-    val G2 = Z3Goal(
+
+    private val goalG2 = Z3Goal(
             "G2",
+            "Goal for testing",
             listOf(
-                    PredicateApplication(">", listOf(Variable("n"), Literal("0", ConstrType("int")))),
-                    PredicateApplication("mu1", listOf(Variable("a"), Variable("n"))),
-                    PredicateApplication("=", listOf(Variable("k"), FunctionApplication("-", listOf(Variable("n"), Literal("1", ConstrType("int")))))),
+                    PredicateApplication(">=", listOf(Variable("a_len"), Literal("0", intType))),
+                    PredicateApplication(">", listOf(Variable("n"), Literal("0", intType))),
+                    PredicateApplication("mu1", listOf(Variable("a"), Variable("n"), Variable("a_len"))),
+                    PredicateApplication("=", listOf(Variable("k"), FunctionApplication("-", listOf(Variable("n"), Literal("1", intType))))),
                     PredicateApplication("<=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("k"))), FunctionApplication("get-array", listOf(Variable("a"), Variable("n")))))
             ),
-            PredicateApplication("mu1", listOf(Variable("a"), FunctionApplication("+", listOf(Variable("n"), Literal("1", ConstrType("int")))))),
-            mapOf("a" to ConstrType("array", listOf(ConstrType("int"))), "n" to ConstrType("int"), "k" to ConstrType("int")),
+            PredicateApplication("mu1", listOf(Variable("a"), FunctionApplication("+", listOf(Variable("n"), Literal("1", intType))), Variable("a_len"))),
+            mapOf("a" to ConstrType("array", listOf(intType)), "n" to intType, "k" to intType, "a_len" to intType),
             mapOf(),
             mapOf("mu1" to Mu(
                     "mu1",
-                    listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("n", ConstrType("int"))),
+                    listOf(HMTypedVar("nu", ConstrType("array", listOf(intType))), HMTypedVar("n", intType), HMTypedVar("nu_len", intType)),
                     "j1",
                     "j2",
                     listOf(),
@@ -62,37 +74,40 @@ class MusTest {
                     listOf(
                             QEEStarElement(
                                     PredicateApplication("<=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), FunctionApplication("get-array", listOf(Variable("nu"), Variable("j2"))))),
-                                    listOf(Pair("nu", ConstrType("int"))),
-                                    listOf(Pair("nu", ConstrType("int")))
+                                    listOf("nu_len"),
+                                    listOf("nu_len")
                             ),
                             QEEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", ConstrType("int")))),
-                                    listOf(Pair("nu", ConstrType("int"))),
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", intType))),
+                                    listOf("nu_len"),
                                     listOf()
                             )),
                     listOf()
             )),
-            mapOf("mu1" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int"))), ConstrType("int")), ConstrType("bool")))
+            mapOf(),
+            mapOf("mu1" to setOf(2)),
+            mapOf()
     )
 
-    val G3 = Z3Goal(
+    private val goalG3 = Z3Goal(
             "G3",
+            "Goal for testing",
             listOf(
-                    PredicateApplication("mu1", listOf(Variable("a"), Variable("m")))
+                    PredicateApplication("mu1", listOf(Variable("a"), Variable("m"), Variable("a_len")))
             ),
-            ForAll(listOf(HMTypedVar("j1", ConstrType("int")), HMTypedVar("j2", ConstrType("int"))),
+            ForAll(listOf(HMTypedVar("j1", intType), HMTypedVar("j2", intType)),
                     Implication(listOf(
-                            PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("j1"))),
+                            PredicateApplication("<=", listOf(Literal("0", intType), Variable("j1"))),
                             PredicateApplication("<=", listOf(Variable("j1"), Variable("j2"))),
-                            PredicateApplication("<", listOf(Variable("j2"), FunctionApplication("len", listOf(Variable("a"))))),
+                            PredicateApplication("<", listOf(Variable("j2"), Variable("a_len"))),
                             PredicateApplication("<=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("j1"))), FunctionApplication("get-array", listOf(Variable("a"), Variable("j2")))))
                     ))
             ),
-            mapOf("a" to ConstrType("array", listOf(ConstrType("int"))), "m" to ConstrType("int")),
+            mapOf("a" to ConstrType("array", listOf(intType)), "m" to intType, "a_len" to intType),
             mapOf(),
             mapOf("mu1" to Mu(
                     "mu1",
-                    listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("m", ConstrType("int"))),
+                    listOf(HMTypedVar("nu", ConstrType("array", listOf(intType))), HMTypedVar("m", intType), HMTypedVar("nu_len", intType)),
                     "j1", "j2",
                     listOf(
                             PredicateApplication("<=", listOf(Variable("j1"), Variable("m"))),
@@ -100,66 +115,76 @@ class MusTest {
                     ),
                     listOf(
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", ConstrType("int")))),
-                                    listOf(Pair("nu", ConstrType("int")))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("0", intType))),
+                                    listOf("nu_len")
                             ),
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("1", ConstrType("int")))),
-                                    listOf(Pair("nu", ConstrType("int")))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("j1"))), Literal("1", intType))),
+                                    listOf("nu_len")
                             )
                     ),
                     listOf(),
                     listOf(),
                     listOf()
             )),
-            mapOf("len" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int")))), ConstrType("int")),
-                    "mu1" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int"))), ConstrType("int")), ConstrType("bool")))
+            mapOf(),
+            mapOf("mu1" to setOf(2)),
+            mapOf()
     )
 
-    val assumptionsG4 = listOf(
-            PredicateApplication(">=", listOf(Variable("n"), Literal("0", ConstrType("int")))),
-            PredicateApplication("<", listOf(Variable("n"), FunctionApplication("len", listOf(Variable("a"))))),
-            ForAll("i", ConstrType("int"), Implication(listOf(
-                    PredicateApplication("<=", listOf(Literal("0", ConstrType("int")), Variable("i"))),
+    private val assumptionsG4 = listOf(
+            PredicateApplication(">=", listOf(Variable("a_len"), Literal("0", intType))),
+            PredicateApplication(">=", listOf(Variable("n"), Literal("0", intType))),
+            PredicateApplication("<", listOf(Variable("n"), Variable("a_len"))),
+            ForAll(listOf(HMTypedVar("i", intType)), Implication(listOf(
+                    PredicateApplication("<=", listOf(Literal("0", intType), Variable("i"))),
                     PredicateApplication("<=", listOf(Variable("i"), Variable("n"))),
-                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("i"))), Literal("0", ConstrType("int"))))
+                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("a"), Variable("i"))), Literal("0", intType)))
             )))
     )
-    val conclusionG4 = PredicateApplication("mu1", listOf(Variable("a"), Variable("n")))
-    val environmentG4 = mapOf("n" to ConstrType("int"), "a" to ConstrType("array", listOf(ConstrType("int"))))
-    val declarationMapG4 = mapOf("len" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int")))), ConstrType("int")),
-            "mu1" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int"))), ConstrType("int")), ConstrType("bool")))
+    private val conclusionG4 = PredicateApplication("mu1", listOf(Variable("a"), Variable("n"), Variable("a_len")))
+    private val environmentG4 = mapOf("n" to intType, "a" to ConstrType("array", listOf(intType)), "a_len" to intType)
+    private val declarationMapG4 = mapOf<String, UninterpretedFunctionType>()
 
-    val G4 = Z3Goal("G4",
+    private val goalG4 = Z3Goal("G4",
+            "Goal for testing",
             assumptionsG4,
             conclusionG4,
             environmentG4,
             mapOf(),
-            mapOf("mu1" to Mu("mu1", listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("n", ConstrType("int"))),
+            mapOf("mu1" to Mu("mu1",
+                    listOf(HMTypedVar("nu", ConstrType("array", listOf(intType))), HMTypedVar("n", intType), HMTypedVar("nu_len", intType)),
                     "i", "j",
                     listOf(PredicateApplication("<=", listOf(Variable("i"), Variable("n")))),
                     listOf(
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", ConstrType("int")))),
-                                    listOf("nu" to ConstrType("array", listOf(ConstrType("int"))))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", intType))),
+                                    listOf("nu_len")
                             ),
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", ConstrType("int")))),
-                                    listOf("nu" to ConstrType("array", listOf(ConstrType("int"))))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", intType))),
+                                    listOf("nu_len")
                             )
                     ),
                     listOf(),
                     listOf(),
                     listOf())),
+            mapOf(),
+            mapOf("mu1" to setOf(2)),
             declarationMapG4
     )
 
-    val G5 = Z3Goal("G5",
+    private val goalG5 = Z3Goal("G5",
+            "Goal for testing",
             assumptionsG4,
             conclusionG4,
             environmentG4,
             mapOf(),
-            mapOf("mu1" to Mu("mu1", listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int")))), HMTypedVar("n", ConstrType("int"))),
+            mapOf("mu1" to Mu("mu1", listOf(
+                    HMTypedVar("nu", ConstrType("array", listOf(intType))),
+                    HMTypedVar("n", intType),
+                    HMTypedVar("nu_len", intType)
+            ),
                     "i", "j",
                     listOf(
                             PredicateApplication("<=", listOf(Variable("i"), Variable("n"))),
@@ -167,33 +192,39 @@ class MusTest {
                     ),
                     listOf(
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", ConstrType("int")))),
-                                    listOf("nu" to ConstrType("array", listOf(ConstrType("int"))))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("0", intType))),
+                                    listOf("nu_len")
                             ),
                             QEStarElement(
-                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", ConstrType("int")))),
-                                    listOf("nu" to ConstrType("array", listOf(ConstrType("int"))))
+                                    PredicateApplication("=", listOf(FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))), Literal("1", intType))),
+                                    listOf("nu_len")
                             )
                     ),
                     listOf(),
                     listOf(),
                     listOf())),
+            mapOf(),
+            mapOf("mu1" to setOf(2)),
             declarationMapG4
     )
 
-    @Test fun checkSolMu() {
-        val solution = Solution(mutableMapOf(),
+
+    @Test
+    fun checkSolMu() {
+        val solution = Solution(
+                mutableMapOf(),
                 mutableMapOf("mu1" to
                         MuSolution(mutableListOf(
                                 Refinement(mutableSetOf(0), mutableSetOf(0))
                         ), mutableListOf(), mutableSetOf())
                 )
         )
-        val result = G1.check(solution)
+        val result = goalG1.check(solution)
         assertTrue(result is Correct, "G1: solution mu1 a m = [forall i. i < m -> a[i] = 0] is correct")
     }
 
-    @Test fun checkSolMu2() {
+    @Test
+    fun checkSolMu2() {
         val solution = Solution(mutableMapOf(),
                 mutableMapOf("mu1" to
                         MuSolution(
@@ -205,11 +236,12 @@ class MusTest {
                         )
                 )
         )
-        val result = G2.check(solution)
+        val result = goalG2.check(solution)
         assertTrue(result is Correct, "G2: solution mu1 nu n = [forall j1, j2. 0 <= j1 <= j2 < n  -> nu[j1] <= nu[j2]] is correct")
     }
 
-    @Test fun checkSolMu3() {
+    @Test
+    fun checkSolMu3() {
         val solution = Solution(mutableMapOf(),
                 mutableMapOf(
                         "mu1" to MuSolution(
@@ -222,11 +254,12 @@ class MusTest {
                         )
                 )
         )
-        val result = G3.check(solution)
+        val result = goalG3.check(solution)
         assertTrue(result is Correct, "G3: solution mu1 nu n = [forall j1. j1 <= m -> nu[j1] = 0] && [forall j1. j1 > m -> nu[j1] = 1]")
     }
 
-    @Test fun checkSolMu4() {
+    @Test
+    fun checkSolMu4() {
         val solution = Solution(mutableMapOf(),
                 mutableMapOf(
                         "mu1" to MuSolution(
@@ -239,7 +272,7 @@ class MusTest {
                         )
                 )
         )
-        val result = G4.check(solution)
+        val result = goalG4.check(solution)
         assertEquals(MuWeakened("mu1"), result, "G4 must have been weakened")
         assertEquals(MuSolution(listOf(Refinement(setOf(0), setOf(0))), listOf(), setOf()), solution.mus["mu1"])
     }
@@ -257,29 +290,31 @@ class MusTest {
                         )
                 )
         )
-        val result = G5.check(solution)
+        val result = goalG5.check(solution)
         assertEquals(MuWeakened("mu1"), result, "G4 must have been weakened")
         assertEquals(MuSolution(listOf(Refinement(setOf(0), setOf(0)), Refinement(setOf(1), setOf(0))), listOf(), setOf()), solution.mus["mu1"])
     }
 
 
-    val auxG6 = { qii: List<Assertion> -> Z3Goal("G6",
+    private val auxG6 = { qii: List<Assertion> -> Z3Goal("G6",
+            "Goal for testing",
             listOf(
+                    PredicateApplication(">=", listOf(Variable("a_len"), Literal("0", intType))),
                     ForAll(
-                            listOf(HMTypedVar("i", ConstrType("int")), HMTypedVar("j", ConstrType("int"))),
+                            listOf(HMTypedVar("i", intType), HMTypedVar("j", intType)),
                             Implication(
                                     Or(
                                             And(
-                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", ConstrType("int")))),
-                                                    PredicateApplication("=", listOf(Variable("j"), Literal("2", ConstrType("int"))))
+                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", intType))),
+                                                    PredicateApplication("=", listOf(Variable("j"), Literal("2", intType)))
                                             ),
                                             And(
-                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", ConstrType("int")))),
-                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", ConstrType("int"))))
+                                                    PredicateApplication("=", listOf(Variable("i"), Literal("1", intType))),
+                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", intType)))
                                             ),
                                             And(
-                                                    PredicateApplication("=", listOf(Variable("i"), Literal("2", ConstrType("int")))),
-                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", ConstrType("int"))))
+                                                    PredicateApplication("=", listOf(Variable("i"), Literal("2", intType))),
+                                                    PredicateApplication("=", listOf(Variable("j"), Literal("3", intType)))
                                             ),
                                             PredicateApplication("=", listOf(Variable("i"), Variable("j")))
                                     ),
@@ -290,10 +325,10 @@ class MusTest {
                             )
                     )
             ),
-            PredicateApplication("mu1", listOf(Variable("a"))),
-            mapOf("a" to ConstrType("array", listOf(ConstrType("int")))),
+            PredicateApplication("mu1", listOf(Variable("a"), Variable("a_len"))),
+            mapOf("a" to ConstrType("array", listOf(intType)), "a_len" to intType),
             mapOf(),
-            mapOf("mu1" to Mu("mu1", listOf(HMTypedVar("nu", ConstrType("array", listOf(ConstrType("int"))))),
+            mapOf("mu1" to Mu("mu1", listOf(HMTypedVar("nu", ConstrType("array", listOf(intType))), HMTypedVar("nu_len", intType)),
                     "i", "j",
                     listOf(),
                     listOf(),
@@ -304,39 +339,44 @@ class MusTest {
                                             FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))),
                                             FunctionApplication("get-array", listOf(Variable("nu"), Variable("j")))
                                     )),
-                                    listOf(Pair("nu", ConstrType("array", listOf(ConstrType("int"))))),
-                                    listOf(Pair("nu", ConstrType("array", listOf(ConstrType("int")))))
+                                    listOf("nu_len"),
+                                    listOf("nu_len")
                             ),
                             QEEStarElement(
                                     PredicateApplication("<", listOf(
                                             FunctionApplication("get-array", listOf(Variable("nu"), Variable("i"))),
                                             FunctionApplication("get-array", listOf(Variable("nu"), Variable("j")))
                                     )),
-                                    listOf(Pair("nu", ConstrType("array", listOf(ConstrType("int"))))),
-                                    listOf(Pair("nu", ConstrType("array", listOf(ConstrType("int")))))
+                                    listOf("nu_len"),
+                                    listOf("nu_len")
                             )
                     ),
                     listOf()
             )),
-            mapOf("len" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int")))), ConstrType("int")),
-                    "mu1" to UninterpretedFunctionType(listOf(ConstrType("array", listOf(ConstrType("int")))), ConstrType("bool")))
+            mapOf(),
+            mapOf("mu1" to setOf(1)),
+            mapOf()
     )}
 
-    val G6 = auxG6(listOf(
+
+    private val goalG6 = auxG6(listOf(
             PredicateApplication("<=", listOf(Variable("i"), Variable("j")))
     ))
 
-    val G7 = auxG6(listOf(
-            PredicateApplication("<=", listOf(Literal("1", ConstrType("int")), Variable("i"))),
+
+    private val goalG7 = auxG6(listOf(
+            PredicateApplication("<=", listOf(Literal("1", intType), Variable("i"))),
             PredicateApplication("<=", listOf(Variable("i"), Variable("j"))),
-            PredicateApplication("<=", listOf(Variable("j"), Literal("3", ConstrType("int")))),
+            PredicateApplication("<=", listOf(Variable("j"), Literal("3", intType))),
             PredicateApplication("<", listOf(Variable("i"), Variable("j"))),
             And(
-                    PredicateApplication("<", listOf(Literal("0", ConstrType("int")), Variable("i"))),
-                    PredicateApplication("<", listOf(Variable("j"), Literal("4", ConstrType("int")))),
+                    PredicateApplication("<", listOf(Literal("0", intType), Variable("i"))),
+                    PredicateApplication("<", listOf(Variable("j"), Literal("4", intType))),
                     PredicateApplication("<=", listOf(Variable("i"), Variable("j")))
             )
     ))
+
+
 
     @Test fun checkSolMu6() {
         val solution = Solution(mutableMapOf(),
@@ -351,7 +391,7 @@ class MusTest {
                         )
                 )
         )
-        val result = G6.check(solution)
+        val result = goalG6.check(solution)
         assertEquals(MuWeakened("mu1"), result, "With G6 solution must have been weakened")
         assertEquals(listOf(), solution.mus["mu1"]!!.doubleRefinements, "All refinements must have been erased")
     }
@@ -368,7 +408,7 @@ class MusTest {
                         )
                 )
         )
-        val result = G7.check(solution)
+        val result = goalG7.check(solution)
         assertTrue(result is Correct, "Correct solution with G7 must be valid")
     }
 
@@ -385,7 +425,7 @@ class MusTest {
                         )
                 )
         )
-        val result = G7.check(solution)
+        val result = goalG7.check(solution)
         assertEquals(MuWeakened("mu1"), result, "G7: A redundant qualifier in QEE must have been weakened")
         assertEquals(listOf(Refinement(setOf(0, 1, 2), setOf(0))), solution.mus["mu1"]!!.doubleRefinements,
                 "G7: Redundant qualifier of QEE must have been removed")
@@ -404,7 +444,7 @@ class MusTest {
                         )
                 )
         )
-        val result = G7.check(solution)
+        val result = goalG7.check(solution)
         assertEquals(MuWeakened("mu1"), result, "G7: mu1 must have been weakened")
         assertEquals(listOf(
                 Refinement(setOf(0, 4), setOf(0)),
@@ -425,7 +465,7 @@ class MusTest {
                         )
                 )
         )
-        val result = G7.check(solution)
+        val result = goalG7.check(solution)
         assertEquals(MuWeakened("mu1"), result, "G7: mu1 must have been weakened")
         assertEquals(listOf(
                 Refinement(setOf(4), setOf(0)),

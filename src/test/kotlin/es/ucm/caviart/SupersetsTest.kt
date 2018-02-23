@@ -1,9 +1,9 @@
 package es.ucm.caviart
 
+import es.ucm.caviart.iterativeweakening.iterateSupersetsOf
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 /**
  * Created by manuel on 5/07/17.
@@ -56,7 +56,6 @@ class SupersetsTest {
         assertEquals(setOf(0, 2), iterator.next(true))
         assertEquals(setOf(0, 3), iterator.next(true))
         assertEquals(setOf(0, 1, 2), iterator.next(false))
-        assertEquals(null, iterator.next(true)) // ERROR
-        // TODO: Creo que es necesario que la cola tenga conjuntos de elementos descartados
+        assertEquals(null, iterator.next(true))
     }
 }

@@ -1,5 +1,6 @@
 package es.ucm.caviart
 
+import es.ucm.caviart.iterativeweakening.FilterQueue
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -62,7 +63,7 @@ class FilterQueueTest {
         assertEquals(2, deq2, "Dequeued element must be 2")
         assertEquals(3, queue.first, "First element must be 3")
         assertFalse(queue.empty, "After dequeuing two, queue must not be empty")
-        val deq3 = queue.dequeue()
+        queue.dequeue()
         assertTrue(queue.empty, "After dequeuing three, queue must be empty")
     }
 
