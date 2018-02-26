@@ -111,7 +111,11 @@ fun generateForAtomic(atomic: Atomic, localEnvironment: List<EnvironmentEntry>):
         // We look for the variable into the environment
         val hmType: HMType =
                 (localEnvironment.findLast { it is VariableEntry && it.variable == atomic.name } as VariableEntry).type.HMType
-        QualType(newNu, hmType, PredicateApplication("=", listOf(Variable(newNu), atomic)))
+        when {
+            hmType is ConstrType && hmType.typeConstructor == "array" -> QualType(newNu, hmType, PredicateApplication("=[]", listOf(Variable(newNu), atomic)))
+            else -> QualType(newNu, hmType, PredicateApplication("=", listOf(Variable(newNu), atomic)))
+        }
+
     }
 
     else -> throw InvalidASTException(atomic)
