@@ -121,7 +121,8 @@ fun Mu.removeLen(kappaIndices: Map<String, Set<Int>>, muIndices: Map<String, Set
             qI = this.qI.map { it.removeLen(kappaIndices, muIndices) },
             qE = this.qE.map { it.copy(qualifier = it.qualifier.removeLen(kappaIndices, muIndices), arrayNames = it.arrayNames.map { it.toLenVar() }) },
             qII = this.qII.map { it.removeLen(kappaIndices, muIndices) },
-            qEE = this.qEE.map { it.copy(qualifier = it.qualifier.removeLen(kappaIndices, muIndices), arrayNames1 = it.arrayNames1.map { it.toLenVar() }, arrayNames2 = it.arrayNames2.map { it.toLenVar() }) }
+            qEE = this.qEE.map { it.copy(qualifier = it.qualifier.removeLen(kappaIndices, muIndices), arrayNames1 = it.arrayNames1.map { it.toLenVar() }, arrayNames2 = it.arrayNames2.map { it.toLenVar() }) },
+            qLen = this.qLen.map { it.removeLen(kappaIndices, muIndices) }
     ) to arrayLenVars
 }
 
