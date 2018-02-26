@@ -169,12 +169,71 @@ data class QEEStarElement(val qualifier: Assertion, val arrayNames1: List<String
  * represented respectively by instances of KappaSolution and MuSolution.
  */
 data class Solution(val kappas: MutableMap<String, KappaSolution>,
-                    val mus: MutableMap<String, MuSolution>)
+                    val mus: MutableMap<String, MuSolution>) {
+    fun toString(kappasDef: Map<String, Kappa>, musDef: Map<String, Mu>): String {
 
-/**
- * A KappaSolution is just a set of the positions of qualifiers
- * taken from the qStar list of the corresponding Kappa.
- */
+        fun buildConjunct(assertions: List<Assertion>): Assertion = when {
+            assertions.isEmpty() -> True()
+            assertions.size == 1 -> assertions[0]
+            else -> And(assertions)
+        }
+
+        val kappasText = kappas.toList().joinToString("\n") { (name, kappaSol) ->
+            val realKappa = kappasDef[name]!!
+            if (kappaSol.isEmpty()) {
+                " * `$name`: *true*"
+            } else {
+                val assertions = kappaSol.joinToString(", ") { "`${realKappa.qStar[it].toSExp()}`" }
+                " * `$name`: $assertions"
+            }
+        }
+
+        val musText = mus.toList().joinToString("\n") { (name, muSol) ->
+            val realMu = musDef[name]!!
+            val singleRefStrings = muSol.singleRefinements.map {
+                ForAll(listOf(HMTypedVar(realMu.boundVar1, intType)),
+                        Implication(buildConjunct(it.lhs.map { realMu.qI[it] }), buildConjunct(it.rhs.map { realMu.qE[it].qualifier }))
+                ).toSExp().toString()
+            }
+
+            val doubleRefStrings = muSol.doubleRefinements.map {
+                ForAll(listOf(HMTypedVar(realMu.boundVar1, intType), HMTypedVar(realMu.boundVar2, intType)),
+                        Implication(buildConjunct(it.lhs.map { realMu.qII[it] }), buildConjunct(it.rhs.map { realMu.qEE[it].qualifier }))
+                ).toSExp().toString()
+            }
+
+            val lenRefStrings = muSol.qLen.map { realMu.qLen[it].toSExp().toString() }
+
+            val allRefStrings = singleRefStrings + doubleRefStrings + lenRefStrings
+
+            when {
+                allRefStrings.isEmpty() -> " * `$name`: *true*"
+                allRefStrings.size == 1 -> " * `$name`: `${allRefStrings[0]}`"
+                else -> " * `$name`: conjunction of the following\n" +
+                        allRefStrings.joinToString("\n") { "    - `$it`" }
+            }
+        }
+
+        return kappasText + "\n\n" + musText
+    }
+
+
+}
+
+
+fun buildStrongestSolution(kappas: Map<String, Kappa>, mus: Map<String, Mu>): Solution = Solution(
+        kappas = kappas.mapValues { (_, kappa) -> (0 until kappa.qStar.size).toSet() }.toMutableMap(),
+        mus = mus.mapValues { (_, mu) -> MuSolution(
+                singleRefinements = mu.qE.mapIndexed { index, _ -> Refinement(setOf(), setOf(index)) },
+                doubleRefinements = mu.qEE.mapIndexed { index, _ -> Refinement(setOf(), setOf(index)) },
+                qLen = (0 until mu.qLen.size).toSet()
+        ) }.toMutableMap()
+)
+
+        /**
+         * A KappaSolution is just a set of the positions of qualifiers
+         * taken from the qStar list of the corresponding Kappa.
+         */
 typealias KappaSolution = Set<Int>
 
 /**
