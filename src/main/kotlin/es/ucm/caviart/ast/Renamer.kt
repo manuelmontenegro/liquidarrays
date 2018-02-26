@@ -39,11 +39,11 @@ import es.ucm.caviart.utils.mapAccumLeft
  * @return A fresh variable distinct from `prefix` and not occurring in `taken`.
  */
 fun freshName(prefix: String, taken: Set<String>): String {
-    var currentStr = prefix
-    while (currentStr in taken) {
-        currentStr += "'"
+    var currentNumber = 1
+    while ("${prefix}_$currentNumber" in taken) {
+        currentNumber += 1
     }
-    return currentStr
+    return "${prefix}_$currentNumber"
 }
 
 typealias Renaming = Map<String, String>
