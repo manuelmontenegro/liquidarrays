@@ -3,13 +3,13 @@ package es.ucm.caviart
 import es.ucm.caviart.ast.*
 import es.ucm.caviart.goal.Goal
 import es.ucm.caviart.goal.generateForDefinition
-import es.ucm.caviart.iterativeweakening.fromKappaDeclaration
-import es.ucm.caviart.iterativeweakening.fromMuDeclaration
+import es.ucm.caviart.iterativeweakening.*
+import es.ucm.caviart.iterativeweakening.z3.*
 import es.ucm.caviart.qstar.instantiateVerificationUnit
 import es.ucm.caviart.typecheck.TypeCheckerException
 import es.ucm.caviart.typecheck.checkVerificationUnit
 import es.ucm.caviart.typecheck.initialEnvironment
-import es.ucm.caviart.typecheck.qualifyVeriticationUnit
+import es.ucm.caviart.typecheck.qualifyVerificationUnit
 import es.ucm.caviart.utils.asDarkGray
 import es.ucm.caviart.utils.asGreen
 import es.ucm.caviart.utils.asRed
@@ -19,7 +19,7 @@ import kotlin.math.min
 
 private const val WIDTH = 40
 
-fun<T> runPhase(description: String, action: () -> T): T {
+fun <T> runPhase(description: String, action: () -> T): T {
     val initCad = " - $description"
     print(initCad.substring(0, min(initCad.length, WIDTH)))
     System.out.flush()
@@ -39,7 +39,7 @@ fun<T> runPhase(description: String, action: () -> T): T {
 }
 
 fun Goal.isTrivial() =
-    this.conclusion is True || this.assumptions.any { it is False }
+        this.conclusion is True || this.assumptions.any { it is False }
 
 fun Goal.prune() =
         this.copy(assumptions = this.assumptions.filterNot { it is True })
@@ -73,7 +73,7 @@ fun main(args: Array<String>) {
         val numberMus = verificationUnit.muDeclarations.size
 
         val verificationUnitDecorated = runPhase("Generating qualified types") {
-            qualifyVeriticationUnit(verificationUnit)
+            qualifyVerificationUnit(verificationUnit, newEnvironment)
         }
 
         val newKappas = verificationUnitDecorated.kappaDeclarations.size - numberKappas
@@ -85,10 +85,13 @@ fun main(args: Array<String>) {
             instantiateVerificationUnit(verificationUnitDecorated)
         }
 
+        val verificationUnitDecorated3 = runPhase("Renaming") {
+            verificationUnitDecorated2.applyRenaming()
+        }
 
         val generatedGoals: List<Goal> = runPhase("Generating goals") {
             val result = mutableListOf<Goal>()
-            verificationUnitDecorated2.definitions.map {
+            verificationUnitDecorated3.definitions.map {
                 generateForDefinition(it, listOf(), newEnvironment, result)
             }
             result
@@ -98,17 +101,90 @@ fun main(args: Array<String>) {
         val prunedGoals = generatedGoals.filterNot { it.isTrivial() }.map { it.prune() }
         println("     Non-trivial: ${prunedGoals.size}")
 
-
-        val kappas = verificationUnitDecorated2.kappaDeclarations.map { fromKappaDeclaration(it) }
-        val mus = verificationUnitDecorated2.muDeclarations.map { fromMuDeclaration(it) }
-
-        println(kappas)
-        println(mus)
-
-        val sexpAgain = verificationUnitDecorated2.toSExpList()
-        sexpAgain.forEach {
-            println(it.prettyPrint(100))
+        val (kappas, mus) = runPhase("Preparing kappas and mus") {
+            Pair(
+                    verificationUnitDecorated3.kappaDeclarations.map { fromKappaDeclaration(it) },
+                    verificationUnitDecorated3.muDeclarations.map { fromMuDeclaration(it) }
+            )
         }
+
+        val generatedGoalsZ3: List<Z3Goal> = runPhase("Transforming goals into Z3") {
+            val kappaIndices = kappas.map { it.name to getArrayParams(it.arguments) }.toMap()
+            val muIndices = mus.map { it.name to getArrayParams(it.arguments) }.toMap()
+
+            val goalsWithoutLen = prunedGoals.map { it.removeLen(kappaIndices, muIndices) }
+            val kappasWithoutLen = kappas.map { it.removeLen(kappaIndices, muIndices) }
+            val musWithoutLen = mus.map { it.removeLen(kappaIndices, muIndices) }
+
+            val kappaLenIndices = kappasWithoutLen.map { (kappa, lenVars) ->
+                kappa.name to lenVars.map { kappa.arguments.indexOf(it) }.toSet()
+            }.toMap()
+
+            val muLenIndices = musWithoutLen.map { (mu, lenVars) ->
+                mu.name to lenVars.map { mu.arguments.indexOf(it) }.toSet()
+            }.toMap()
+
+            goalsWithoutLen.map {
+                Z3Goal(
+                        name = it.name,
+                        description = it.description,
+                        assumptions = it.assumptions,
+                        conclusion = it.conclusion,
+                        environment = it.environment,
+                        kappas = kappasWithoutLen.map { (kappa, _) -> kappa.name to kappa }.toMap(),
+                        mus = musWithoutLen.map { (mu, _) -> mu.name to mu }.toMap(),
+                        kappaIndices = kappaLenIndices,
+                        muIndices = muLenIndices,
+                        declarationMap = newEnvironment.logicFunctions +
+                                newEnvironment.logicPredicates.mapValues { (_, args) -> UninterpretedFunctionType(args, boolType) }
+                )
+            }
+        }
+
+        val kappasMap = kappas.map { it.name to it }.toMap()
+        val musMap = mus.map { it.name to it }.toMap()
+
+        val solution = buildStrongestSolution(kappasMap, musMap)
+
+        val goalsMap = generatedGoalsZ3.map { it.name to it }.toMap()
+        val pending = goalsMap.keys.toMutableSet()
+        val buffer = StringBuffer()
+        var stepNumber = 1
+        var broken = false
+
+        while (!pending.isEmpty() && !broken) {
+            buffer.append("===== STEP $stepNumber =====\n")
+            buffer.append("Starting from solution:\n")
+            buffer.append(solution.toString(kappasMap, musMap) + "\n")
+
+            val goalId = "G_17" // pending.first()
+            pending.remove(goalId)
+            val goal = goalsMap[goalId]!!
+            print(" - $goalId: ")
+            val result = goal.check(solution, buffer)
+            buffer.append("\n\n")
+            when (result) {
+                is Correct -> { println("valid".asGreen()) }
+                is CannotWeaken -> {
+                    println("error".asRed())
+                    broken = true
+                }
+                is KappaWeakened -> {
+                    val affected = goalsMap.filterValues { result.varName in it.mentionedKappas }.map { it.key }
+                    pending.addAll(affected)
+                    println("had to weaken ${result.varName}")
+                }
+                is MuWeakened -> {
+                    val affected = goalsMap.filterValues { result.varName in it.mentionedMus }.map { it.key }
+                    pending.addAll(affected)
+                    println("had to weaken ${result.varName}")
+                }
+            }
+            stepNumber += 1
+        }
+
+        println(buffer.toString())
+
 
 
     } catch (e: IOException) {
