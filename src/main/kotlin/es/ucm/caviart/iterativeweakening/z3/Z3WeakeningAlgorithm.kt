@@ -52,8 +52,8 @@ class Z3Goal(val name: String,
              assumptions: List<Assertion>,
              conclusion: Assertion,
              environment: Map<String, HMType>,
-             kappas: Map<String, Kappa>,
-             mus: Map<String, Mu>,
+             val kappas: Map<String, Kappa>,
+             val mus: Map<String, Mu>,
              kappaIndices: Map<String, Set<Int>>,
              muIndices: Map<String, Set<Int>>,
              declarationMap: Map<String, UninterpretedFunctionType>) {
@@ -125,11 +125,11 @@ class Z3Goal(val name: String,
     /**
      * The solver which will be used in that context
      */
-    private val solver: Solver = ctx.mkSolver()
+    private val solver: Solver = ctx.mkSolver("AUFLIRA")
 
 
     override fun toString(): String {
-        return solver.assertions.joinToString("\n") { it.sExpr }
+        return solver.toString()
     }
 
 
@@ -456,7 +456,7 @@ class Z3Goal(val name: String,
             solution.mus[muVar] = builder(listOf(it))
             val z3Equivalence = muDefinitionToZ3(muVar, solution)
 
-            // ¿Is the formula still valid?
+            // Is the formula still valid?
             solver.push()
             solver.add(z3Equivalence)
             val status = solver.check()

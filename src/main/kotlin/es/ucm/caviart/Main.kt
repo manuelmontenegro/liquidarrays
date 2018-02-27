@@ -144,46 +144,60 @@ fun main(args: Array<String>) {
         val kappasMap = kappas.map { it.name to it }.toMap()
         val musMap = mus.map { it.name to it }.toMap()
 
-        val solution = buildStrongestSolution(kappasMap, musMap)
+        val solution: Solution? = runPhase("Running iterative weakening") {
+            val solution = buildStrongestSolution(kappasMap, musMap)
 
-        val goalsMap = generatedGoalsZ3.map { it.name to it }.toMap()
-        val pending = goalsMap.keys.toMutableSet()
-        val buffer = StringBuffer()
-        var stepNumber = 1
-        var broken = false
+            val goalsMap = generatedGoalsZ3.map { it.name to it }.toMap()
+            val pending = goalsMap.keys.toMutableSet()
+            val buffer = StringBuffer()
+            var stepNumber = 1
+            var broken = false
 
-        while (!pending.isEmpty() && !broken) {
-            buffer.append("===== STEP $stepNumber =====\n")
-            buffer.append("Starting from solution:\n")
-            buffer.append(solution.toString(kappasMap, musMap) + "\n")
+            while (!pending.isEmpty() && !broken) {
+                buffer?.append("===== STEP $stepNumber =====\n")
+                buffer?.append("Starting from solution:\n")
+                buffer?.append(solution.toString(kappasMap, musMap) + "\n")
 
-            val goalId = "G_17" // pending.first()
-            pending.remove(goalId)
-            val goal = goalsMap[goalId]!!
-            print(" - $goalId: ")
-            val result = goal.check(solution, buffer)
-            buffer.append("\n\n")
-            when (result) {
-                is Correct -> { println("valid".asGreen()) }
-                is CannotWeaken -> {
-                    println("error".asRed())
-                    broken = true
+                val goalId = pending.first() // "G_17"
+                pending.remove(goalId)
+                val goal = goalsMap[goalId]!!
+                print(" - $goalId: ")
+                val result = goal.check(solution, buffer)
+                buffer?.append("\n\n")
+                when (result) {
+                    is Correct -> { println("valid".asGreen()) }
+                    is CannotWeaken -> {
+                        println("error".asRed())
+                        broken = true
+                    }
+                    is KappaWeakened -> {
+                        val affected = goalsMap.filterValues { result.varName in it.mentionedKappas }.map { it.key }
+                        pending.addAll(affected)
+                        println("had to weaken ${result.varName}")
+                    }
+                    is MuWeakened -> {
+                        val affected = goalsMap.filterValues { result.varName in it.mentionedMus }.map { it.key }
+                        pending.addAll(affected)
+                        println("had to weaken ${result.varName}")
+                    }
                 }
-                is KappaWeakened -> {
-                    val affected = goalsMap.filterValues { result.varName in it.mentionedKappas }.map { it.key }
-                    pending.addAll(affected)
-                    println("had to weaken ${result.varName}")
-                }
-                is MuWeakened -> {
-                    val affected = goalsMap.filterValues { result.varName in it.mentionedMus }.map { it.key }
-                    pending.addAll(affected)
-                    println("had to weaken ${result.varName}")
-                }
+                stepNumber += 1
             }
-            stepNumber += 1
+
+            print("Finished iterative weakening")
+            if (!broken) {
+                solution
+            } else {
+                null
+            }
         }
 
-        println(buffer.toString())
+        if (solution != null) {
+            println("\nSolution found!".asGreen())
+            println(solution.toString(kappasMap, musMap))
+        } else {
+            println("No solution found")
+        }
 
 
 

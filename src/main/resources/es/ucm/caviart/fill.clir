@@ -1,0 +1,30 @@
+(verification-unit "fill"
+	   :sources (((:lang :handmade-clir)
+			      (:module :self)))
+	   :uses (:ir)
+	   :documentation "A function that fills the elements of an array with a given value"
+       :external (set-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+                             (nv int))
+                            ((res (qual nu (array int) (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+       :external (get-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+                            ((res (qual nu int (@ = nu (@ get-array xs i))))))
+       :qset (Q (nu int () (@ <= (the int 0) nu)) (nu int ((* (array int))) (@ < nu (@ len *))))
+       :qset (QI i (nu (array int) ((* int)) (@ < i *)))
+       :qset (QE i (nu (array int) ((* int)) (@ = (@ get-array nu i) *)))
+       :qset (QLen (nu (array int) ((* int)) (@ <= * (@ len nu)))))
+(define fill ((xs (array int)) (elem int)) ((res (array int)))
+    (declare
+        (assertion
+            (precd true)
+            (postcd (forall ((i int)) (-> (@ <= (the int 0) i) (-> (@ < i (@ len res)) (@ = (@ get-array res i) elem)))))))
+    (letfun (
+        (filln ((n int) (elem int) (xs (array int))) ((res (array int))) (declare (assertion (precd false) (postcd true)))
+            (let ((l int)) (@ len xs)
+              (let ((b bool)) (@ >= n l)
+                (case b (
+                    (true xs)
+                    (false (let ((xsp (array int))) (@ set-array xs n elem)
+                                (let ((n1 int)) (@ + n (the int 1)) (@ filln n1 elem xsp))))))))))
+        (@ filln (the int 0) elem xs)))
