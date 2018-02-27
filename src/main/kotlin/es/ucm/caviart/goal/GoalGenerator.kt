@@ -112,7 +112,9 @@ fun generateForAtomic(atomic: Atomic, localEnvironment: List<EnvironmentEntry>):
         val hmType: HMType =
                 (localEnvironment.findLast { it is VariableEntry && it.variable == atomic.name } as VariableEntry).type.HMType
         when {
-            hmType is ConstrType && hmType.typeConstructor == "array" -> QualType(newNu, hmType, PredicateApplication("=[]", listOf(Variable(newNu), atomic)))
+            hmType is ConstrType && hmType.typeConstructor == "array" ->
+                QualType(newNu, hmType, And(PredicateApplication("=[]", listOf(Variable(newNu), atomic)),
+                        PredicateApplication("=", listOf(FunctionApplication("len", listOf(Variable(newNu))), FunctionApplication("len", listOf(atomic))))))
             else -> QualType(newNu, hmType, PredicateApplication("=", listOf(Variable(newNu), atomic)))
         }
 
