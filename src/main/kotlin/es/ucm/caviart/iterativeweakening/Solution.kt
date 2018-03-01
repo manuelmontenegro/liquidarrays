@@ -180,25 +180,51 @@ data class Solution(val kappas: MutableMap<String, KappaSolution>,
 
         val kappasText = kappas.toList().joinToString("\n") { (name, kappaSol) ->
             val realKappa = kappasDef[name]!!
+            val params = realKappa.arguments.joinToString(" ") { it.varName }
             if (kappaSol.isEmpty()) {
-                " * `$name`: *true*"
+                " * `$name $params`: *true*"
             } else {
                 val assertions = kappaSol.joinToString(", ") { "`${realKappa.qStar[it].toSExp()}`" }
-                " * `$name`: $assertions"
+                " * `$name $params`: $assertions"
             }
         }
 
         val musText = mus.toList().joinToString("\n") { (name, muSol) ->
             val realMu = musDef[name]!!
+            val params = realMu.arguments.joinToString(" ") { it.varName }
             val singleRefStrings = muSol.singleRefinements.map {
+                val accessedArrays = it.rhs.map { realMu.qE[it].arrayNames }.flatten().toSet()
+                val extraPreconditions = accessedArrays.flatMap {
+                    listOf(
+                            PredicateApplication("<=", listOf(Literal("0", intType), Variable(realMu.boundVar1))),
+                            PredicateApplication("<", listOf(Variable(realMu.boundVar1),
+                                    FunctionApplication("len", listOf(Variable(it)))))
+                    )
+                }
                 ForAll(listOf(HMTypedVar(realMu.boundVar1, intType)),
-                        Implication(buildConjunct(it.lhs.map { realMu.qI[it] }), buildConjunct(it.rhs.map { realMu.qE[it].qualifier }))
+                        Implication(buildConjunct(extraPreconditions + it.lhs.map { realMu.qI[it] }), buildConjunct(it.rhs.map { realMu.qE[it].qualifier }))
                 ).toSExp().toString()
             }
 
             val doubleRefStrings = muSol.doubleRefinements.map {
-                ForAll(listOf(HMTypedVar(realMu.boundVar1, intType), HMTypedVar(realMu.boundVar2, intType)),
-                        Implication(buildConjunct(it.lhs.map { realMu.qII[it] }), buildConjunct(it.rhs.map { realMu.qEE[it].qualifier }))
+                val accessedArrays1 = it.rhs.map { realMu.qEE[it].arrayNames1 }.flatten().toSet()
+                val accessedArrays2 = it.rhs.map { realMu.qEE[it].arrayNames2 }.flatten().toSet()
+                val extraPreconditions1 = accessedArrays1.flatMap {
+                    listOf(
+                            PredicateApplication("<=", listOf(Literal("0", intType), Variable(realMu.boundVar1))),
+                            PredicateApplication("<", listOf(Variable(realMu.boundVar1),
+                                    FunctionApplication("len", listOf(Variable(it)))))
+                    )
+                }
+                val extraPreconditions2 = accessedArrays2.flatMap {
+                    listOf(
+                            PredicateApplication("<=", listOf(Literal("0", intType), Variable(realMu.boundVar2))),
+                            PredicateApplication("<", listOf(Variable(realMu.boundVar2),
+                                    FunctionApplication("len", listOf(Variable(it)))))
+                    )
+                }
+                ForAll (listOf(HMTypedVar(realMu.boundVar1, intType), HMTypedVar(realMu.boundVar2, intType)),
+                Implication(buildConjunct(extraPreconditions1 + extraPreconditions2 + it.lhs.map { realMu.qII[it] }), buildConjunct(it.rhs.map { realMu.qEE[it].qualifier }))
                 ).toSExp().toString()
             }
 
@@ -207,9 +233,9 @@ data class Solution(val kappas: MutableMap<String, KappaSolution>,
             val allRefStrings = singleRefStrings + doubleRefStrings + lenRefStrings
 
             when {
-                allRefStrings.isEmpty() -> " * `$name`: *true*"
-                allRefStrings.size == 1 -> " * `$name`: `${allRefStrings[0]}`"
-                else -> " * `$name`: conjunction of the following\n" +
+                allRefStrings.isEmpty() -> " * `$name $params`: *true*"
+                allRefStrings.size == 1 -> " * `$name $params`: `${allRefStrings[0]}`"
+                else -> " * `$name $params`: conjunction of the following\n" +
                         allRefStrings.joinToString("\n") { "    - `$it`" }
             }
         }
@@ -223,11 +249,13 @@ data class Solution(val kappas: MutableMap<String, KappaSolution>,
 
 fun buildStrongestSolution(kappas: Map<String, Kappa>, mus: Map<String, Mu>): Solution = Solution(
         kappas = kappas.mapValues { (_, kappa) -> (0 until kappa.qStar.size).toSet() }.toMutableMap(),
-        mus = mus.mapValues { (_, mu) -> MuSolution(
-                singleRefinements = mu.qE.mapIndexed { index, _ -> Refinement(setOf(), setOf(index)) },
-                doubleRefinements = mu.qEE.mapIndexed { index, _ -> Refinement(setOf(), setOf(index)) },
-                qLen = (0 until mu.qLen.size).toSet()
-        ) }.toMutableMap()
+        mus = mus.mapValues { (_, mu) ->
+            MuSolution(
+                    singleRefinements = mu.qE.mapIndexed { index, _ -> Refinement(setOf(), setOf(index)) },
+                    doubleRefinements = mu.qEE.mapIndexed { index, _ -> Refinement(setOf(), setOf(index)) },
+                    qLen = (0 until mu.qLen.size).toSet()
+            )
+        }.toMutableMap()
 )
 
         /**
