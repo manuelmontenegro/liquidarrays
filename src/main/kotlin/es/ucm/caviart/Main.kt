@@ -386,7 +386,7 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
             buffer?.append("Starting from solution:\n")
             buffer?.append(solution.toString(kappas, mus) + "\n")
 
-            val goalId = pending.first() // "G_17"
+            val goalId = pending.first()
             pending.remove(goalId)
             val goal = goalsMap[goalId]!!
             print(" - $goalId: ")
@@ -414,7 +414,7 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
             stepNumber += 1
         }
 
-        print("Finished iterative weakening: $stepNumber steps, ${FormulaCounter.currentValue} formulas")
+        print("Finished iterative weakening:\n $stepNumber steps, ${FormulaCounter.currentValue} formulas")
         solution
     }
 

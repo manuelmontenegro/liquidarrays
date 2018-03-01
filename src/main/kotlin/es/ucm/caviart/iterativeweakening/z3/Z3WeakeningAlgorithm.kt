@@ -30,6 +30,7 @@ package es.ucm.caviart.iterativeweakening.z3
 import com.microsoft.z3.*
 import es.ucm.caviart.ast.*
 import es.ucm.caviart.iterativeweakening.*
+import es.ucm.caviart.utils.FormulaCounter
 
 
 /**
@@ -309,6 +310,7 @@ class Z3Goal(val name: String,
         }
 
         // And we are done! We check the validity of the formula
+        FormulaCounter.increment()
         val wholeFormulaVerdict: Status = solver.check()
 
         // We discard the latest definition, so
@@ -370,6 +372,7 @@ class Z3Goal(val name: String,
             debugMessages?.append("  Trying: ${z3Equivalence.sExpr}\n")
             solver.push()
             solver.add(z3Equivalence)
+            FormulaCounter.increment()
             val status = solver.check()
             solver.pop()
             status == Status.UNSATISFIABLE
@@ -427,6 +430,7 @@ class Z3Goal(val name: String,
             debugMessages?.append("  Weakening length refinement: ${z3Equivalence.sExpr}\n")
             solver.push()
             solver.add(z3Equivalence)
+            FormulaCounter.increment()
             val status = solver.check()
             debugMessages?.append("    Result: $status\n")
             solver.pop()
@@ -459,6 +463,7 @@ class Z3Goal(val name: String,
             // Is the formula still valid?
             solver.push()
             solver.add(z3Equivalence)
+            FormulaCounter.increment()
             val status = solver.check()
             solver.pop()
 
@@ -495,6 +500,7 @@ class Z3Goal(val name: String,
         solver.push()
         val z3Definition = muDefinitionToZ3(rhsMu, solution)
         solver.add(z3Definition)
+        FormulaCounter.increment()
         val status = solver.check()
         debugMessages?.append("  Strongest mapping\n    ${z3Definition.sExpr}\n    Result: $status\n")
         solver.pop()
@@ -521,6 +527,7 @@ class Z3Goal(val name: String,
             solver.push()
             val updatedDefinition = muDefinitionToZ3(rhsMu, solution)
             solver.add(updatedDefinition)
+            FormulaCounter.increment()
             val updatedStatus = solver.check()
             debugMessages?.append("  Superset $superSetNumber:\n    ${updatedDefinition.sExpr}\n    Result: $updatedStatus\n")
             solver.pop()
