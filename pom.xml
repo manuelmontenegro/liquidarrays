@@ -39,6 +39,11 @@
             <artifactId>z3</artifactId>
             <version>4.6.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.xenomachina</groupId>
+            <artifactId>kotlin-argparser</artifactId>
+            <version>2.0.4</version>
+        </dependency>
     </dependencies>
 
     <build>
