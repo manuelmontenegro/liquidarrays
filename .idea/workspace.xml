@@ -1,0 +1,1902 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="035eabb6-12b4-4732-a60d-98f7b5a6bf59" name="Default" comment="Integrated Z3 goal generator into Main.kt">
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_microsoft_z3_4_6_0.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_xenomachina_kotlin_argparser_2_0_4.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_xenomachina_xenocom_0_0_5.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_microsoft_z3_4_5_1.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_1_1_2_4.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_test_1_1_2_4.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_test_junit_1_1_2_4.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change beforePath="$PROJECT_DIR$/TODO.md" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ASTPrettyPrinter.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/FilterQueue.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/FreshNameGenerator.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/GoalGenerator.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/InitialEnvironment.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Lexer.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/LiquidEnvironment.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Parser.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/QStarGenerator.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/QualifyFunctionalTypes.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/SExpParser.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Solution.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Substitution.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Supersets.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Syntax.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/TypeChecker.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Z3AST.kt" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Z3Goals.kt" afterPath="" />
+    </list>
+    <ignored path="$PROJECT_DIR$/target/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/liquidarrays$es_ucm_caviart_MainKt.coverage" NAME="es.ucm.caviart.MainKt Coverage Results" MODIFIED="1514403519802" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="liquidarrays" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="Z3WeakeningAlgorithm.kt" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3WeakeningAlgorithm.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="346">
+              <caret line="421" column="110" lean-forward="false" selection-start-line="421" selection-start-column="110" selection-end-line="421" selection-end-column="110" />
+              <folding>
+                <element signature="e#1277#1416#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="fillTuned.clir" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillTuned.clir">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="198">
+              <caret line="56" column="13" lean-forward="false" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="fillResult.md" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillResult.md">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="274">
+              <caret line="36" column="30" lean-forward="false" selection-start-line="36" selection-start-column="30" selection-end-line="36" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Class" />
+        <option value="Kotlin File" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>letCase</find>
+      <find>letAndT</find>
+      <find>QualType</find>
+      <find>in</find>
+      <find>intType</find>
+      <find>kappaDefinitions</find>
+      <find>ConstrType(&quot;int&quot;)</find>
+      <find>where</find>
+      <find>Result</find>
+      <find>Result:</find>
+      <find>buffer</find>
+      <find>filter</find>
+      <find>context</find>
+      <find>ContexT()</find>
+      <find>Context()</find>
+      <find>.check()</find>
+      <find>mkSolver</find>
+      <find>check</find>
+      <find>Finished</find>
+      <find>running</find>
+      <find>running</find>
+      <find>running iterative</find>
+      <find>$status</find>
+      <find>.check</find>
+      <find>solver.checj</find>
+      <find>solver.chec</find>
+      <find>solver.check</find>
+      <find>.increment</find>
+      <find>Trying</find>
+      <find>Weakening</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>mapOf</replace>
+      <replace>queue</replace>
+      <replace>ConstrType</replace>
+      <replace>HMTypedVar</replace>
+      <replace>#1</replace>
+      <replace>ConstrType(&quot;int&quot;)</replace>
+      <replace>toSExp().toString()</replace>
+      <replace>int</replace>
+      <replace>intType</replace>
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GradleLocalSettings">
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Parser.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/TypeChecker.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/InitialEnvironment.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/TypeCheckerTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/InitialEnvironment.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Z3AST.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/ParserTest.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/SubstitutionTest.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/FilterQueueTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/SExpParser.kt" />
+        <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillQualified.clir" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/QualifyFunctionalTypes.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/MapAccum.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/qstar/Substitution.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/qstar/QStarGenerator.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/QStarGeneratorTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillWithKappasAndMus.clir" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/LiquidEnvironment.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/TypeChecker.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/GoalGenerator.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/goal/LiquidEnvironment.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Solution.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/Z3ASTTest.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappaDefinitionToKappaTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3AST.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/GoalGeneratorTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/ASTPrettyPrinter.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Parser.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Renamer.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/RenamerTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Syntax.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Supersets.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappasTest.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MusTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/Supersets.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/SupersetsTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/FilterQueue.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MuDeclarationToMuTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/QualifyFunctionalTypes.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/QualifyFunctionalTypesTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3LenTransformer.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/goal/GoalGenerator.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/Z3Test.kt" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/MutableCounter.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/FormulaCounter.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/Solution.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Main.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3WeakeningAlgorithm.kt" />
+        <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill_expanded.clir" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="es.ucm.caviart liquidarrays" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="es.ucm.caviart liquidarrays" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Plugins" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$PluginsNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="es.ucm.caviart liquidarrays" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Plugins" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$PluginsNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="dokka" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$PluginNode" />
+        </PATH_ELEMENT>
+      </PATH>
+    </treeState>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="1">
+    <option name="x" value="1690" />
+    <option name="y" value="127" />
+    <option name="width" value="1718" />
+    <option name="height" value="867" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>Android &gt; Lint &gt; Correctness</id>
+          </State>
+          <State>
+            <id>Android &gt; Lint &gt; Usability &gt; Typography</id>
+          </State>
+          <State>
+            <id>Assignment issuesGroovy</id>
+          </State>
+          <State>
+            <id>Assignment issuesJava</id>
+          </State>
+          <State>
+            <id>Control flow issuesJava</id>
+          </State>
+          <State>
+            <id>Groovy</id>
+          </State>
+          <State>
+            <id>Java</id>
+          </State>
+          <State>
+            <id>Kotlin</id>
+          </State>
+          <State>
+            <id>Potentially confusing code constructsGroovy</id>
+          </State>
+          <State>
+            <id>Probable bugsGroovy</id>
+          </State>
+          <State>
+            <id>Probable bugsJava</id>
+          </State>
+          <State>
+            <id>Redundant constructsKotlin</id>
+          </State>
+          <State>
+            <id>Spelling</id>
+          </State>
+          <State>
+            <id>Threading issuesGroovy</id>
+          </State>
+          <State>
+            <id>Threading issuesJava</id>
+          </State>
+          <State>
+            <id>UI Form Problems</id>
+          </State>
+          <State>
+            <id>XPath</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Spelling</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+              <item name="ast" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+              <item name="goal" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+              <item name="iterativeweakening" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+              <item name="iterativeweakening" type="462c0819:PsiDirectoryNode" />
+              <item name="z3" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+              <item name="qstar" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+              <item name="typecheck" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="liquidarrays" type="b2602c69:ProjectViewProjectNode" />
+              <item name="liquidarrays" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="caviart" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="AndroidView" />
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening" />
+    <property name="add_unversioned_files" value="true" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="SearchEverywhereHistoryKey" value="check&#9;null&#9;null&#10;Solution&#9;FILE&#9;file:///home/manuel/CAVIART/Liquid/ImplementacionZ3/liquidarrays/src/main/kotlin/es/ucm/caviart/iterativeweakening/Solution.kt" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/goal" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/qstar" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Kotlin.Fill example (show trace)">
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <module />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+    </configuration>
+    <configuration name="FilterQueueTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="es.ucm.caviart.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="liquidarrays" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="es.ucm.caviart" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.FilterQueueTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+    </configuration>
+    <configuration name="GoalGeneratorTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="es.ucm.caviart.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="liquidarrays" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="es.ucm.caviart" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.GoalGeneratorTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+    </configuration>
+    <configuration name="QualifyFunctionalTypesTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="es.ucm.caviart.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="liquidarrays" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="es.ucm.caviart" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.QualifyFunctionalTypesTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+    </configuration>
+    <configuration name="SupersetsTest.alreadyEnqueuedSubset" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="es.ucm.caviart.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="liquidarrays" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="es.ucm.caviart" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.SupersetsTest" />
+      <option name="METHOD_NAME" value="alreadyEnqueuedSubset" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+    </configuration>
+    <configuration name="es.ucm.caviart in liquidarrays" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="es.ucm.caviart.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="liquidarrays" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="es.ucm.caviart" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="package" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+    </configuration>
+    <configuration name="Fill example (generate goals)" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir -g $PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillGoals.md" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration name="Fill example (only expand)" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir -e $PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill_expanded.clir" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration name="Fill example (show trace)" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill_expanded.clir -t $PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillTrace.md -o $PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillResult.md" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration name="Fill example" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration name="Fill qualified example (1)" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillQualified.clir" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration name="Fill with Kappas and Mus" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillWithKappasAndMus.clir" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration name="Show help" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="-h" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+    </configuration>
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file id="idea.log" enabled="true" />
+    </configuration>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android App">
+      <module name="" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="EXTRA_OPTIONS" value="" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <method />
+    </configuration>
+    <configuration default="true" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <method />
+    </configuration>
+    <configuration default="true" type="JarApplication" factoryName="JAR Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Java Scratch" factoryName="Java Scratch">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="SCRATCH_FILE_ID" value="0" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="liquidarrays" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType" factoryName="Kotlin script">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="filePath" />
+      <option name="vmParameters" />
+      <option name="alternativeJrePath" />
+      <option name="programParameters" />
+      <option name="passParentEnvs" value="true" />
+      <option name="workingDirectory" />
+      <option name="isAlternativeJrePathEnabled" value="false" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list />
+            </option>
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method />
+    </configuration>
+    <configuration default="true" type="executeSpecs" factoryName="Gauge Execution">
+      <setting name="environment" value="" />
+      <setting name="specsToExecute" value="" />
+      <setting name="tags" value="" />
+      <setting name="parallelNodes" value="" />
+      <setting name="execInParallel" value="false" />
+      <setting name="programParameters" value="" />
+      <setting name="workingDirectory" value="" />
+      <setting name="moduleName" value="" />
+      <envMap />
+      <setting name="rowsRange" value="" />
+      <method />
+    </configuration>
+    <list size="12">
+      <item index="0" class="java.lang.String" itemvalue="Kotlin.Fill example" />
+      <item index="1" class="java.lang.String" itemvalue="Kotlin.Fill example (show trace)" />
+      <item index="2" class="java.lang.String" itemvalue="Kotlin.Fill example (generate goals)" />
+      <item index="3" class="java.lang.String" itemvalue="Kotlin.Fill example (only expand)" />
+      <item index="4" class="java.lang.String" itemvalue="Kotlin.Show help" />
+      <item index="5" class="java.lang.String" itemvalue="Kotlin.Fill with Kappas and Mus" />
+      <item index="6" class="java.lang.String" itemvalue="Kotlin.Fill qualified example (1)" />
+      <item index="7" class="java.lang.String" itemvalue="JUnit.FilterQueueTest" />
+      <item index="8" class="java.lang.String" itemvalue="JUnit.SupersetsTest.alreadyEnqueuedSubset" />
+      <item index="9" class="java.lang.String" itemvalue="JUnit.GoalGeneratorTest" />
+      <item index="10" class="java.lang.String" itemvalue="JUnit.es.ucm.caviart in liquidarrays" />
+      <item index="11" class="java.lang.String" itemvalue="JUnit.QualifyFunctionalTypesTest" />
+    </list>
+    <recent_temporary>
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="JUnit.es.ucm.caviart in liquidarrays" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.QualifyFunctionalTypesTest" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.GoalGeneratorTest" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.FilterQueueTest" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.SupersetsTest.alreadyEnqueuedSubset" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SbtLocalSettings">
+    <option name="modificationStamps">
+      <map>
+        <entry key="$USER_HOME$/Pruebas/Spark/example" value="1489426822000" />
+      </map>
+    </option>
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>$USER_HOME$/.subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="035eabb6-12b4-4732-a60d-98f7b5a6bf59" name="Default" comment="" />
+      <created>1496132690527</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1496132690527</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Refectored generator of qualified types with template variables">
+      <created>1517493317093</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1517493317093</updated>
+    </task>
+    <task id="LOCAL-00063" summary="Removed test that checks already existing kappas and mus">
+      <created>1517493406049</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1517493406049</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Generator of QStar sets">
+      <created>1517503837018</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1517503837018</updated>
+    </task>
+    <task id="LOCAL-00065" summary="Updated tests of QStar generator">
+      <created>1517503951761</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1517503951761</updated>
+    </task>
+    <task id="LOCAL-00066" summary="Updated tests of substitution">
+      <created>1517503983213</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1517503983213</updated>
+    </task>
+    <task id="LOCAL-00067" summary="Fixed some typos in the assertion to SExp converter">
+      <created>1517504032024</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1517504032024</updated>
+    </task>
+    <task id="LOCAL-00068" summary="Mover auxiliary functions from QStarGenerator (will be useful later)">
+      <created>1517504063378</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1517504063379</updated>
+    </task>
+    <task id="LOCAL-00069" summary="The type checker returns the new global environment">
+      <created>1518101543344</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1518101543344</updated>
+    </task>
+    <task id="LOCAL-00070" summary="Refactored goal generator">
+      <created>1518101707827</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1518101707827</updated>
+    </task>
+    <task id="LOCAL-00071" summary="Converted Goal class into data class">
+      <created>1518105149508</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1518105149509</updated>
+    </task>
+    <task id="LOCAL-00072" summary="Integrated goal generator into Main.kt">
+      <created>1518105168675</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1518105168675</updated>
+    </task>
+    <task id="LOCAL-00073" summary="Changed Z3 version to 4.6.0">
+      <created>1518620383369</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1518620383369</updated>
+    </task>
+    <task id="LOCAL-00074" summary="Moved FreshNameGenerator to utils">
+      <created>1518620452023</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1518620452023</updated>
+    </task>
+    <task id="LOCAL-00075" summary="Moved FreshNameGenerator.kt">
+      <created>1518620479394</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1518620479394</updated>
+    </task>
+    <task id="LOCAL-00076" summary="Refactored Z3 AST generation">
+      <created>1518620582119</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1518620582119</updated>
+    </task>
+    <task id="LOCAL-00077" summary="Updated tests for parsing, q* generation and goal generation">
+      <created>1518620651628</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1518620651628</updated>
+    </task>
+    <task id="LOCAL-00078" summary="Commented Solution.kt">
+      <created>1518620674613</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1518620674613</updated>
+    </task>
+    <task id="LOCAL-00079" summary="New convenience functions">
+      <created>1518694872398</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1518694872398</updated>
+    </task>
+    <task id="LOCAL-00080" summary="KappaDeclarationToKappa and MuDeclarationToMu">
+      <created>1518694895055</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1518694895055</updated>
+    </task>
+    <task id="LOCAL-00081" summary="Markdown pretty-printing of a goal">
+      <created>1518789955390</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1518789955391</updated>
+    </task>
+    <task id="LOCAL-00082" summary="Fixed missing variables in goal creation">
+      <created>1518790461716</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1518790461716</updated>
+    </task>
+    <task id="LOCAL-00083" summary="Updated goal generator tests after pretty printing">
+      <created>1518790701564</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1518790701564</updated>
+    </task>
+    <task id="LOCAL-00084" summary="Removed dead code">
+      <created>1518790737675</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1518790737675</updated>
+    </task>
+    <task id="LOCAL-00085" summary="Z3 Length transformer">
+      <created>1518792400582</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1518792400582</updated>
+    </task>
+    <task id="LOCAL-00086" summary="Small typo in comment">
+      <created>1519311434881</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1519311434881</updated>
+    </task>
+    <task id="LOCAL-00087" summary="Fixed pretty-printing of constructor patterns">
+      <created>1519311464883</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1519311464883</updated>
+    </task>
+    <task id="LOCAL-00088" summary="Added convenience functions for parsing expressions and definitions">
+      <created>1519311491827</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1519311491827</updated>
+    </task>
+    <task id="LOCAL-00089" summary="New renamer phase">
+      <created>1519311537692</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1519311537692</updated>
+    </task>
+    <task id="LOCAL-00090" summary="The qualifying phase now modifies the environment">
+      <created>1519311591917</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1519311591917</updated>
+    </task>
+    <task id="LOCAL-00091" summary="Added kappaIndices and muIndices parameters to the length transformer">
+      <created>1519378668908</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1519378668911</updated>
+    </task>
+    <task id="LOCAL-00092" summary="Added convenience definition boolType">
+      <created>1519394104282</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1519394104282</updated>
+    </task>
+    <task id="LOCAL-00093" summary="Simplified Kappa and Mu classes by dropping the types of the arrays being accessed in QE and QEE">
+      <created>1519394171501</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1519394171501</updated>
+    </task>
+    <task id="LOCAL-00094" summary="Refactored iterative weakening">
+      <created>1519400345841</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1519400345841</updated>
+    </task>
+    <task id="LOCAL-00095" summary="Typo in qualifyVerificationUnit and updated tests">
+      <created>1519400817471</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1519400817471</updated>
+    </task>
+    <task id="LOCAL-00096" summary="Updated test by removing the types of the arrays in QE and QEE">
+      <created>1519400836634</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1519400836634</updated>
+    </task>
+    <task id="LOCAL-00097" summary="The len removal phase now returns the newly generated variables for kappas and mus.">
+      <created>1519402511898</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1519402511898</updated>
+    </task>
+    <task id="LOCAL-00098" summary="Fixed lack of QLen renaming">
+      <created>1519636444817</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1519636444818</updated>
+    </task>
+    <task id="LOCAL-00099" summary="Changed [VAR] goal generation rule to distinguish arrays from integers">
+      <created>1519636564005</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1519636564006</updated>
+    </task>
+    <task id="LOCAL-00100" summary="Fixed len transformer for QLen">
+      <created>1519636582462</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1519636582462</updated>
+    </task>
+    <task id="LOCAL-00101" summary="Pretty print solution">
+      <created>1519636617273</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1519636617273</updated>
+    </task>
+    <task id="LOCAL-00102" summary="Looping over goals">
+      <created>1519636698660</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1519636698660</updated>
+    </task>
+    <task id="LOCAL-00103" summary="Include equality on lengths in the rule [VAR]">
+      <created>1519731269519</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1519731269520</updated>
+    </task>
+    <task id="LOCAL-00104" summary="Working fill example">
+      <created>1519736526830</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1519736526830</updated>
+    </task>
+    <task id="LOCAL-00105" summary="Refactored Main.kt and added command line options">
+      <created>1519918742947</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1519918742949</updated>
+    </task>
+    <task id="LOCAL-00106" summary="Added formula counter">
+      <created>1519919094247</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1519919094247</updated>
+    </task>
+    <task id="LOCAL-00107" summary="Improved solution output">
+      <created>1519919820884</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1519919820885</updated>
+    </task>
+    <task id="LOCAL-00108" summary="Printing issues">
+      <created>1519920001528</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1519920001528</updated>
+    </task>
+    <task id="LOCAL-00109" summary="Improved trace messages">
+      <created>1519921950992</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1519921950992</updated>
+    </task>
+    <task id="LOCAL-00110" summary="Added fill example with selected qualifiers">
+      <created>1519922551392</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1519922551392</updated>
+    </task>
+    <option name="localTasksCounter" value="111" />
+    <servers />
+  </component>
+  <component name="TestHistory">
+    <history-entry file="FilterQueueTest - 2018.02.23 at 16h 02m 31s.xml">
+      <configuration name="FilterQueueTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="FilterQueueTest - 2018.02.23 at 16h 36m 41s.xml">
+      <configuration name="FilterQueueTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="GoalGeneratorTest - 2018.02.23 at 16h 39m 47s.xml">
+      <configuration name="GoalGeneratorTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MusTest - 2018.02.23 at 16h 02m 18s.xml">
+      <configuration name="MusTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="QualifyFunctionalTypesTest - 2018.02.23 at 16h 46m 13s.xml">
+      <configuration name="QualifyFunctionalTypesTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="SupersetsTest - 2018.02.23 at 16h 34m 34s.xml">
+      <configuration name="SupersetsTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="SupersetsTest_alreadyEnqueuedSubset - 2018.02.23 at 16h 35m 36s.xml">
+      <configuration name="SupersetsTest.alreadyEnqueuedSubset" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="es_ucm_caviart_in_liquidarrays - 2018.02.23 at 16h 40m 06s.xml">
+      <configuration name="es.ucm.caviart in liquidarrays" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="es_ucm_caviart_in_liquidarrays - 2018.02.23 at 16h 41m 56s.xml">
+      <configuration name="es.ucm.caviart in liquidarrays" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="es_ucm_caviart_in_liquidarrays - 2018.02.23 at 16h 46m 20s.xml">
+      <configuration name="es.ucm.caviart in liquidarrays" configurationId="JUnit" />
+    </history-entry>
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1690" y="127" width="1718" height="867" extended-state="1" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32861805" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979852" sideWeight="0.48958334" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33085898" sideWeight="0.5104167" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925257" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5561427" sideWeight="0.6228893" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32752994" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32861805" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22351572" sideWeight="0.49565217" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32767764" sideWeight="0.49375" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32555673" sideWeight="0.49166667" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22008547" sideWeight="0.5043478" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33085898" sideWeight="0.5104167" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925257" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32555673" sideWeight="0.49166667" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32861805" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33085898" sideWeight="0.48958334" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37751856" sideWeight="0.6228893" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32752994" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32861805" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2703125" sideWeight="0.49565217" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32767764" sideWeight="0.49375" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22008547" sideWeight="0.5043478" order="6" side_tool="true" content_ui="tabs" />
+    </layout-to-restore>
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.css" />
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.md" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fixed pretty-printing of constructor patterns" />
+    <MESSAGE value="Added convenience functions for parsing expressions and definitions" />
+    <MESSAGE value="New renamer phase" />
+    <MESSAGE value="The qualifying phase now modifies the environment" />
+    <MESSAGE value="Added kappaIndices and muIndices parameters to the length transformer" />
+    <MESSAGE value="Added convenience definition boolType" />
+    <MESSAGE value="Simplified Kappa and Mu classes by dropping the types of the arrays being accessed in QE and QEE" />
+    <MESSAGE value="Refactored iterative weakening" />
+    <MESSAGE value="Typo in qualifyVerificationUnit and updated tests" />
+    <MESSAGE value="Updated test by removing the types of the arrays in QE and QEE" />
+    <MESSAGE value="The len removal phase now returns the newly generated variables for kappas and mus." />
+    <MESSAGE value="Integrated Z3 goal generator into Main.kt" />
+    <MESSAGE value="Fixed lack of QLen renaming" />
+    <MESSAGE value="Changed [VAR] goal generation rule to distinguish arrays from integers" />
+    <MESSAGE value="Fixed len transformer for QLen" />
+    <MESSAGE value="Pretty print solution" />
+    <MESSAGE value="Looping over goals" />
+    <MESSAGE value="Include equality on lengths in the rule [VAR]" />
+    <MESSAGE value="Working fill example" />
+    <MESSAGE value="Refactored Main.kt and added command line options" />
+    <MESSAGE value="Added formula counter" />
+    <MESSAGE value="Improved solution output" />
+    <MESSAGE value="Printing issues" />
+    <MESSAGE value="Improved trace messages" />
+    <MESSAGE value="Added fill example with selected qualifiers" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added fill example with selected qualifiers" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="81" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="watch">
+      <expression>
+        <expression-string>globalEnvironment</expression-string>
+        <language-id>kotlin</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/liquidarrays.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-182">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/Z3ASTTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1026">
+          <caret line="65" column="22" lean-forward="false" selection-start-line="65" selection-start-column="22" selection-end-line="65" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/QStarGeneratorTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="9" column="6" lean-forward="false" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/ParserTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="648">
+          <caret line="41" column="19" lean-forward="false" selection-start-line="41" selection-start-column="19" selection-end-line="41" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappaDeclarationToKappaTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/org/junit/Assert.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="506">
+          <caret line="156" column="0" lean-forward="false" selection-start-line="156" selection-start-column="0" selection-end-line="156" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/ASTTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="35" column="32" lean-forward="false" selection-start-line="35" selection-start-column="32" selection-end-line="35" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/qstar/Substitution.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="882">
+          <caret line="70" column="20" lean-forward="false" selection-start-line="70" selection-start-column="16" selection-end-line="70" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/SExpParser.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3366">
+          <caret line="209" column="32" lean-forward="false" selection-start-line="209" selection-start-column="32" selection-end-line="209" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///usr/java/latest/lib/src.zip!/java.base/java/util/ArrayList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="887" column="0" lean-forward="false" selection-start-line="887" selection-start-column="0" selection-end-line="887" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib/1.2.21/kotlin-stdlib-1.2.21-sources.jar!/generated/_Collections.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="219">
+          <caret line="1483" column="0" lean-forward="false" selection-start-line="1483" selection-start-column="0" selection-end-line="1483" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/MapAccum.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="20" column="2" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="20" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/ASTPrettyPrinter.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1134">
+          <caret line="83" column="87" lean-forward="false" selection-start-line="83" selection-start-column="87" selection-end-line="83" selection-end-column="87" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Parser.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3078">
+          <caret line="191" column="0" lean-forward="false" selection-start-line="191" selection-start-column="0" selection-end-line="191" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/RenamerTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="24" column="54" lean-forward="false" selection-start-line="24" selection-start-column="54" selection-end-line="24" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappasTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="16" column="33" lean-forward="true" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/SupersetsTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="990">
+          <caret line="58" column="47" lean-forward="false" selection-start-line="58" selection-start-column="47" selection-end-line="58" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/FilterQueueTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1098">
+          <caret line="65" column="8" lean-forward="false" selection-start-line="65" selection-start-column="8" selection-end-line="65" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/FilterQueue.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="41" column="70" lean-forward="true" selection-start-line="41" selection-start-column="70" selection-end-line="41" selection-end-column="70" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/Supersets.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="20" column="2" lean-forward="true" selection-start-line="20" selection-start-column="2" selection-end-line="20" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MuDeclarationToMuTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3006">
+          <caret line="172" column="33" lean-forward="true" selection-start-line="172" selection-start-column="33" selection-end-line="172" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/QualifyFunctionalTypesTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="990">
+          <caret line="62" column="86" lean-forward="false" selection-start-line="62" selection-start-column="86" selection-end-line="62" selection-end-column="86" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/QualifyFunctionalTypes.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2610">
+          <caret line="166" column="4" lean-forward="false" selection-start-line="166" selection-start-column="4" selection-end-line="166" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/GoalGeneratorTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18774">
+          <caret line="1052" column="0" lean-forward="false" selection-start-line="1052" selection-start-column="0" selection-end-line="1052" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/TypeChecker.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="32" column="28" lean-forward="false" selection-start-line="32" selection-start-column="28" selection-end-line="32" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Renamer.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4770">
+          <caret line="285" column="115" lean-forward="false" selection-start-line="285" selection-start-column="115" selection-end-line="285" selection-end-column="115" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Syntax.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="10008">
+          <caret line="576" column="59" lean-forward="false" selection-start-line="576" selection-start-column="59" selection-end-line="576" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/InitialEnvironment.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="339">
+          <caret line="26" column="40" lean-forward="false" selection-start-line="26" selection-start-column="40" selection-end-line="26" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/goal/LiquidEnvironment.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="34" column="15" lean-forward="false" selection-start-line="34" selection-start-column="15" selection-end-line="34" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3LenTransformer.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="389">
+          <caret line="161" column="42" lean-forward="false" selection-start-line="161" selection-start-column="42" selection-end-line="161" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillQualified.clir">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="23" column="12" lean-forward="false" selection-start-line="23" selection-start-column="12" selection-end-line="23" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/Z3Test.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="496">
+          <caret line="146" column="0" lean-forward="true" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/z3.log" />
+    <entry file="file://$PROJECT_DIR$/TODO.md" />
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="13" column="56" lean-forward="false" selection-start-line="13" selection-start-column="56" selection-end-line="13" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.m2/settings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="605">
+          <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillGoals.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="6" column="12" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="533" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/MutableCounter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="2" column="27" lean-forward="false" selection-start-line="2" selection-start-column="27" selection-end-line="2" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3AST.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="229">
+          <caret line="40" column="15" lean-forward="false" selection-start-line="40" selection-start-column="15" selection-end-line="40" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/FreshNameGenerator.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="20" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/FormulaCounter.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="26" column="80" lean-forward="false" selection-start-line="26" selection-start-column="80" selection-end-line="26" selection-end-column="80" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Main.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="391" column="39" lean-forward="true" selection-start-line="391" selection-start-column="39" selection-end-line="391" selection-end-column="39" />
+          <folding>
+            <element signature="e#1156#1815#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/Solution.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="52" column="17" lean-forward="false" selection-start-line="52" selection-start-column="17" selection-end-line="52" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/goal/GoalGenerator.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="50" column="11" lean-forward="false" selection-start-line="50" selection-start-column="11" selection-end-line="50" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MusTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="15" column="6" lean-forward="false" selection-start-line="15" selection-start-column="6" selection-end-line="15" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib/1.2.21/kotlin-stdlib-1.2.21.jar!/kotlin/Pair.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" column="30" lean-forward="false" selection-start-line="10" selection-start-column="30" selection-end-line="10" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillTrace.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="858" column="37" lean-forward="true" selection-start-line="858" selection-start-column="37" selection-end-line="858" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillTuned.clir">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="56" column="13" lean-forward="false" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillResult.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="274">
+          <caret line="36" column="30" lean-forward="false" selection-start-line="36" selection-start-column="30" selection-end-line="36" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3WeakeningAlgorithm.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="346">
+          <caret line="421" column="110" lean-forward="false" selection-start-line="421" selection-start-column="110" selection-end-line="421" selection-end-column="110" />
+          <folding>
+            <element signature="e#1277#1416#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>9.0</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
