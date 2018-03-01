@@ -231,19 +231,6 @@ class Z3Goal(val name: String,
 
         z3Assumptions.forEach { solver.add(it) }
         solver.add(ctx.mkNot(z3Conclusion))
-
-
-        /*
-        if (debug) {
-            println("Created goal " + name + ".")
-            println("Given:")
-            z3Assumptions.forEach {
-                println(it.sExpr)
-            }
-            println("We want to prove:")
-            println(z3Conclusion.sExpr)
-        }
-        */
     }
 
 
@@ -263,12 +250,7 @@ class Z3Goal(val name: String,
      *
      */
     fun check(solution: Solution, debugMessages: StringBuffer? = null): GoalSolveResult {
-        debugMessages?.let {
-            it.append("Checking goal $name: $description\n")
-            it.append("Goal contents:\n")
-            it.append(this.toString())
-            it.append("\n\n")
-        }
+        debugMessages?.append("*Checking goal* `$name`: $description\n\n")
 
         // The assumptions and the negation of the conclusion in the goal are already
         // in the solver. We save them
@@ -283,13 +265,11 @@ class Z3Goal(val name: String,
 
         lhsKappas.forEach {
             val z3Equivalence = kappaDefinitionToZ3(it, solution)
-            debugMessages?.append("where ${z3Equivalence.sExpr}\n")
             solver.add(z3Equivalence)
         }
 
         lhsMus.forEach {
             val z3Equivalence = muDefinitionToZ3(it, solution)
-            debugMessages?.append("where ${z3Equivalence.sExpr}\n")
             solver.add(z3Equivalence)
         }
 
@@ -300,18 +280,15 @@ class Z3Goal(val name: String,
 
         rhsKappa?.let {
             val z3Equivalence = kappaDefinitionToZ3(it, solution)
-            debugMessages?.append("where ${z3Equivalence.sExpr}")
             solver.add(z3Equivalence)
         }
         rhsMu?.let {
             val z3Equivalence = muDefinitionToZ3(it, solution)
-            debugMessages?.append("where ${z3Equivalence.sExpr}")
             solver.add(z3Equivalence)
         }
 
         // And we are done! We check the validity of the formula
-        FormulaCounter.increment()
-        val wholeFormulaVerdict: Status = solver.check()
+        val wholeFormulaVerdict: Status = checkStatus(debugMessages)
 
         // We discard the latest definition, so
         // we restore the state to (assumptions + ¬goal + kappas and mus only in the lhs)
@@ -350,6 +327,18 @@ class Z3Goal(val name: String,
         return result
     }
 
+    private fun checkStatus(debugMessages: StringBuffer?): Status {
+        FormulaCounter.increment()
+        debugMessages?.let {
+            it.append("```lisp\n")
+            it.append(solver)
+            it.append("```\n\n")
+        }
+        val verdict: Status = solver.check()
+        debugMessages?.append("*Result:* $verdict\n\n")
+        return verdict
+    }
+
     /**
      * Assuming that the current goal is not valid by the given solution due to the
      * kappa whose name is pased to the second parameter, it mutates the solution
@@ -357,7 +346,7 @@ class Z3Goal(val name: String,
      * valid.
      */
     private fun weakenKappa(solution: Solution, rhsKappa: String, debugMessages: StringBuffer?) {
-        debugMessages?.append("Weakening $rhsKappa...\n")
+        debugMessages?.append("### Weakening `$rhsKappa`\n\n")
 
         // We get the qualifiers corresponding to the current solution
         val qualifiersInSolution: Set<Int> = solution.kappas[rhsKappa]!!.toSet()
@@ -369,11 +358,10 @@ class Z3Goal(val name: String,
         val acceptedQualifiers = qualifiersInSolution.filter {
             solution.kappas[rhsKappa] = mutableSetOf(it)
             val z3Equivalence = kappaDefinitionToZ3(rhsKappa, solution)
-            debugMessages?.append("  Trying: ${z3Equivalence.sExpr}\n")
+            debugMessages?.append("  Trying: `${z3Equivalence.sExpr}`\n\n")
             solver.push()
             solver.add(z3Equivalence)
-            FormulaCounter.increment()
-            val status = solver.check()
+            val status = checkStatus(debugMessages)
             solver.pop()
             status == Status.UNSATISFIABLE
         }
@@ -389,15 +377,16 @@ class Z3Goal(val name: String,
      * valid.
      */
     private fun weakenMu(solution: Solution, rhsMu: String, debugMessages: StringBuffer?) {
-        debugMessages?.append("Weakening $rhsMu...\n")
+        debugMessages?.append("### Weakening `$rhsMu`\n\n")
 
         val muSolutionToWeaken = solution.mus[rhsMu]!!
 
+        debugMessages?.append("#### Clasifying single refinements\n\n")
         // For each singly-quantified refinement, we build a solution containing only that
         // refinement and check whether the goal is valid. If it is, the refinement goes
         // to the `acceptedSingleRefinements` list. Otherwise, it comes into `rejectedSingleRefinements`.
         val (acceptedSingleRefinements, rejectedSingleRefinements) =
-                classifyRefinements(solution, rhsMu, muSolutionToWeaken.singleRefinements, { MuSolution(it, listOf(), setOf()) })
+                classifyRefinements(solution, rhsMu, muSolutionToWeaken.singleRefinements, { MuSolution(it, listOf(), setOf()) }, debugMessages)
 
 
         val numberOfQI = muQualifiers[rhsMu]!!.qIQualifiers.size
@@ -405,6 +394,7 @@ class Z3Goal(val name: String,
         // For each single refinement, we strengthen its antecedent. As a result we can get many refinements
         // whose left-hand sides are not comparable. We add them all to the newSigleRefinements
         val newSingleRefinements = rejectedSingleRefinements.flatMap {
+            debugMessages?.append("#### Weakening rejected refinement\n\n")
             weakenRefinement(it, numberOfQI, solution, rhsMu, { MuSolution(it, listOf(), setOf()) }, debugMessages)
         }
 
@@ -412,12 +402,14 @@ class Z3Goal(val name: String,
         acceptedSingleRefinements += newSingleRefinements
 
         // We do the same with the doubly-quantified refinements
+        debugMessages?.append("#### Clasifying double refinements\n\n")
         val (acceptedDoubleRefinements, rejectedDoubleRefinements) =
-                classifyRefinements(solution, rhsMu, muSolutionToWeaken.doubleRefinements, { MuSolution(listOf(), it, setOf()) })
+                classifyRefinements(solution, rhsMu, muSolutionToWeaken.doubleRefinements, { MuSolution(listOf(), it, setOf()) }, debugMessages)
 
         val numberOfQII = muQualifiers[rhsMu]!!.qIIQualifiers.size
 
         val newDoubleRefinements = rejectedDoubleRefinements.flatMap {
+            debugMessages?.append("#### Weakening rejected refinement\n\n")
             weakenRefinement(it, numberOfQII, solution, rhsMu, { MuSolution(listOf(), it, setOf()) }, debugMessages)
         }
         acceptedDoubleRefinements += newDoubleRefinements
@@ -427,11 +419,10 @@ class Z3Goal(val name: String,
         val acceptedLenRefinements = muSolutionToWeaken.qLen.filter {
             solution.mus[rhsMu] = MuSolution(listOf(), listOf(), setOf(it))
             val z3Equivalence = muDefinitionToZ3(rhsMu, solution)
-            debugMessages?.append("  Weakening length refinement: ${z3Equivalence.sExpr}\n")
+            debugMessages?.append("  Weakening length refinement:\n\n ```lisp\n${z3Equivalence.sExpr}\n```\n\n")
             solver.push()
             solver.add(z3Equivalence)
-            FormulaCounter.increment()
-            val status = solver.check()
+            val status = checkStatus(debugMessages)
             debugMessages?.append("    Result: $status\n")
             solver.pop()
             status == Status.UNSATISFIABLE
@@ -451,7 +442,8 @@ class Z3Goal(val name: String,
     private fun classifyRefinements(solution: Solution,
                                     muVar: String,
                                     refinements: List<Refinement>,
-                                    builder: (List<Refinement>) -> MuSolution): Pair<MutableList<Refinement>, MutableList<Refinement>> {
+                                    builder: (List<Refinement>) -> MuSolution,
+                                    debugMessages: StringBuffer?): Pair<MutableList<Refinement>, MutableList<Refinement>> {
         val accepted = mutableListOf<Refinement>()
         val rejected = mutableListOf<Refinement>()
 
@@ -463,8 +455,7 @@ class Z3Goal(val name: String,
             // Is the formula still valid?
             solver.push()
             solver.add(z3Equivalence)
-            FormulaCounter.increment()
-            val status = solver.check()
+            val status = checkStatus(debugMessages)
             solver.pop()
 
             // Depending on whether it is valid or not, the refinement goes to the set `accepted` or `rejected`.
@@ -500,9 +491,8 @@ class Z3Goal(val name: String,
         solver.push()
         val z3Definition = muDefinitionToZ3(rhsMu, solution)
         solver.add(z3Definition)
-        FormulaCounter.increment()
-        val status = solver.check()
-        debugMessages?.append("  Strongest mapping\n    ${z3Definition.sExpr}\n    Result: $status\n")
+        debugMessages?.append("Trying strongest mapping\n\n")
+        val status = checkStatus(debugMessages)
         solver.pop()
 
         // If it does not hold, then we return the empty list, so that refinement is
@@ -527,9 +517,8 @@ class Z3Goal(val name: String,
             solver.push()
             val updatedDefinition = muDefinitionToZ3(rhsMu, solution)
             solver.add(updatedDefinition)
-            FormulaCounter.increment()
-            val updatedStatus = solver.check()
-            debugMessages?.append("  Superset $superSetNumber:\n    ${updatedDefinition.sExpr}\n    Result: $updatedStatus\n")
+            debugMessages?.append("Trying new superset.\n\n")
+            val updatedStatus = checkStatus(debugMessages)
             solver.pop()
 
 

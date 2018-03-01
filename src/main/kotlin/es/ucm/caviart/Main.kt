@@ -383,9 +383,9 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
         FormulaCounter.reset()
 
         while (!pending.isEmpty()) {
-            buffer?.append("===== STEP $stepNumber =====\n")
-            buffer?.append("Starting from solution:\n")
-            buffer?.append(solution.toString(kappas, mus) + "\n")
+            buffer?.append("## Step $stepNumber\n\n")
+            buffer?.append("Starting from solution:\n\n")
+            buffer?.append(solution.toString(kappas, mus) + "\n\n")
 
             val goalId = pending.first()
             pending.remove(goalId)
