@@ -374,6 +374,7 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
     val buffer = if (traceFileName != null) StringBuffer() else null
 
     val result = runPhase("Running iterative weakening") {
+        println("\n")
         val solution = buildStrongestSolution(kappas, mus)
 
         val goalsMap = goals.map { it.name to it }.toMap()
@@ -389,7 +390,7 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
             val goalId = pending.first()
             pending.remove(goalId)
             val goal = goalsMap[goalId]!!
-            print(" - $goalId: ")
+            print("   - $goalId: ")
             val result = goal.check(solution, buffer)
             buffer?.append("\n\n")
             when (result) {
@@ -414,7 +415,7 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
             stepNumber += 1
         }
 
-        print("Finished iterative weakening:\n $stepNumber steps, ${FormulaCounter.currentValue} formulas")
+        print("\nFinished iterative weakening:\n $stepNumber steps, ${FormulaCounter.currentValue} formulas")
         solution
     }
 
