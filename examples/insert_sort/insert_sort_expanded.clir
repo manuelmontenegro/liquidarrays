@@ -1,0 +1,85 @@
+(verification-unit insert_sort :external
+  (set-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+      (nv int))
+    (
+      (res
+        (qual nu (array int)
+          (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+  :external
+  (get-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+    ((res (qual nu int (@ = nu (@ get-array xs i))))))
+  :external
+  (insert
+    ((k (qual nu int (@ <= (the int 0) nu)))
+      (a
+        (qual nu (array int)
+          (and (@ < k (@ len nu))
+            (forall ((i int) (j int))
+              (-> (and (@ <= (the int 0) i) (@ <= i j) (@ < j k))
+                (@ <= (@ get-array nu i) (@ get-array nu j))))))))
+    (
+      (res
+        (qual nu (array int)
+          (forall ((i int) (j int))
+            (-> (and (@ <= (the int 0) i) (@ <= i j) (@ <= j k))
+              (@ <= (@ get-array nu i) (@ get-array nu j))))))))
+  :qset
+  (Q (nu int () (@ <= (the int 0) nu)) (nu int ((* int)) (@ <= * nu)))
+  :qset
+  (QI i)
+  :qset
+  (QE i)
+  :qset
+  (QII i j (nu (array int) () (@ <= i j))
+    (nu (array int) ((* int)) (@ <= j *))
+    (nu (array int) ((* int)) (@ <= * i))
+    (nu (array int) ((* int)) (@ < i *))
+    (nu (array int) ((* int)) (@ < * j))
+    (nu (array int) ((* int)) (@ < j *)))
+  :qset
+  (QEE i j (nu (array int) () (@ <= (@ get-array nu i) (@ get-array nu j))))
+  :qset
+  (QLen (nu (array int) ((* int)) (@ < * (@ len nu)))))
+(define insert-sort ((a (qual nu (array int) true)))
+  (
+    (res
+      (qual nu (array int)
+        (forall ((i int) (j int))
+          (-> (and (@ <= (the int 0) i) (@ <= i j) (@ < j (@ len nu)))
+            (@ <= (@ get-array nu i) (@ get-array nu j)))))))
+  (declare
+    (assertion (precd true)
+      (postcd
+        (forall ((i int) (j int))
+          (-> (and (@ <= (the int 0) i) (@ <= i j) (@ < j (@ len res)))
+            (@ <= (@ get-array res i) (@ get-array res j)))))))
+  (letfun
+    (
+      (f1
+        ((k (qual nu int (@ <= (the int 0) nu)))
+          (a
+            (qual nu (array int)
+              (and
+                (forall ((i int) (j int))
+                  (-> (and (@ <= (the int 0) i) (@ <= i j) (@ < j k))
+                    (@ <= (@ get-array nu i) (@ get-array nu j))))
+                (@ <= k (@ len a))))))
+        (
+          (res
+            (qual nu (array int)
+              (forall ((i int) (j int))
+                (-> (and (@ <= (the int 0) i) (@ <= i j) (@ < j (@ len nu)))
+                  (@ <= (@ get-array nu i) (@ get-array nu j)))))))
+        (declare (assertion (precd false) (postcd true)))
+        (let ((la int)) (@ len a)
+          (let ((b bool)) (@ < k la)
+            (case b
+              (
+                (true
+                  (let ((ap (array int))) (@ insert k a)
+                    (let ((k1 int)) (@ + k (the int 1)) (@ f1 k1 ap))))(false a)))))))
+    (@ f1 (the int 0) a)))
