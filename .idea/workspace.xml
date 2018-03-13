@@ -1,35 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="liquidarrays:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="035eabb6-12b4-4732-a60d-98f7b5a6bf59" name="Default" comment="Integrated Z3 goal generator into Main.kt">
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_microsoft_z3_4_6_0.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_xenomachina_kotlin_argparser_2_0_4.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_xenomachina_xenocom_0_0_5.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_microsoft_z3_4_5_1.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_1_1_2_4.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_test_1_1_2_4.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_test_junit_1_1_2_4.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change beforePath="$PROJECT_DIR$/TODO.md" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ASTPrettyPrinter.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/FilterQueue.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/FreshNameGenerator.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/GoalGenerator.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/InitialEnvironment.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Lexer.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/LiquidEnvironment.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Parser.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/QStarGenerator.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/QualifyFunctionalTypes.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/SExpParser.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Solution.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Substitution.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Supersets.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Syntax.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/TypeChecker.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Z3AST.kt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Z3Goals.kt" afterPath="" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/LiquidException.kt" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTyped.clir" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_1_2_21.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_1_2_30.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_test_1_2_21.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_test_1_2_30.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_test_junit_1_2_21.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_test_junit_1_2_30.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/liquidarrays.iml" afterPath="$PROJECT_DIR$/liquidarrays.iml" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Main.kt" afterPath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Main.kt" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/ASTPrettyPrinter.kt" afterPath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/ASTPrettyPrinter.kt" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Lexer.kt" afterPath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Lexer.kt" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Parser.kt" afterPath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Parser.kt" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/SExpParser.kt" afterPath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/SExpParser.kt" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Syntax.kt" afterPath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Syntax.kt" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3AST.kt" afterPath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3AST.kt" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3WeakeningAlgorithm.kt" afterPath="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3WeakeningAlgorithm.kt" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappasTest.kt" afterPath="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappasTest.kt" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MusTest.kt" afterPath="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MusTest.kt" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/RenamerTest.kt" afterPath="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/RenamerTest.kt" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -47,33 +43,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Z3WeakeningAlgorithm.kt" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3WeakeningAlgorithm.kt">
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="346">
-              <caret line="421" column="110" lean-forward="false" selection-start-line="421" selection-start-column="110" selection-end-line="421" selection-end-column="110" />
-              <folding>
-                <element signature="e#1277#1416#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="fillTuned.clir" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillTuned.clir">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="56" column="13" lean-forward="false" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="fillResult.md" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillResult.md">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="274">
-              <caret line="36" column="30" lean-forward="false" selection-start-line="36" selection-start-column="30" selection-end-line="36" selection-end-column="30" />
+            <state relative-caret-position="126">
+              <caret line="7" column="16" lean-forward="false" selection-start-line="7" selection-start-column="16" selection-end-line="7" selection-end-column="16" />
               <folding />
             </state>
           </provider>
@@ -92,36 +66,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>letCase</find>
-      <find>letAndT</find>
-      <find>QualType</find>
-      <find>in</find>
-      <find>intType</find>
-      <find>kappaDefinitions</find>
-      <find>ConstrType(&quot;int&quot;)</find>
-      <find>where</find>
-      <find>Result</find>
-      <find>Result:</find>
-      <find>buffer</find>
-      <find>filter</find>
-      <find>context</find>
-      <find>ContexT()</find>
-      <find>Context()</find>
-      <find>.check()</find>
-      <find>mkSolver</find>
-      <find>check</find>
-      <find>Finished</find>
-      <find>running</find>
-      <find>running</find>
-      <find>running iterative</find>
-      <find>$status</find>
-      <find>.check</find>
-      <find>solver.checj</find>
-      <find>solver.chec</find>
       <find>solver.check</find>
       <find>.increment</find>
       <find>Trying</find>
       <find>Weakening</find>
+      <find>ip</find>
+      <find>x'</find>
+      <find>cannotweaken</find>
+      <find>buffer</find>
+      <find>G_7</find>
+      <find>G_17</find>
+      <find>G_3</find>
+      <find>G_42</find>
+      <find>G_15</find>
+      <find>G_43</find>
+      <find>solve</find>
+      <find>Context(</find>
+      <find>G_22</find>
+      <find>Weakening `_mu_f1_res`</find>
+      <find>G_26</find>
+      <find>step</find>
+      <find>Weakening `_mu_f1_a</find>
+      <find>Weakening `_mu_f1_a`</find>
+      <find>weakenMu</find>
+      <find>Solution</find>
+      <find>isTrivial</find>
+      <find>istrivial</find>
+      <find>timeout</find>
+      <find>.check</find>
+      <find>check</find>
+      <find>fun check</find>
     </findStrings>
     <replaceStrings>
       <replace>mapOf</replace>
@@ -133,6 +107,8 @@
       <replace>toSExp().toString()</replace>
       <replace>int</replace>
       <replace>intType</replace>
+      <replace>i</replace>
+      <replace>x_1</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -146,16 +122,9 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Parser.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/TypeChecker.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/InitialEnvironment.kt" />
-        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/TypeCheckerTest.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/InitialEnvironment.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Z3AST.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/ParserTest.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/SubstitutionTest.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/FilterQueueTest.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/SExpParser.kt" />
         <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillQualified.clir" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/QualifyFunctionalTypes.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/MapAccum.kt" />
@@ -170,17 +139,10 @@
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Solution.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/Z3ASTTest.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappaDefinitionToKappaTest.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3AST.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/GoalGeneratorTest.kt" />
         <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/ASTPrettyPrinter.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Parser.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Renamer.kt" />
-        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/RenamerTest.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Syntax.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Supersets.kt" />
-        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappasTest.kt" />
-        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MusTest.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/Supersets.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/SupersetsTest.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/FilterQueue.kt" />
@@ -190,13 +152,27 @@
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3LenTransformer.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/goal/GoalGenerator.kt" />
         <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/Z3Test.kt" />
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/MutableCounter.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/FormulaCounter.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/Solution.kt" />
+        <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill_expanded.clir" />
+        <option value="$APPLICATION_CONFIG_DIR$/consoles/jshell/jshell_console.snippet" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/ASTPrettyPrinter.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/RenamerTest.kt" />
+        <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTyped.clir" />
+        <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertExpanded.clir" />
+        <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insert.clir" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Syntax.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Parser.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/LiquidException.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Lexer.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/SExpParser.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3AST.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Main.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3WeakeningAlgorithm.kt" />
-        <option value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill_expanded.clir" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappasTest.kt" />
+        <option value="$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MusTest.kt" />
+        <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
   </component>
@@ -253,11 +229,11 @@
       </PATH>
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
-    <option name="x" value="1690" />
-    <option name="y" value="127" />
-    <option name="width" value="1718" />
-    <option name="height" value="867" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="1600" />
+    <option name="y" value="27" />
+    <option name="width" value="1920" />
+    <option name="height" value="1053" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -342,6 +318,10 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -479,10 +459,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
-      <pane id="Scratches" />
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -491,9 +467,15 @@
     <property name="settings.editor.selected.configurable" value="Errors" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="SearchEverywhereHistoryKey" value="check&#9;null&#9;null&#10;Solution&#9;FILE&#9;file:///home/manuel/CAVIART/Liquid/ImplementacionZ3/liquidarrays/src/main/kotlin/es/ucm/caviart/iterativeweakening/Solution.kt" />
+    <property name="SearchEverywhereHistoryKey" value="Exception&#9;null&#9;null&#10;Solution&#9;null&#9;null&#10;appa&#9;null&#9;null&#10;check&#9;null&#9;null" />
+    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/es/ucm/caviart" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/" />
       <recent name="$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening" />
@@ -514,7 +496,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Kotlin.Fill example (show trace)">
+  <component name="RunManager" selected="JUnit.All in liquidarrays">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="HTML_USED" value="false" />
       <option name="WIDTH" value="400" />
@@ -536,7 +518,27 @@
       <module name="" />
       <envs />
     </configuration>
-    <configuration name="FilterQueueTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="All in liquidarrays" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="liquidarrays" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="package" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+    </configuration>
+    <configuration name="RenamerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
           <option name="PATTERN" value="es.ucm.caviart.*" />
@@ -547,7 +549,7 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="es.ucm.caviart" />
-      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.FilterQueueTest" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.RenamerTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -561,7 +563,7 @@
       <envs />
       <patterns />
     </configuration>
-    <configuration name="GoalGeneratorTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="RenamerTest.renameExp8" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
           <option name="PATTERN" value="es.ucm.caviart.*" />
@@ -572,9 +574,9 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="es.ucm.caviart" />
-      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.GoalGeneratorTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.RenamerTest" />
+      <option name="METHOD_NAME" value="renameExp8" />
+      <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
@@ -586,7 +588,7 @@
       <envs />
       <patterns />
     </configuration>
-    <configuration name="QualifyFunctionalTypesTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="RenamerTest.renameExp9" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
           <option name="PATTERN" value="es.ucm.caviart.*" />
@@ -597,33 +599,8 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="es.ucm.caviart" />
-      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.QualifyFunctionalTypesTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <envs />
-      <patterns />
-    </configuration>
-    <configuration name="SupersetsTest.alreadyEnqueuedSubset" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="es.ucm.caviart.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <module name="liquidarrays" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="es.ucm.caviart" />
-      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.SupersetsTest" />
-      <option name="METHOD_NAME" value="alreadyEnqueuedSubset" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.RenamerTest" />
+      <option name="METHOD_NAME" value="renameExp9" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
       <option name="PARAMETERS" />
@@ -720,7 +697,7 @@
     <configuration name="Fill example" type="JetRunConfigurationType" factoryName="Kotlin">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir -p" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PASS_PARENT_ENVS" value="true" />
@@ -745,6 +722,42 @@
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillWithKappasAndMus.clir" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration name="Insert example (typecheck)" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTyped.clir -g $PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTypedGoals.md" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration name="Insert example (with trace)" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insert.clir --timeout 1000" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="es.ucm.caviart.MainKt" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <module name="liquidarrays" />
+      <envs />
+    </configuration>
+    <configuration name="Insert expanded example" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertExpanded.clir -t $PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTrace.md -p" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PASS_PARENT_ENVS" value="true" />
@@ -957,27 +970,30 @@
       <setting name="rowsRange" value="" />
       <method />
     </configuration>
-    <list size="12">
+    <list size="15">
       <item index="0" class="java.lang.String" itemvalue="Kotlin.Fill example" />
-      <item index="1" class="java.lang.String" itemvalue="Kotlin.Fill example (show trace)" />
-      <item index="2" class="java.lang.String" itemvalue="Kotlin.Fill example (generate goals)" />
-      <item index="3" class="java.lang.String" itemvalue="Kotlin.Fill example (only expand)" />
-      <item index="4" class="java.lang.String" itemvalue="Kotlin.Show help" />
-      <item index="5" class="java.lang.String" itemvalue="Kotlin.Fill with Kappas and Mus" />
-      <item index="6" class="java.lang.String" itemvalue="Kotlin.Fill qualified example (1)" />
-      <item index="7" class="java.lang.String" itemvalue="JUnit.FilterQueueTest" />
-      <item index="8" class="java.lang.String" itemvalue="JUnit.SupersetsTest.alreadyEnqueuedSubset" />
-      <item index="9" class="java.lang.String" itemvalue="JUnit.GoalGeneratorTest" />
+      <item index="1" class="java.lang.String" itemvalue="Kotlin.Insert expanded example" />
+      <item index="2" class="java.lang.String" itemvalue="Kotlin.Insert example (with trace)" />
+      <item index="3" class="java.lang.String" itemvalue="Kotlin.Insert example (typecheck)" />
+      <item index="4" class="java.lang.String" itemvalue="Kotlin.Fill example (show trace)" />
+      <item index="5" class="java.lang.String" itemvalue="Kotlin.Fill example (generate goals)" />
+      <item index="6" class="java.lang.String" itemvalue="Kotlin.Fill example (only expand)" />
+      <item index="7" class="java.lang.String" itemvalue="Kotlin.Show help" />
+      <item index="8" class="java.lang.String" itemvalue="Kotlin.Fill with Kappas and Mus" />
+      <item index="9" class="java.lang.String" itemvalue="Kotlin.Fill qualified example (1)" />
       <item index="10" class="java.lang.String" itemvalue="JUnit.es.ucm.caviart in liquidarrays" />
-      <item index="11" class="java.lang.String" itemvalue="JUnit.QualifyFunctionalTypesTest" />
+      <item index="11" class="java.lang.String" itemvalue="JUnit.RenamerTest" />
+      <item index="12" class="java.lang.String" itemvalue="JUnit.RenamerTest.renameExp8" />
+      <item index="13" class="java.lang.String" itemvalue="JUnit.RenamerTest.renameExp9" />
+      <item index="14" class="java.lang.String" itemvalue="JUnit.All in liquidarrays" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.es.ucm.caviart in liquidarrays" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.QualifyFunctionalTypesTest" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.GoalGeneratorTest" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.FilterQueueTest" />
-        <item index="4" class="java.lang.String" itemvalue="JUnit.SupersetsTest.alreadyEnqueuedSubset" />
+        <item index="0" class="java.lang.String" itemvalue="JUnit.All in liquidarrays" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.es.ucm.caviart in liquidarrays" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.RenamerTest" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.RenamerTest.renameExp9" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.RenamerTest.renameExp8" />
       </list>
     </recent_temporary>
   </component>
@@ -1353,34 +1369,34 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="FilterQueueTest - 2018.02.23 at 16h 02m 31s.xml">
-      <configuration name="FilterQueueTest" configurationId="JUnit" />
+    <history-entry file="All_in_liquidarrays - 2018.03.13 at 16h 06m 50s.xml">
+      <configuration name="All in liquidarrays" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="FilterQueueTest - 2018.02.23 at 16h 36m 41s.xml">
-      <configuration name="FilterQueueTest" configurationId="JUnit" />
+    <history-entry file="All_in_liquidarrays - 2018.03.13 at 16h 08m 23s.xml">
+      <configuration name="All in liquidarrays" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="GoalGeneratorTest - 2018.02.23 at 16h 39m 47s.xml">
-      <configuration name="GoalGeneratorTest" configurationId="JUnit" />
+    <history-entry file="All_in_liquidarrays - 2018.03.13 at 16h 09m 03s.xml">
+      <configuration name="All in liquidarrays" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="MusTest - 2018.02.23 at 16h 02m 18s.xml">
-      <configuration name="MusTest" configurationId="JUnit" />
+    <history-entry file="RenamerTest - 2018.03.05 at 14h 38m 44s.xml">
+      <configuration name="RenamerTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="QualifyFunctionalTypesTest - 2018.02.23 at 16h 46m 13s.xml">
-      <configuration name="QualifyFunctionalTypesTest" configurationId="JUnit" />
+    <history-entry file="RenamerTest - 2018.03.05 at 14h 40m 09s.xml">
+      <configuration name="RenamerTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SupersetsTest - 2018.02.23 at 16h 34m 34s.xml">
-      <configuration name="SupersetsTest" configurationId="JUnit" />
+    <history-entry file="RenamerTest_renameDef3 - 2018.03.05 at 14h 38m 39s.xml">
+      <configuration name="RenamerTest.renameDef3" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="SupersetsTest_alreadyEnqueuedSubset - 2018.02.23 at 16h 35m 36s.xml">
-      <configuration name="SupersetsTest.alreadyEnqueuedSubset" configurationId="JUnit" />
+    <history-entry file="RenamerTest_renameExp8 - 2018.03.05 at 14h 39m 30s.xml">
+      <configuration name="RenamerTest.renameExp8" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="es_ucm_caviart_in_liquidarrays - 2018.02.23 at 16h 40m 06s.xml">
-      <configuration name="es.ucm.caviart in liquidarrays" configurationId="JUnit" />
+    <history-entry file="RenamerTest_renameExp9 - 2018.03.05 at 14h 39m 35s.xml">
+      <configuration name="RenamerTest.renameExp9" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="es_ucm_caviart_in_liquidarrays - 2018.02.23 at 16h 41m 56s.xml">
-      <configuration name="es.ucm.caviart in liquidarrays" configurationId="JUnit" />
+    <history-entry file="RenamerTest_renameExp9 - 2018.03.05 at 14h 40m 06s.xml">
+      <configuration name="RenamerTest.renameExp9" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="es_ucm_caviart_in_liquidarrays - 2018.02.23 at 16h 46m 20s.xml">
+    <history-entry file="es_ucm_caviart_in_liquidarrays - 2018.03.05 at 14h 40m 17s.xml">
       <configuration name="es.ucm.caviart in liquidarrays" configurationId="JUnit" />
     </history-entry>
   </component>
@@ -1394,8 +1410,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1690" y="127" width="1718" height="867" extended-state="1" />
-    <editor active="true" />
+    <frame x="1600" y="27" width="1920" height="1053" extended-state="6" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32861805" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1405,12 +1420,12 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33085898" sideWeight="0.5104167" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925257" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5561427" sideWeight="0.6228893" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.44644752" sideWeight="0.6228893" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32752994" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32861805" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22351572" sideWeight="0.49565217" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2" sideWeight="0.49565217" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32767764" sideWeight="0.49375" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1496,7 +1511,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="81" />
+      <option name="time" value="84" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1514,139 +1529,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/liquidarrays.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-182">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/Z3ASTTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1026">
-          <caret line="65" column="22" lean-forward="false" selection-start-line="65" selection-start-column="22" selection-end-line="65" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/QStarGeneratorTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="9" column="6" lean-forward="false" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/ParserTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
-          <caret line="41" column="19" lean-forward="false" selection-start-line="41" selection-start-column="19" selection-end-line="41" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappaDeclarationToKappaTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/org/junit/Assert.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="156" column="0" lean-forward="false" selection-start-line="156" selection-start-column="0" selection-end-line="156" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/ASTTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="35" column="32" lean-forward="false" selection-start-line="35" selection-start-column="32" selection-end-line="35" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/qstar/Substitution.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="882">
-          <caret line="70" column="20" lean-forward="false" selection-start-line="70" selection-start-column="16" selection-end-line="70" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/SExpParser.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3366">
-          <caret line="209" column="32" lean-forward="false" selection-start-line="209" selection-start-column="32" selection-end-line="209" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///usr/java/latest/lib/src.zip!/java.base/java/util/ArrayList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="887" column="0" lean-forward="false" selection-start-line="887" selection-start-column="0" selection-end-line="887" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib/1.2.21/kotlin-stdlib-1.2.21-sources.jar!/generated/_Collections.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="1483" column="0" lean-forward="false" selection-start-line="1483" selection-start-column="0" selection-end-line="1483" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/MapAccum.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="20" column="2" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="20" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/ASTPrettyPrinter.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1134">
-          <caret line="83" column="87" lean-forward="false" selection-start-line="83" selection-start-column="87" selection-end-line="83" selection-end-column="87" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Parser.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3078">
-          <caret line="191" column="0" lean-forward="false" selection-start-line="191" selection-start-column="0" selection-end-line="191" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/RenamerTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="24" column="54" lean-forward="false" selection-start-line="24" selection-start-column="54" selection-end-line="24" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappasTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="16" column="33" lean-forward="true" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/SupersetsTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="990">
-          <caret line="58" column="47" lean-forward="false" selection-start-line="58" selection-start-column="47" selection-end-line="58" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/FilterQueueTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1098">
-          <caret line="65" column="8" lean-forward="false" selection-start-line="65" selection-start-column="8" selection-end-line="65" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/FilterQueue.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="41" column="70" lean-forward="true" selection-start-line="41" selection-start-column="70" selection-end-line="41" selection-end-column="70" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/Supersets.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
@@ -1682,13 +1564,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/TypeChecker.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="32" column="28" lean-forward="false" selection-start-line="32" selection-start-column="28" selection-end-line="32" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Renamer.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4770">
@@ -1697,19 +1572,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Syntax.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10008">
-          <caret line="576" column="59" lean-forward="false" selection-start-line="576" selection-start-column="59" selection-end-line="576" selection-end-column="59" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/InitialEnvironment.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="339">
           <caret line="26" column="40" lean-forward="false" selection-start-line="26" selection-start-column="40" selection-end-line="26" selection-end-column="40" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1727,13 +1593,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillQualified.clir">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="23" column="12" lean-forward="false" selection-start-line="23" selection-start-column="12" selection-end-line="23" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillQualified.clir" />
     <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/Z3Test.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="496">
@@ -1743,58 +1603,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/z3.log" />
     <entry file="file://$PROJECT_DIR$/TODO.md" />
-    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="13" column="56" lean-forward="false" selection-start-line="13" selection-start-column="56" selection-end-line="13" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.m2/settings.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="605">
-          <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillGoals.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="6" column="12" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="533" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/MutableCounter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="27" lean-forward="false" selection-start-line="2" selection-start-column="27" selection-end-line="2" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3AST.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="229">
-          <caret line="40" column="15" lean-forward="false" selection-start-line="40" selection-start-column="15" selection-end-line="40" selection-end-column="15" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/MutableCounter.java" />
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/FreshNameGenerator.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="20" selection-end-column="2" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1802,41 +1622,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
           <caret line="26" column="80" lean-forward="false" selection-start-line="26" selection-start-column="80" selection-end-line="26" selection-end-column="80" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Main.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="391" column="39" lean-forward="true" selection-start-line="391" selection-start-column="39" selection-end-line="391" selection-end-column="39" />
-          <folding>
-            <element signature="e#1156#1815#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/Solution.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="52" column="17" lean-forward="false" selection-start-line="52" selection-start-column="17" selection-end-line="52" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/goal/GoalGenerator.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="50" column="11" lean-forward="false" selection-start-line="50" selection-start-column="11" selection-end-line="50" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MusTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="15" column="6" lean-forward="false" selection-start-line="15" selection-start-column="6" selection-end-line="15" selection-end-column="6" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1844,7 +1629,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="10" column="30" lean-forward="false" selection-start-line="10" selection-start-column="30" selection-end-line="10" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1852,42 +1636,338 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
           <caret line="858" column="37" lean-forward="true" selection-start-line="858" selection-start-column="37" selection-end-line="858" selection-end-column="37" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillTuned.clir">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
+        <state relative-caret-position="875">
           <caret line="56" column="13" lean-forward="false" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/consoles/jshell/jshell_console.snippet">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/RenamerTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1122">
+          <caret line="131" column="8" lean-forward="false" selection-start-line="131" selection-start-column="8" selection-end-line="131" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insert_new.clir" />
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTypedGoals.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="875">
+          <caret line="1237" column="33" lean-forward="false" selection-start-line="1237" selection-start-column="33" selection-end-line="1237" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTypedTrace.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="528" column="26" lean-forward="false" selection-start-line="528" selection-start-column="26" selection-end-line="528" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTyped.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="673" column="14" lean-forward="false" selection-start-line="673" selection-start-column="14" selection-end-line="673" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTyped.clir">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="918">
+          <caret line="51" column="37" lean-forward="false" selection-start-line="51" selection-start-column="37" selection-end-line="51" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertTrace.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68868">
+          <caret line="3826" column="23" lean-forward="false" selection-start-line="3826" selection-start-column="23" selection-end-line="3826" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insert.clir">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="32" column="0" lean-forward="false" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill.clir">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="21" column="13" lean-forward="false" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fill_expanded.clir">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillGoals.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="26" column="38" lean-forward="false" selection-start-line="26" selection-start-column="38" selection-end-line="26" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/fillResult.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="274">
+        <state relative-caret-position="648">
           <caret line="36" column="30" lean-forward="false" selection-start-line="36" selection-start-column="30" selection-end-line="36" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/qstar/QStarGenerator.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1458">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/qstar/Substitution.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2014">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/goal/GoalGenerator.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="50" column="11" lean-forward="false" selection-start-line="50" selection-start-column="11" selection-end-line="50" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Syntax.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="594" column="14" lean-forward="false" selection-start-line="594" selection-start-column="14" selection-end-line="594" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Parser.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="163">
+          <caret line="920" column="36" lean-forward="true" selection-start-line="920" selection-start-column="31" selection-end-line="920" selection-end-column="84" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/utils/LiquidException.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" column="5" lean-forward="false" selection-start-line="5" selection-start-column="5" selection-end-line="5" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/ASTPrettyPrinter.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1733">
+          <caret line="204" column="31" lean-forward="false" selection-start-line="204" selection-start-column="31" selection-end-line="204" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3AST.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="283">
+          <caret line="345" column="6" lean-forward="false" selection-start-line="345" selection-start-column="6" selection-end-line="345" selection-end-column="6" />
+          <folding>
+            <element signature="e#1262#1359#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/SExpParser.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="328">
+          <caret line="218" column="91" lean-forward="false" selection-start-line="218" selection-start-column="91" selection-end-line="218" selection-end-column="91" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/ast/Lexer.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="382">
+          <caret line="266" column="80" lean-forward="false" selection-start-line="266" selection-start-column="80" selection-end-line="266" selection-end-column="80" />
+          <folding>
+            <element signature="e#1159#1224#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/typecheck/TypeChecker.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="592" column="51" lean-forward="false" selection-start-line="592" selection-start-column="51" selection-end-line="592" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/es/ucm/caviart/insertExpanded.clir">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="18" column="2" lean-forward="false" selection-start-line="18" selection-start-column="2" selection-end-line="18" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/Solution.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="73" column="11" lean-forward="false" selection-start-line="73" selection-start-column="11" selection-end-line="73" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/Main.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="31" column="42" lean-forward="true" selection-start-line="31" selection-start-column="42" selection-end-line="31" selection-end-column="42" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/es/ucm/caviart/iterativeweakening/z3/Z3WeakeningAlgorithm.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="346">
-          <caret line="421" column="110" lean-forward="false" selection-start-line="421" selection-start-column="110" selection-end-line="421" selection-end-column="110" />
-          <folding>
-            <element signature="e#1277#1416#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="175">
+          <caret line="253" column="71" lean-forward="true" selection-start-line="253" selection-start-column="71" selection-end-line="253" selection-end-column="71" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/KappasTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="71" column="32" lean-forward="false" selection-start-line="71" selection-start-column="32" selection-end-line="71" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/es/ucm/caviart/MusTest.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="118">
+          <caret line="357" column="32" lean-forward="false" selection-start-line="357" selection-start-column="32" selection-end-line="357" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="7" column="16" lean-forward="false" selection-start-line="7" selection-start-column="16" selection-end-line="7" selection-end-column="16" />
+          <folding />
         </state>
       </provider>
     </entry>
   </component>
   <component name="masterDetails">
     <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <last-edited>liquidarrays:jar</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Kotlin</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>9.0</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>liquidarrays</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.6" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
       <state key="ProjectJDKs.UI">
         <settings>
           <last-edited>9.0</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>Maven: com.microsoft:z3:4.6.0</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

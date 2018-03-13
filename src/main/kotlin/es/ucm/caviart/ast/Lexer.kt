@@ -21,6 +21,7 @@
 */
 package es.ucm.caviart.ast
 
+import es.ucm.caviart.utils.LiquidException
 import java.io.Reader
 
 /*
@@ -263,4 +264,4 @@ fun readTokens(reader: Reader): List<Token> {
  *
  * There must be a space in between, as in `hello "symb"`.
  */
-class UnexpectedQuoteException(val line: Int, val column: Int) : Exception("Unexpected quote symbol: line $line, column $column")
+class UnexpectedQuoteException(val line: Int, val column: Int) : LiquidException("Unexpected quote symbol: line $line, column $column")

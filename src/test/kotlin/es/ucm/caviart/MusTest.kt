@@ -46,7 +46,7 @@ class MusTest {
             ),
             mapOf(),
             mapOf("mu1" to setOf(2)),
-            mapOf()
+            mapOf(), false, 5000
     )
 
 
@@ -86,7 +86,7 @@ class MusTest {
             )),
             mapOf(),
             mapOf("mu1" to setOf(2)),
-            mapOf()
+            mapOf(), false, 5000
     )
 
     private val goalG3 = Z3Goal(
@@ -129,7 +129,7 @@ class MusTest {
             )),
             mapOf(),
             mapOf("mu1" to setOf(2)),
-            mapOf()
+            mapOf(), false, 5000
     )
 
     private val assumptionsG4 = listOf(
@@ -171,7 +171,7 @@ class MusTest {
                     listOf())),
             mapOf(),
             mapOf("mu1" to setOf(2)),
-            declarationMapG4
+            declarationMapG4, false, 5000
     )
 
     private val goalG5 = Z3Goal("G5",
@@ -205,7 +205,7 @@ class MusTest {
                     listOf())),
             mapOf(),
             mapOf("mu1" to setOf(2)),
-            declarationMapG4
+            declarationMapG4, false, 5000
     )
 
 
@@ -355,7 +355,7 @@ class MusTest {
             )),
             mapOf(),
             mapOf("mu1" to setOf(1)),
-            mapOf()
+            mapOf(), false, 5000
     )}
 
 

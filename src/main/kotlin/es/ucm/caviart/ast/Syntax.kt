@@ -714,4 +714,29 @@ fun Assertion.findArrayAccesses(indexVar: String, environment: Map<String, HMTyp
 
 
 
+/**
+ * It traverses the AST of a list of assertions and returns the names of
+ * the predicates being applied.
+ */
+fun findAppliedPredicates(assertions: List<Assertion>): Set<String> {
+    val result = mutableSetOf<String>()
+
+    fun traverseAssertion(assertion: Assertion) {
+        when (assertion) {
+            is PredicateApplication ->
+                result.add(assertion.name)
+            is Not -> traverseAssertion(assertion.assertion)
+            is And -> assertion.conjuncts.forEach { traverseAssertion(it) }
+            is Or -> assertion.disjuncts.forEach { traverseAssertion(it) }
+            is Implication -> assertion.operands.forEach { traverseAssertion(it) }
+            is Iff -> assertion.operands.forEach { traverseAssertion(it) }
+            is ForAll -> traverseAssertion(assertion.assertion)
+            is Exists -> traverseAssertion(assertion.assertion)
+        }
+    }
+
+    assertions.forEach { traverseAssertion(it) }
+
+    return result
+}
 

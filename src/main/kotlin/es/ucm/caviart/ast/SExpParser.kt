@@ -21,6 +21,7 @@
 */
 package es.ucm.caviart.ast
 
+import es.ucm.caviart.utils.LiquidException
 import java.io.Reader
 import java.io.StringReader
 import java.util.*
@@ -212,9 +213,9 @@ fun getSExps(string: String): List<SExp> = getSExps(StringReader(string))
 /**
  * Exception that will be thrown when an unmatched right parenthesis is found, as in `((hello)))`.
  */
-class UnexpectedRightParenException(val line: Int, val column: Int) : Exception("Unexpected ')': line $line, column $column")
+class UnexpectedRightParenException(val line: Int, val column: Int) : LiquidException("Unexpected ')': line $line, column $column")
 
 /**
  * Exception that will be thrown when we reach the end of the file and there are left parenthesis to be closed.
  */
-class UnmatchedLeftParenException(val line: Int, val column: Int) : Exception("Unmatched '(': line $line, column $column")
+class UnmatchedLeftParenException(val line: Int, val column: Int) : LiquidException("Unmatched '(': line $line, column $column")

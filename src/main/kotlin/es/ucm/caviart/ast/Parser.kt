@@ -27,6 +27,8 @@
 
 package es.ucm.caviart.ast
 
+import es.ucm.caviart.utils.LiquidException
+
 /*
     This constant specifies how many characters of an S-Expression should be printed
     in error messages
@@ -916,9 +918,9 @@ fun String.toDef(): FunctionDefinition {
     return parseFunctionDefinition(sexps[0])
 }
 
-class MissingHeaderException : Exception("Missing 'verification-unit' header")
-class InvalidHeaderNoName : Exception("Invalid 'verification-unit' header. No varName given")
-class DanglingExpression(sexp: SExp) : Exception("Expression ${sexp.trim()} is not preceeded by a directive")
+class MissingHeaderException : LiquidException("Missing 'verification-unit' header")
+class InvalidHeaderNoName : LiquidException("Invalid 'verification-unit' header. No varName given")
+class DanglingExpression(sexp: SExp) : LiquidException("Expression ${sexp.trim()} is not preceeded by a directive")
 
 
 class ExpectedCompound(given: SExp) :

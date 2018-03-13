@@ -57,7 +57,9 @@ class Z3Goal(val name: String,
              val mus: Map<String, Mu>,
              kappaIndices: Map<String, Set<Int>>,
              muIndices: Map<String, Set<Int>>,
-             declarationMap: Map<String, UninterpretedFunctionType>) {
+             declarationMap: Map<String, UninterpretedFunctionType>,
+             val pruneTrivialLHS: Boolean,
+             val timeout: Long) {
 
     /**
      * The MuInfo, KappaInfo, QEQualifier, QEEQualifier structures are similar to the Mu class,
@@ -121,12 +123,12 @@ class Z3Goal(val name: String,
     /**
      * The context in which all expressions will be created
      */
-    private val ctx: Context = Context()
+    private val ctx: Context = Context(mapOf("timeout" to timeout.toString()))
 
     /**
      * The solver which will be used in that context
      */
-    private val solver: Solver = ctx.mkSolver("AUFLIRA")
+    private val solver: Solver = ctx.mkSolver("AUFLIA")
 
 
     override fun toString(): String {
@@ -148,7 +150,7 @@ class Z3Goal(val name: String,
         val kappaNames = kappas.keys
         val muNames = mus.keys
 
-        val appliedPredicates = searchAppliedPredicates(assumptions + conclusion)
+        val appliedPredicates = findAppliedPredicates(assumptions + conclusion)
         mentionedKappas = appliedPredicates.intersect(kappaNames)
         mentionedMus = appliedPredicates.intersect(muNames)
         rhsKappa = if (conclusion is PredicateApplication && conclusion.name in kappaNames) conclusion.name else null
@@ -329,14 +331,21 @@ class Z3Goal(val name: String,
 
     private fun checkStatus(debugMessages: StringBuffer?): Status {
         FormulaCounter.increment()
+        System.out.flush()
         debugMessages?.let {
             it.append("```lisp\n")
             it.append(solver)
             it.append("```\n\n")
         }
-        val verdict: Status = solver.check()
-        debugMessages?.append("*Result:* $verdict\n\n")
-        return verdict
+        try {
+            val verdict: Status = solver.check()
+            print(".")
+            debugMessages?.append("*Result:* $verdict\n\n")
+            return verdict
+        } catch (e: Z3Exception) {
+            print("T")
+            return Status.UNKNOWN
+        }
     }
 
     /**
@@ -398,8 +407,13 @@ class Z3Goal(val name: String,
             weakenRefinement(it, numberOfQI, solution, rhsMu, { MuSolution(it, listOf(), setOf()) }, debugMessages)
         }
 
+
         // Now the weakened refinements are added to the solution
-        acceptedSingleRefinements += newSingleRefinements
+        acceptedSingleRefinements += if (pruneTrivialLHS) {
+            newSingleRefinements.filterNot { isTrivialSingleRefinement(rhsMu, it, debugMessages) }
+        } else {
+            newSingleRefinements
+        }
 
         // We do the same with the doubly-quantified refinements
         debugMessages?.append("#### Clasifying double refinements\n\n")
@@ -412,7 +426,12 @@ class Z3Goal(val name: String,
             debugMessages?.append("#### Weakening rejected refinement\n\n")
             weakenRefinement(it, numberOfQII, solution, rhsMu, { MuSolution(listOf(), it, setOf()) }, debugMessages)
         }
-        acceptedDoubleRefinements += newDoubleRefinements
+
+        acceptedDoubleRefinements += if (pruneTrivialLHS) {
+            newDoubleRefinements.filterNot { isTrivialDoubleRefinement(rhsMu, it, debugMessages) }
+        } else {
+            newDoubleRefinements
+        }
 
         // Now we try each length refinement, and take only those which make the formula valid
         // It is similar to the kappa
@@ -604,21 +623,7 @@ class Z3Goal(val name: String,
             ctx.mkForall(arrayOf(boundVarAsConst),
                     ctx.mkImplies(
                             // Left hand side: elements of QI and index range conditions
-                            ctx.mkAnd(
-                                    // The constraint 0 <= boundvar
-                                    ctx.mkGe(boundVarAsConst, ctx.mkInt(0)),
-
-                                    // For each element of QE appearing in the solution, we generate
-                                    // the constraint boundvar < array_len
-                                    *it.rhs.flatMap {
-                                        muQualifiers[muName]!!.qEQualifiers[it].arrays.map {
-                                            ctx.mkLt(boundVarAsConst, ctx.mkIntConst(it))
-                                        }
-                                    }.toTypedArray(),
-
-                                    // And, finally, the elements of QI itself
-                                    *it.lhs.map { muQualifiers[muName]!!.qIQualifiers[it] }.toTypedArray()
-                            ),
+                            buildSingleLHS(boundVarAsConst, it, muName),
 
                             // Right hand side: elements of QE
                             ctx.mkAnd(
@@ -638,24 +643,7 @@ class Z3Goal(val name: String,
             ctx.mkForall(arrayOf(boundVar1AsConst, boundVar2AsConst),
                     ctx.mkImplies(
                             // Left hand side: elements of QII and index range conditions
-                            ctx.mkAnd(
-                                    // 0 <= boundvar1, 0 <= boundvar2
-                                    ctx.mkGe(boundVar1AsConst, ctx.mkInt(0)), ctx.mkGe(boundVar2AsConst, ctx.mkInt(0)),
-                                    // For every array x indexed by boundvar1 in QEE, boundvar1 < array_len
-                                    *it.rhs.flatMap {
-                                        muQualifiers[muName]!!.qEEQualifiers[it].arrays1.map {
-                                            ctx.mkLt(boundVar1AsConst, ctx.mkIntConst(it))
-                                        }
-                                    }.toTypedArray(),
-                                    // For every array x indexed by boundvar2 in QEE, boundvar2 <= array_len
-                                    *it.rhs.flatMap {
-                                        muQualifiers[muName]!!.qEEQualifiers[it].arrays2.map {
-                                            ctx.mkLt(boundVar2AsConst, ctx.mkIntConst(it))
-                                        }
-                                    }.toTypedArray(),
-                                    // and the elements of QII
-                                    *it.lhs.map { muQualifiers[muName]!!.qIIQualifiers[it] }.toTypedArray()
-                            ),
+                            buildDoubleLHS(boundVar1AsConst, boundVar2AsConst, it, muName),
                             // Right hand side: elements of QEE and index range conditions
                             ctx.mkAnd(
                                     *it.rhs.map { muQualifiers[muName]!!.qEEQualifiers[it].qualifier }.toTypedArray()
@@ -684,31 +672,97 @@ class Z3Goal(val name: String,
         )
     }
 
-    /**
-     * It traverses the AST of an assertion and returns all the predicate applications,
-     * provided they appear
-     */
-    private fun searchAppliedPredicates(assertions: List<Assertion>): Set<String> {
-        val result = mutableSetOf<String>()
+    private fun buildSingleLHS(boundVarAsConst: IntExpr?, it: Refinement, muName: String): BoolExpr {
+        return ctx.mkAnd(
+                // The constraint 0 <= boundvar
+                ctx.mkGe(boundVarAsConst, ctx.mkInt(0)),
 
-        fun traverseAssertion(assertion: Assertion) {
-            when (assertion) {
-                is PredicateApplication ->
-                    result.add(assertion.name)
-                is Not -> traverseAssertion(assertion.assertion)
-                is And -> assertion.conjuncts.forEach { traverseAssertion(it) }
-                is Or -> assertion.disjuncts.forEach { traverseAssertion(it) }
-                is Implication -> assertion.operands.forEach { traverseAssertion(it) }
-                is Iff -> assertion.operands.forEach { traverseAssertion(it) }
-                is ForAll -> traverseAssertion(assertion.assertion)
-                is Exists -> traverseAssertion(assertion.assertion)
-            }
-        }
+                // For each element of QE appearing in the solution, we generate
+                // the constraint boundvar < array_len
+                *it.rhs.flatMap {
+                    muQualifiers[muName]!!.qEQualifiers[it].arrays.map {
+                        ctx.mkLt(boundVarAsConst, ctx.mkIntConst(it))
+                    }
+                }.toTypedArray(),
 
-        assertions.forEach { traverseAssertion(it) }
-
-        return result
+                // And, finally, the elements of QI itself
+                *it.lhs.map { muQualifiers[muName]!!.qIQualifiers[it] }.toTypedArray()
+        )
     }
+
+    private fun buildDoubleLHS(boundVar1AsConst: IntExpr, boundVar2AsConst: IntExpr, refinement: Refinement, muName: String): BoolExpr {
+        return ctx.mkAnd(
+                // 0 <= boundvar1, 0 <= boundvar2
+                ctx.mkGe(boundVar1AsConst, ctx.mkInt(0)), ctx.mkGe(boundVar2AsConst, ctx.mkInt(0)),
+                // For every array x indexed by boundvar1 in QEE, boundvar1 < array_len
+                *refinement.rhs.flatMap {
+                    muQualifiers[muName]!!.qEEQualifiers[it].arrays1.map {
+                        ctx.mkLt(boundVar1AsConst, ctx.mkIntConst(it))
+                    }
+                }.toTypedArray(),
+                // For every array x indexed by boundvar2 in QEE, boundvar2 <= array_len
+                *refinement.rhs.flatMap {
+                    muQualifiers[muName]!!.qEEQualifiers[it].arrays2.map {
+                        ctx.mkLt(boundVar2AsConst, ctx.mkIntConst(it))
+                    }
+                }.toTypedArray(),
+                // and the elements of QII
+                *refinement.lhs.map { muQualifiers[muName]!!.qIIQualifiers[it] }.toTypedArray()
+        )
+    }
+
+    private fun isTrivialSingleRefinement(muName: String, refinement: Refinement, debugMessages: StringBuffer?): Boolean {
+        // We have to build a formula of the form
+        // forall i. (lhs_1 /\ lhs_2 /\ ... /\ lhs_n == false)
+        //
+        // equivalently: forall i. ¬(lhs_1 /\ lhs_2 /\ ... /\ lhs_n)
+
+        val muInfo = muQualifiers[muName]!!
+
+        val boundVar1AsConst = ctx.mkIntConst(muInfo.boundVar1)
+
+        val allLhs = ctx.mkForall(arrayOf(boundVar1AsConst),
+                ctx.mkNot(
+                        buildSingleLHS(boundVar1AsConst, refinement, muName)
+                ), 0, null, null, null, null)
+
+
+        solver.push()
+        solver.add(ctx.mkNot(allLhs))
+        debugMessages?.append("Checking whether LHS is trivial\n\n")
+        val status = checkStatus(debugMessages)
+        solver.pop()
+
+        return status == Status.UNSATISFIABLE
+    }
+
+
+    private fun isTrivialDoubleRefinement(muName: String, refinement: Refinement, debugMessages: StringBuffer?): Boolean {
+        // We have to build a formula of the form
+        // forall i, j. (lhs_1 /\ lhs_2 /\ ... /\ lhs_n == false)
+        //
+        // equivalently: forall i, j. ¬(lhs_1 /\ lhs_2 /\ ... /\ lhs_n)
+
+        val muInfo = muQualifiers[muName]!!
+
+        val boundVar1AsConst = ctx.mkIntConst(muInfo.boundVar1)
+        val boundVar2AsConst = ctx.mkIntConst(muInfo.boundVar2)
+
+        val allLhs = ctx.mkForall(arrayOf(boundVar1AsConst, boundVar2AsConst),
+                ctx.mkNot(
+                        buildDoubleLHS(boundVar1AsConst, boundVar2AsConst, refinement, muName)
+                ), 0, null, null, null, null)
+
+
+        solver.push()
+        solver.add(ctx.mkNot(allLhs))
+        debugMessages?.append("Checking whether LHS is trivial\n\n")
+        val status = checkStatus(debugMessages)
+        solver.pop()
+
+        return status == Status.UNSATISFIABLE
+    }
+
 
 }
 

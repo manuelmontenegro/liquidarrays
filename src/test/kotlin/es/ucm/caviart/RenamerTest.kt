@@ -6,23 +6,23 @@ import kotlin.test.assertEquals
 
 class RenamerTest {
     @Test fun checkFreshVar1() {
-        assertEquals("x", freshName("x", setOf()))
+        assertEquals("x_1", freshName("x", setOf()))
     }
 
     @Test fun checkFreshVar2() {
-        assertEquals("x", freshName("x", setOf("y")))
+        assertEquals("x_1", freshName("x", setOf("y")))
     }
 
     @Test fun checkFreshVar3() {
-        assertEquals("x'", freshName("x", setOf("x")))
+        assertEquals("x_1", freshName("x", setOf("x")))
     }
 
     @Test fun checkFreshVar4() {
-        assertEquals("x''", freshName("x", setOf("x", "x'")))
+        assertEquals("x_2", freshName("x", setOf("x", "x_1")))
     }
 
     @Test fun checkFreshVar5() {
-        assertEquals("x", freshName("x", setOf("x'")))
+        assertEquals("x_2", freshName("x", setOf("x_1")))
     }
 
     @Test fun renameAtomic1() {
@@ -93,43 +93,43 @@ class RenamerTest {
 
     @Test fun renameExp2() {
         val exp = "(let ((z int)) x (let ((x int)) y x))".toTerm()
-        assertEquals("(let ((z int)) v (let ((x' int)) w x'))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
+        assertEquals("(let ((z int)) v (let ((x_1 int)) w x_1))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
     }
 
     @Test fun renameExp3() {
         val exp = "(let ((x int)) x (let ((x int)) y x))".toTerm()
-        assertEquals("(let ((x' int)) v (let ((x'' int)) w x''))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
+        assertEquals("(let ((x_1 int)) v (let ((x_2 int)) w x_2))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
     }
 
     @Test fun renameExp4() {
         val exp = "(let ((x int)) x (letfun ((f1 ((x int)) ((z int)) (declare (assertion (precd true) (postcd true))) (@ + x z))) (@ f x)))".toTerm()
-        assertEquals("(let ((x' int)) v (letfun ((f1 ((x'' int)) ((z int)) (declare (assertion (precd true) (postcd true))) (@ + x'' z))) (@ f x')))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
+        assertEquals("(let ((x_1 int)) v (letfun ((f1 ((x_2 int)) ((z int)) (declare (assertion (precd true) (postcd true))) (@ + x_2 z))) (@ f x_1)))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
     }
 
     @Test fun renameExp5() {
         val exp = "(let ((x int)) x (letfun ((f1 ((x int)) ((z int)) (declare (assertion (precd (@ = x (the int 0))) (postcd true))) (@ + x z))) (@ f x)))".toTerm()
-        assertEquals("(let ((x' int)) v (letfun ((f1 ((x'' int)) ((z int)) (declare (assertion (precd (@ = x'' (the int 0))) (postcd true))) (@ + x'' z))) (@ f x')))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
+        assertEquals("(let ((x_1 int)) v (letfun ((f1 ((x_2 int)) ((z int)) (declare (assertion (precd (@ = x_2 (the int 0))) (postcd true))) (@ + x_2 z))) (@ f x_1)))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
     }
 
     @Test fun renameExp6() {
         val exp = "(let ((x int)) x (letfun ((f1 ((x int)) ((z int)) (declare (assertion (precd (@ = x z)) (postcd true))) (@ + x z))) (@ f x)))".toTerm()
-        assertEquals("(let ((x' int)) v (letfun ((f1 ((x'' int)) ((z int)) (declare (assertion (precd (@ = x'' z)) (postcd true))) (@ + x'' z))) (@ f x')))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
+        assertEquals("(let ((x_1 int)) v (letfun ((f1 ((x_2 int)) ((z int)) (declare (assertion (precd (@ = x_2 z)) (postcd true))) (@ + x_2 z))) (@ f x_1)))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
     }
 
     @Test fun renameExp7() {
-        val exp = "(let ((x int)) x (letfun ((f1 ((x int)) ((z int)) (declare (assertion (precd (@ = x z)) (postcd (@ = x'' z)))) (@ + x z))) (@ f x)))".toTerm()
-        assertEquals("(let ((x' int)) v (letfun ((f1 ((x'' int)) ((z int)) (declare (assertion (precd (@ = x'' z)) (postcd (@ = x'' z)))) (@ + x'' z))) (@ f x')))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
+        val exp = "(let ((x int)) x (letfun ((f1 ((x int)) ((z int)) (declare (assertion (precd (@ = x z)) (postcd (@ = x_2 z)))) (@ + x z))) (@ f x)))".toTerm()
+        assertEquals("(let ((x_1 int)) v (letfun ((f1 ((x_2 int)) ((z int)) (declare (assertion (precd (@ = x_2 z)) (postcd (@ = x_2 z)))) (@ + x_2 z))) (@ f x_1)))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y")).toSExp().toString())
     }
 
     @Test fun renameExp8() {
-        val exp = "(let ((x int)) x (letfun ((f1 ((x int)) ((z int)) (declare (assertion (precd (@ = x z)) (postcd (@ = x'' z)))) (let ((x int)) (the int 9) (@ + x z)))) (@ f x)))".toTerm()
-        assertEquals("(let ((x' int)) v (letfun ((f1 ((x'' int)) ((z' int)) (declare (assertion (precd (@ = x'' z)) (postcd (@ = x'' z')))) (let ((x''' int)) (the int 9) (@ + x''' z)))) (@ f x')))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y", "z")).toSExp().toString())
+        val exp = "(let ((x int)) x (letfun ((f1 ((x int)) ((z int)) (declare (assertion (precd (@ = x z)) (postcd (@ = x_2 z)))) (let ((x int)) (the int 9) (@ + x z)))) (@ f x)))".toTerm()
+        assertEquals("(let ((x_1 int)) v (letfun ((f1 ((x_2 int)) ((z_1 int)) (declare (assertion (precd (@ = x_2 z)) (postcd (@ = x_2 z_1)))) (let ((x_3 int)) (the int 9) (@ + x_3 z)))) (@ f x_1)))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y", "z")).toSExp().toString())
     }
 
 
     @Test fun renameExp9() {
-        val exp = "(let ((x int)) x (letfun ((f1 ((x int)) ((z int)) (declare (assertion (precd (@ = x z)) (postcd (@ = x'' z)))) (let ((x int)) (the int 9) (@ + x z)))) (@ f x)))".toTerm()
-        assertEquals("(let ((x' int)) v (letfun ((f1 ((x'' int)) ((z' int)) (declare (assertion (precd (@ = x'' z)) (postcd (@ = x'' z')))) (let ((x''' int)) (the int 9) (@ + x''' z)))) (@ f x')))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y", "z")).toSExp().toString())
+        val exp = "(let ((x int)) x (letfun ((f1 ((x int)) ((z int)) (declare (assertion (precd (@ = x z)) (postcd (@ = x_2 z)))) (let ((x int)) (the int 9) (@ + x z)))) (@ f x)))".toTerm()
+        assertEquals("(let ((x_1 int)) v (letfun ((f1 ((x_2 int)) ((z_1 int)) (declare (assertion (precd (@ = x_2 z)) (postcd (@ = x_2 z_1)))) (let ((x_3 int)) (the int 9) (@ + x_3 z)))) (@ f x_1)))", exp.applyRenaming(mapOf("y" to "w", "x" to "v"), setOf("x", "y", "z")).toSExp().toString())
     }
 
     @Test fun renameExp10() {
@@ -139,7 +139,7 @@ class RenamerTest {
 
     @Test fun renameExp11() {
         val exp = "(case x (((@@ C x z) (let ((x int)) x x))))".toTerm()
-        assertEquals("(case t (((@@ C x' z) (let ((x'' int)) x' x''))))", exp.applyRenaming(mapOf("x" to "t"), setOf("x")).toSExp().toString())
+        assertEquals("(case t (((@@ C x_1 z) (let ((x_2 int)) x_1 x_2))))", exp.applyRenaming(mapOf("x" to "t"), setOf("x")).toSExp().toString())
     }
 
     @Test fun renameDef1() {
@@ -149,12 +149,12 @@ class RenamerTest {
 
     @Test fun renameDef2() {
         val def = "(f ((x int)) ((y (qual nu int (@ < nu x)))) (declare (assertion (precd true) (postcd true))) (@ + x y))".toDef()
-        assertEquals("(f ((x' int)) ((y (qual nu int (@ < nu x')))) (declare (assertion (precd true) (postcd true))) (@ + x' y))", def.applyRenaming(mapOf(), setOf("x")).toSExp().toString())
+        assertEquals("(f ((x_1 int)) ((y (qual nu int (@ < nu x_1)))) (declare (assertion (precd true) (postcd true))) (@ + x_1 y))", def.applyRenaming(mapOf(), setOf("x")).toSExp().toString())
     }
 
     @Test fun renameDef3() {
-        val def = "(f ((x int)) ((y (qual x' int (@ < x' x)))) (declare (assertion (precd true) (postcd true))) (@ + x y))".toDef()
-        assertEquals("(f ((x' int)) ((y (qual x'' int (@ < x'' x')))) (declare (assertion (precd true) (postcd true))) (@ + x' y))", def.applyRenaming(mapOf(), setOf("x")).toSExp().toString())
+        val def = "(f ((x int)) ((y (qual x_1 int (@ < x_1 x)))) (declare (assertion (precd true) (postcd true))) (@ + x y))".toDef()
+        assertEquals("(f ((x_1 int)) ((y (qual x_1_1 int (@ < x_1_1 x_1)))) (declare (assertion (precd true) (postcd true))) (@ + x_1 y))", def.applyRenaming(mapOf(), setOf("x")).toSExp().toString())
     }
 
 }

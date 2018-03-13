@@ -23,6 +23,9 @@
 
 package es.ucm.caviart.ast
 
+import es.ucm.caviart.qstar.applySubstitution
+import es.ucm.caviart.utils.FreshNameGenerator
+
 /*
  * This module exports the `toSExp` method, which allows one to translate an AST
  * element into its corresponding CLIR representation.
@@ -167,29 +170,40 @@ fun MuDeclaration.toSExp(): SExp {
 
     fun getSingle(name: String, qSet: Set<SingleQualifier>): SExp {
         val boundVars = qSet.map { it.boundVar }.toSet()
-        if (boundVars.size > 1)
-            throw InvalidQualifierSet(this.line, this.column, boundVars)
+        val (substitution, newBV) = if (boundVars.size > 1) {
+            val freshName = FreshNameGenerator.nextName("_i")
+            Pair(boundVars.map { it to Variable(freshName) }.toMap(), freshName)
+        } else Pair(emptyMap(), if (boundVars.isEmpty()) "i" else boundVars.first())
+
 
         return if (qSet.isEmpty()) {
-            s(t(name), t(if (boundVars.isEmpty()) "i" else boundVars.first()))
+            s(t(name), t(newBV))
         } else {
-            s(t(name), t(if (boundVars.isEmpty()) "i" else boundVars.first()), *(qSet.map { it.assertion.toSExp() }.toTypedArray()))
+            s(t(name), t(if (boundVars.isEmpty()) "i" else boundVars.first()), *(qSet.map { it.assertion.applySubstitution(substitution).toSExp() }.toTypedArray()))
         }
     }
 
     fun getDouble(name: String, qSet: Set<DoubleQualifier>): SExp {
         val boundVars1 = qSet.map { it.boundVar1 }.toSet()
-        if (boundVars1.size > 1)
-            throw InvalidQualifierSet(this.line, this.column, boundVars1)
+        val (substitution1, newBV1) = if (boundVars1.size > 1) {
+            val freshName = FreshNameGenerator.nextName("_i")
+            Pair(boundVars1.map { it to Variable(freshName) }.toMap(), freshName)
+        } else Pair(emptyMap(), if (boundVars1.isEmpty()) "i" else boundVars1.first())
 
         val boundVars2 = qSet.map { it.boundVar2 }.toSet()
-        if (boundVars2.size > 1)
-            throw InvalidQualifierSet(this.line, this.column, boundVars2)
+        val (substitution2, newBV2) = if (boundVars2.size > 1) {
+            val freshName = FreshNameGenerator.nextName("_j")
+            Pair(boundVars2.map { it to Variable(freshName) }.toMap(), freshName)
+        } else Pair(emptyMap(), if (boundVars1.isEmpty()) "j" else boundVars1.first())
+
+        val substitution = substitution1 + substitution2
+
 
         return if (qSet.isEmpty()) {
-            s(t(name), t(if (boundVars1.isEmpty()) "i" else boundVars1.first()), t(if (boundVars2.isEmpty()) "j" else boundVars2.first()))
+            s(t(name), t(newBV1), t(if (boundVars2.isEmpty()) "j" else boundVars2.first()))
         } else {
-            s(t(name), t(if (boundVars1.isEmpty()) "i" else boundVars1.first()), t(if (boundVars2.isEmpty()) "j" else boundVars2.first()), *(qSet.map { it.assertion.toSExp() }.toTypedArray()))
+            s(t(name), t(newBV2), t(if (boundVars2.isEmpty()) "j" else boundVars2.first()),
+                    *(qSet.map { it.assertion.applySubstitution(substitution).toSExp() }.toTypedArray()))
         }
 
     }
@@ -272,7 +286,7 @@ fun VerificationUnit.toSExpList(): List<SExp> {
         if (boundVars1.size > 1) {
             throw InvalidQualifierSet(0, 0, boundVars1)
         }
-        val boundVars2 = qSet.map { it.boundVar1 }.toSet()
+        val boundVars2 = qSet.map { it.boundVar2 }.toSet()
         if (boundVars2.size > 1) {
             throw InvalidQualifierSet(0, 0, boundVars2)
         }

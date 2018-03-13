@@ -28,16 +28,13 @@ import es.ucm.caviart.goal.generateForDefinition
 import es.ucm.caviart.iterativeweakening.*
 import es.ucm.caviart.iterativeweakening.z3.*
 import es.ucm.caviart.qstar.instantiateVerificationUnit
-import es.ucm.caviart.utils.asDarkGray
-import es.ucm.caviart.utils.asGreen
-import es.ucm.caviart.utils.asRed
 import kotlin.math.min
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.DefaultHelpFormatter
 import com.xenomachina.argparser.default
 import com.xenomachina.argparser.mainBody
 import es.ucm.caviart.typecheck.*
-import es.ucm.caviart.utils.FormulaCounter
+import es.ucm.caviart.utils.*
 import java.io.*
 
 
@@ -59,6 +56,12 @@ class CLIArguments(parser: ArgParser) {
 
     val outputFile: String? by
     parser.storing("-o", "--output", help = "write output to file", argName = "FILE_MD").default { null }
+
+    val pruneTrivial: Boolean by
+    parser.flagging("-p", "--prune-trivial", help = "prune trivial refinements").default(false)
+
+    val timeout: Long by
+    parser.storing("--timeout", help = "solver timeout (in milliseconds)", argName = "NUMBER") { this.toLong() }.default(5000)
 }
 
 /**
@@ -120,22 +123,36 @@ fun main(args: Array<String>) = mainBody("liquidarrays") {
         // The latter contain information about array accesses in each qualifier. Those are needed when including
         // the 0 <= i < len(x) assumption in each refinement that accesses the array `x` in its right-hand side
         val (kappas, mus) = preprocessKappasAndMus(verificationUnitRenamed)
-
-        // We convert each goal into its Z3 representation
-        val generatedGoalsZ3: List<Z3Goal> = convertGoalsToZ3(goals, kappas, mus, newEnvironment)
-
         val kappasMap = kappas.map { it.name to it }.toMap()
         val musMap = mus.map { it.name to it }.toMap()
 
+        val (goalsWithClonedTemplates, cloneMap, inverseCloneMap, kappasCloned, musCloned) = cloneTemplates(goals, kappasMap, musMap)
+
+
+        // We convert each goal into its Z3 representation
+        val generatedGoalsZ3: List<Z3Goal> = convertGoalsToZ3(
+                goalsWithClonedTemplates,
+                kappasCloned.values.toList(), musCloned.values.toList(),
+                newEnvironment,
+                parsedArgs.pruneTrivial, parsedArgs.timeout)
+
         // Finally, we find a solution by iterative weakening
-        val solution: Solution = findSolution(generatedGoalsZ3, kappasMap, musMap, parsedArgs.trace)
+        val solution: Solution = findSolution(generatedGoalsZ3, kappasCloned, musCloned, cloneMap, inverseCloneMap, parsedArgs.trace)
 
         println("\nSolution found!".asGreen())
 
         // We look in the environment all the user-defined functions
         val userDefTypes = newEnvironment.programFunctions.filterKeys { !initialEnvironment.programFunctions.containsKey(it) }
+
+        // We remove from the solution the cloned kappas and mus
+        val prunedSolution =
+                Solution(
+                        kappas = (solution.kappas - cloneMap.keys).toMutableMap(),
+                        mus = (solution.mus - cloneMap.keys).toMutableMap()
+                )
+
         // Write the solution in the standard output or a file
-        writeSolution(parsedArgs.outputFile, userDefTypes, solution, kappasMap, musMap)
+        writeSolution(parsedArgs.outputFile, userDefTypes, prunedSolution, kappasCloned, musCloned)
 
     } catch (e: IOException) {
         println("Error:".asRed() + " " + e.message)
@@ -143,8 +160,100 @@ fun main(args: Array<String>) = mainBody("liquidarrays") {
         println(("Type checker error: ".asRed()) + " " + e.message)
     } catch (e: CannotWeakenGoalException) {
         println("Solver error: ${e.message}")
+    } catch (e: LiquidException) {
+        println("Error: ".asRed() + " " + e.message)
     }
 }
+
+
+/**
+ * Given a list of goals, kappas and mus, it traverses each goal in which the same kappa occurs in
+ * both the assumptions and the conclusion of the goal. In this case, the conclusion must be changed
+ * so that, instead containing the application of the kappa (or mu), it contains the application
+ * of a *copy* of that kappa (or mu), so later we can apply iterative weakening in the right hand
+ * side by changing the solution while maintaining the left hand side intact.
+ *
+ * It returns a CloneResult structure made of:
+ *    - The updated goals
+ *    - A clone map: it indicates the correspondence between the newly generated kappas and mus (i.e. the clones)
+ *                   and the original kappas. This will be needed by the weakening algorithm to maintain them in sync.
+ *    - The updated kappa definitions (possibly with new kappas that are copies from existing ones)
+ *    - The updated mu definitions (idem)
+ */
+fun cloneTemplates(goals: List<Goal>, kappas: Map<String, Kappa>, mus: Map<String, Mu>): CloneResult {
+    // Newly generated kappas and mus
+    val newKappas: MutableMap<String, Kappa> = mutableMapOf()
+    val newMus: MutableMap<String, Mu> = mutableMapOf()
+
+    // Map from the clones to the originals
+    val cloneMap: MutableMap<String, String> = mutableMapOf()
+
+    // Map from the original to the clones (to know whether a kappa or mu has already been cloned)
+    val cloneInverseMap: MutableMap<String, String> = mutableMapOf()
+
+    // This function generates the name of a clone from the name of the original
+    fun cloneName(baseName: String): String = "${baseName}_${FreshNameGenerator.nextName("clone")}"
+
+    val clonedGoals = goals.map {
+        when {
+        // If the conclusion of a goal is a kappa that occurs in the assumptions
+        // we have to clone it, if it is not already cloned
+            it.conclusion is PredicateApplication
+                    && it.conclusion.name in kappas.keys
+                    && it.conclusion.name in findAppliedPredicates(it.assumptions) -> {
+                val kappaName = it.conclusion.name
+                val existingClonedName = cloneInverseMap[kappaName]
+
+                // It had been cloned before?
+                val clonedKappaName = if (existingClonedName != null) {
+                    existingClonedName
+                } else {
+                    // In case it is not, we generate a new clone
+                    val newName = cloneName(kappaName)
+                    cloneMap[newName] = kappaName
+                    cloneInverseMap[kappaName] = newName
+                    newKappas[newName] = kappas[kappaName]!!.copy(name = newName)
+                    newName
+                }
+                // In any case, we have to change the conclusion of the goal in order to
+                // have the cloned kappa or mu in its conclusion
+                it.copy(conclusion = PredicateApplication(clonedKappaName, it.conclusion.arguments))
+            }
+
+        // Idem, but with the mus
+            it.conclusion is PredicateApplication
+                    && it.conclusion.name in mus.keys
+                    && it.conclusion.name in findAppliedPredicates(it.assumptions) -> {
+                val muName = it.conclusion.name
+                val existingClonedName = cloneInverseMap[muName]
+                val clonedMuName = if (existingClonedName != null) {
+                    existingClonedName
+                } else {
+                    val newName = cloneName(muName)
+                    cloneMap[newName] = muName
+                    cloneInverseMap[muName] = newName
+                    newMus[newName] = mus[muName]!!.copy(name = newName)
+                    newName
+                }
+                it.copy(conclusion = PredicateApplication(clonedMuName, it.conclusion.arguments))
+            }
+
+        // In other case, we leave the goal as is
+            else -> it
+        }
+    }
+
+    if (newKappas.isNotEmpty()) println("     Cloned ${newKappas.size} kappas")
+    if (newMus.isNotEmpty()) println("     Cloned ${newMus.size} mus")
+
+    return CloneResult(clonedGoals, cloneMap, cloneInverseMap, kappas + newKappas, mus + newMus)
+}
+
+data class CloneResult(val goals: List<Goal>,
+                       val cloneMap: Map<String, String>,
+                       val cloneInverseMap: Map<String, String>,
+                       val kappas: Map<String, Kappa>,
+                       val mus: Map<String, Mu>)
 
 
 // Whenever the program executes a phase, it shows the name of
@@ -331,7 +440,7 @@ private fun preprocessKappasAndMus(verificationUnitRenamed: VerificationUnit): P
 /**
  * It converts the instaces of Goal class into a Z3 goal, including their corresponding kappas and mus.
  */
-private fun convertGoalsToZ3(goals: List<Goal>, kappas: List<Kappa>, mus: List<Mu>, environment: GlobalEnvironment): List<Z3Goal> {
+private fun convertGoalsToZ3(goals: List<Goal>, kappas: List<Kappa>, mus: List<Mu>, environment: GlobalEnvironment, pruneTrivial: Boolean, timeout: Long): List<Z3Goal> {
     return runPhase("Transforming goals into Z3") {
         val kappaIndices = kappas.map { it.name to getArrayParams(it.arguments) }.toMap()
         val muIndices = mus.map { it.name to getArrayParams(it.arguments) }.toMap()
@@ -360,7 +469,9 @@ private fun convertGoalsToZ3(goals: List<Goal>, kappas: List<Kappa>, mus: List<M
                     kappaIndices = kappaLenIndices,
                     muIndices = muLenIndices,
                     declarationMap = environment.logicFunctions +
-                            environment.logicPredicates.mapValues { (_, args) -> UninterpretedFunctionType(args, boolType) }
+                            environment.logicPredicates.mapValues { (_, args) -> UninterpretedFunctionType(args, boolType) },
+                    pruneTrivialLHS = pruneTrivial,
+                    timeout = timeout
             )
         }
     }
@@ -369,7 +480,11 @@ private fun convertGoalsToZ3(goals: List<Goal>, kappas: List<Kappa>, mus: List<M
 /**
  * It runs the iterative weakening algorithm on a list of goals
  */
-private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: Map<String, Mu>, traceFileName: String?): Solution {
+private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>,
+                         mus: Map<String, Mu>,
+                         cloneMap: Map<String, String>,
+                         inverseCloneMap: Map<String, String>,
+                         traceFileName: String?): Solution {
 
     val buffer = if (traceFileName != null) StringBuffer() else null
 
@@ -379,7 +494,7 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
 
         val goalsMap = goals.map { it.name to it }.toMap()
         val pending = goalsMap.keys.toMutableSet()
-        var stepNumber = 1
+        var stepNumber = 0
         FormulaCounter.reset()
 
         while (!pending.isEmpty()) {
@@ -390,6 +505,7 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
             val goalId = pending.first()
             pending.remove(goalId)
             val goal = goalsMap[goalId]!!
+
             print("   - $goalId: ")
             val result = goal.check(solution, buffer)
             buffer?.append("\n\n")
@@ -398,17 +514,67 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
                     println("valid".asGreen())
                 }
                 is CannotWeaken -> {
-                    println("error".asRed())
+                    println("cannot weaken".asRed())
+                    if (traceFileName != null) {
+                        writeTraceFile(traceFileName, buffer!!)
+                    }
                     throw CannotWeakenGoalException(goalId, solution.toString(kappas, mus))
                 }
                 is KappaWeakened -> {
                     val affected = goalsMap.filterValues { result.varName in it.mentionedKappas }.map { it.key }
                     pending.addAll(affected)
+                    val originalName = cloneMap[result.varName]
+                    val clonedName = inverseCloneMap[result.varName]
+
+                    // If we have weakened a cloned kappa
+                    if (originalName != null) {
+                        // We synchronize the original with the recently weakened one
+                        solution.kappas[originalName] = solution.kappas[result.varName]!!
+
+                        // We have to look for those original ones to add them as pending
+                        val newAffected = goalsMap.filterValues { originalName in it.mentionedKappas }.map { it.key }
+                        pending.addAll(newAffected)
+                    }
+
+                    // If we have weakened a kappa for which there exist a cloned one
+                    if (clonedName != null) {
+                        // We synchronize the clone with the recently weakened one
+                        solution.kappas[clonedName] = solution.kappas[result.varName]!!
+
+                        // We have to look for the clones ones to add them as pending
+                        val newAffected = goalsMap.filterValues { clonedName in it.mentionedKappas }.map { it.key }
+                        pending.addAll(newAffected)
+                    }
+
                     println("had to weaken ${result.varName}")
                 }
                 is MuWeakened -> {
                     val affected = goalsMap.filterValues { result.varName in it.mentionedMus }.map { it.key }
                     pending.addAll(affected)
+
+                    val originalName = cloneMap[result.varName]
+                    val clonedName = inverseCloneMap[result.varName]
+
+                    // If we have weakened a cloned mu
+                    if (originalName != null) {
+                        // We synchronize the original with the recently weakened one
+                        solution.mus[originalName] = solution.mus[result.varName]!!
+
+                        // We have to look for those original ones to add them as pending
+                        val newAffected = goalsMap.filterValues { originalName in it.mentionedMus }.map { it.key }
+                        pending.addAll(newAffected)
+                    }
+
+                    // If we have weakened a kappa for which there exist a cloned one
+                    if (clonedName != null) {
+                        // We synchronize the clone with the recently weakened one
+                        solution.mus[clonedName] = solution.mus[result.varName]!!
+
+                        // We have to look for the clones ones to add them as pending
+                        val newAffected = goalsMap.filterValues { clonedName in it.mentionedMus }.map { it.key }
+                        pending.addAll(newAffected)
+                    }
+
                     println("had to weaken ${result.varName}")
                 }
             }
@@ -420,20 +586,28 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>, mus: M
     }
 
     if (traceFileName != null) {
-        val traceFile = File(traceFileName)
-        val traceWriter = FileWriter(traceFile)
-        traceWriter.write(buffer!!.toString())
-        traceWriter.close()
-        println("Trace written to: ${traceFile.name}")
+        writeTraceFile(traceFileName, buffer!!)
     }
 
     return result
 }
 
+private fun writeTraceFile(traceFileName: String, buffer: StringBuffer) {
+    val traceFile = File(traceFileName)
+    val traceWriter = FileWriter(traceFile)
+    traceWriter.write(buffer.toString())
+    traceWriter.close()
+    println("Trace written to: ${traceFile.name}")
+}
+
 /**
  * It writes the given solution to a file, together with the types of the functions
  */
-private fun writeSolution(outputFile: String?, environment: Map<String, FunctionalType>, solution: Solution, kappasMap: Map<String, Kappa>, musMap: Map<String, Mu>) {
+private fun writeSolution(outputFile: String?,
+                          environment: Map<String, FunctionalType>,
+                          solution: Solution,
+                          kappasMap: Map<String, Kappa>,
+                          musMap: Map<String, Mu>) {
     val outputWriter: PrintStream = if (outputFile != null) {
         PrintStream(FileOutputStream(outputFile))
     } else {
@@ -448,11 +622,12 @@ private fun writeSolution(outputFile: String?, environment: Map<String, Function
         }
 
         outputWriter.println("\nOutput parameters:\n")
-        ft.input.forEach {
+        ft.output.forEach {
             outputWriter.println(" * `${it.varName}` of type `${it.type.toSExp()}`")
         }
         outputWriter.println("")
     }
+
     outputWriter.println("## Solution\n")
     outputWriter.println(solution.toString(kappasMap, musMap))
     if (outputFile != null) {
@@ -461,6 +636,4 @@ private fun writeSolution(outputFile: String?, environment: Map<String, Function
 }
 
 
-
-
-class CannotWeakenGoalException(goalName: String, solution: String): RuntimeException("Cannot weaken goal $goalName under the following solution:\n$solution")
+class CannotWeakenGoalException(goalName: String, solution: String) : RuntimeException("Cannot weaken goal $goalName under the following solution:\n$solution")

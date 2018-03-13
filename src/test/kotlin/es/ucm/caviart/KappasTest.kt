@@ -42,7 +42,8 @@ class KappasTest {
             mapOf(),
             mapOf("kappa1" to setOf()),
             mapOf(),
-            mapOf()
+            mapOf(),
+            false, 5000
     )
 
     private val goalG2 = Z3Goal(
@@ -55,7 +56,7 @@ class KappasTest {
             mapOf(),
             mapOf("kappa1" to setOf()),
             mapOf(),
-            mapOf()
+            mapOf(), false, 5000
     )
 
     private val goalG3 = Z3Goal(
@@ -68,7 +69,7 @@ class KappasTest {
             mapOf(),
             mapOf("kappa1" to setOf()),
             mapOf(),
-            mapOf()
+            mapOf(), false, 5000
     )
 
     @Test fun namedKappasG1() {

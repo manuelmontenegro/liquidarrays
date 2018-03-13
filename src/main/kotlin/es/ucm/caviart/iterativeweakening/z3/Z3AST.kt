@@ -27,6 +27,7 @@ package es.ucm.caviart.iterativeweakening.z3
 
 import com.microsoft.z3.*
 import es.ucm.caviart.ast.*
+import es.ucm.caviart.utils.LiquidException
 
 /**
  * Functions for converting an AST structure to a Z3's AST
@@ -339,10 +340,10 @@ fun UninterpretedFunctionType.toFuncDecl(name: String, ctx: Context): FuncDecl =
         ctx.mkFuncDecl(name, argumentTypes.map { it.toZ3Sort(ctx) }.toTypedArray(), resultType.toZ3Sort(ctx))
 
 
-class UnsupportedZ3AST(term: ASTElem) : RuntimeException("Cannot convert to Z3: $term")
-class UnsupportedZ3ArithExpr(term: ASTElem) : RuntimeException("Cannot use as arithmetic expression: $term")
-class UnsupportedZ3ArrayExpr(term: ASTElem) : RuntimeException("Cannot use as array expression: $term")
-class UnsupportedTypeException(t: Type) : RuntimeException("Unsupported type $t")
-class UndefinedVariable(name: String) : RuntimeException("Undefined variable $name")
-class UndefinedFunction(name: String) : RuntimeException("Undefined function $name")
-class Z3TypeMismatch(sort: Sort) : RuntimeException("HMType mismatch ${sort.sExpr}")
+class UnsupportedZ3AST(term: ASTElem) : LiquidException("Cannot convert to Z3: $term")
+class UnsupportedZ3ArithExpr(term: ASTElem) : LiquidException("Cannot use as arithmetic expression: $term")
+class UnsupportedZ3ArrayExpr(term: ASTElem) : LiquidException("Cannot use as array expression: $term")
+class UnsupportedTypeException(t: Type) : LiquidException("Unsupported type $t")
+class UndefinedVariable(name: String) : LiquidException("Undefined variable $name")
+class UndefinedFunction(name: String) : LiquidException("Undefined function $name")
+class Z3TypeMismatch(sort: Sort) : LiquidException("HMType mismatch ${sort.sExpr}")
