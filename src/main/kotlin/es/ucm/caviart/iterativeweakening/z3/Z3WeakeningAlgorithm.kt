@@ -344,6 +344,7 @@ class Z3Goal(val name: String,
             return verdict
         } catch (e: Z3Exception) {
             print("T")
+            debugMessages?.append("*Timeout*\n\n")
             return Status.UNKNOWN
         }
     }
