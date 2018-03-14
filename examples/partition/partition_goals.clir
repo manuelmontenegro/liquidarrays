@@ -1,0 +1,1145 @@
+# Goals for `partition_pruned.clir`
+
+## Goal `G_1`
+
+Precondition of partition must imply the qualifier of its parameter a
+
+**For all**:
+
+  * `a` of type `(array int)`
+
+**such that**:
+
+  * `(@ < (the int 0) (@ len a))`
+
+**Prove:** `(@ _mu_partition_a a)`
+
+## Goal `G_2`
+
+The qualified type of the result of partition must imply its postcondition
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `pend` of type `int`
+  * `res` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition_pend pend a)`
+  * `(@ _mu_partition_res res a pend)`
+
+**Prove:** `(and (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i pend)) (@ <= (@ get-array res i) (@ get-array res pend)))) (forall ((i int)) (-> (and (@ <= pend i) (@ < i (@ len res))) (@ >= (@ get-array res i) (@ get-array res pend)))) (@ <= (the int 0) pend) (@ < pend (@ len res)))`
+
+## Goal `G_3`
+
+Precondition of partition-rec must imply the qualifier of its parameter p
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `false`
+
+**Prove:** `(@ _kappa_partition-rec_p p a)`
+
+## Goal `G_4`
+
+Precondition of partition-rec must imply the qualifier of its parameter l
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `false`
+
+**Prove:** `(@ _kappa_partition-rec_l l a p)`
+
+## Goal `G_5`
+
+Precondition of partition-rec must imply the qualifier of its parameter a_1
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `false`
+
+**Prove:** `(@ _mu_partition-rec_a a_1 a p l)`
+
+## Goal `G_6`
+
+The qualified type of the result of partition-rec must imply its postcondition
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `pend` of type `int`
+  * `res` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ _kappa_partition-rec_pend pend p l a_1)`
+  * `(@ _mu_partition-rec_res res p l a_1 pend)`
+
+**Prove:** `true`
+
+## Goal `G_7`
+
+Precondition of parameter x_0 in call to +
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `_NU_1` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = _NU_1 p)`
+
+**Prove:** `true`
+
+## Goal `G_8`
+
+Precondition of parameter x_1 in call to +
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `_NU_2` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = _NU_2 (the int 1))`
+
+**Prove:** `true`
+
+## Goal `G_9`
+
+Precondition of parameter x_0 in call to =
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `_NU_3` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(@ = _NU_3 p1)`
+
+**Prove:** `true`
+
+## Goal `G_10`
+
+Precondition of parameter x_1 in call to =
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `_NU_4` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(@ = _NU_4 l)`
+
+**Prove:** `true`
+
+## Goal `G_11`
+
+The type of (tuple p a_1) must match the type of the result #1 of partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `_X_3` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `b`
+  * `(@ = _X_3 p)`
+
+**Prove:** `(@ _kappa_partition-rec_pend _X_3 p l a_1)`
+
+## Goal `G_12`
+
+The type of (tuple p a_1) must match the type of the result #2 of partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `_X_3` of type `int`
+  * `_X_4` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `b`
+  * `(@ = _X_3 p)`
+  * `(and (@ =[] _X_4 a_1) (@ = (@ len _X_4) (@ len a_1)))`
+
+**Prove:** `(@ _mu_partition-rec_res _X_4 p l a_1 _X_3)`
+
+## Goal `G_13`
+
+Precondition of parameter i in call to get-array
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `_NU_9` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = _NU_9 p)`
+
+**Prove:** `(and (@ <= (the int 0) _NU_9) (@ < _NU_9 (@ len a_1)))`
+
+## Goal `G_14`
+
+Precondition of parameter i in call to get-array
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `_NU_11` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = _NU_11 p1)`
+
+**Prove:** `(and (@ <= (the int 0) _NU_11) (@ < _NU_11 (@ len a_1)))`
+
+## Goal `G_15`
+
+Precondition of parameter x_0 in call to >
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `_NU_12` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(@ = _NU_12 ap)`
+
+**Prove:** `true`
+
+## Goal `G_16`
+
+Precondition of parameter x_1 in call to >
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `_NU_13` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(@ = _NU_13 ap1)`
+
+**Prove:** `true`
+
+## Goal `G_17`
+
+Precondition of parameter i in call to set-array
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `_NU_16` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `b1`
+  * `(@ = _NU_16 p)`
+
+**Prove:** `(and (@ <= (the int 0) _NU_16) (@ < _NU_16 (@ len a_1)))`
+
+## Goal `G_18`
+
+Precondition of parameter i in call to set-array
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `anext1` of type `(array int)`
+  * `_NU_19` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `b1`
+  * `(and (@ =[] anext1 (@ set-array a_1 p ap1)) (@ = (@ len anext1) (@ len a_1)))`
+  * `(@ = _NU_19 p1)`
+
+**Prove:** `(and (@ <= (the int 0) _NU_19) (@ < _NU_19 (@ len anext1)))`
+
+## Goal `G_19`
+
+Precondition of parameter p in call to partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `anext1` of type `(array int)`
+  * `anext2` of type `(array int)`
+  * `_NU_21` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `b1`
+  * `(and (@ =[] anext1 (@ set-array a_1 p ap1)) (@ = (@ len anext1) (@ len a_1)))`
+  * `(and (@ =[] anext2 (@ set-array anext1 p1 ap)) (@ = (@ len anext2) (@ len anext1)))`
+  * `(@ = _NU_21 p1)`
+
+**Prove:** `(@ _kappa_partition-rec_p _NU_21 anext2)`
+
+## Goal `G_20`
+
+Precondition of parameter l in call to partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `anext1` of type `(array int)`
+  * `anext2` of type `(array int)`
+  * `_NU_22` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `b1`
+  * `(and (@ =[] anext1 (@ set-array a_1 p ap1)) (@ = (@ len anext1) (@ len a_1)))`
+  * `(and (@ =[] anext2 (@ set-array anext1 p1 ap)) (@ = (@ len anext2) (@ len anext1)))`
+  * `(@ = _NU_22 l)`
+
+**Prove:** `(@ _kappa_partition-rec_l _NU_22 anext2 p1)`
+
+## Goal `G_21`
+
+Precondition of parameter a in call to partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `anext1` of type `(array int)`
+  * `anext2` of type `(array int)`
+  * `_NU_23` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `b1`
+  * `(and (@ =[] anext1 (@ set-array a_1 p ap1)) (@ = (@ len anext1) (@ len a_1)))`
+  * `(and (@ =[] anext2 (@ set-array anext1 p1 ap)) (@ = (@ len anext2) (@ len anext1)))`
+  * `(and (@ =[] _NU_23 anext2) (@ = (@ len _NU_23) (@ len anext2)))`
+
+**Prove:** `(@ _mu_partition-rec_a _NU_23 anext2 p1 l)`
+
+## Goal `G_22`
+
+The type of (@ partition-rec p1 l anext2) must match the type of the result #1 of partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `anext1` of type `(array int)`
+  * `anext2` of type `(array int)`
+  * `_X_10` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `b1`
+  * `(and (@ =[] anext1 (@ set-array a_1 p ap1)) (@ = (@ len anext1) (@ len a_1)))`
+  * `(and (@ =[] anext2 (@ set-array anext1 p1 ap)) (@ = (@ len anext2) (@ len anext1)))`
+  * `(@ _kappa_partition-rec_pend _X_10 p1 l anext2)`
+
+**Prove:** `(@ _kappa_partition-rec_pend _X_10 p l a_1)`
+
+## Goal `G_23`
+
+The type of (@ partition-rec p1 l anext2) must match the type of the result #2 of partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `anext1` of type `(array int)`
+  * `anext2` of type `(array int)`
+  * `_X_10` of type `int`
+  * `_X_11` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `b1`
+  * `(and (@ =[] anext1 (@ set-array a_1 p ap1)) (@ = (@ len anext1) (@ len a_1)))`
+  * `(and (@ =[] anext2 (@ set-array anext1 p1 ap)) (@ = (@ len anext2) (@ len anext1)))`
+  * `(@ _kappa_partition-rec_pend _X_10 p1 l anext2)`
+  * `(@ _mu_partition-rec_res _X_11 p1 l anext2 _X_10)`
+
+**Prove:** `(@ _mu_partition-rec_res _X_11 p l a_1 _X_10)`
+
+## Goal `G_24`
+
+Precondition of parameter x_0 in call to -
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `_NU_24` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = _NU_24 l)`
+
+**Prove:** `true`
+
+## Goal `G_25`
+
+Precondition of parameter x_1 in call to -
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `_NU_25` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = _NU_25 (the int 1))`
+
+**Prove:** `true`
+
+## Goal `G_26`
+
+Precondition of parameter i in call to get-array
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `l1` of type `int`
+  * `_NU_27` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = l1 (@ - l (the int 1)))`
+  * `(@ = _NU_27 l1)`
+
+**Prove:** `(and (@ <= (the int 0) _NU_27) (@ < _NU_27 (@ len a_1)))`
+
+## Goal `G_27`
+
+Precondition of parameter i in call to set-array
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `l1` of type `int`
+  * `al1` of type `int`
+  * `_NU_29` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = l1 (@ - l (the int 1)))`
+  * `(@ = al1 (@ get-array a_1 l1))`
+  * `(@ = _NU_29 p1)`
+
+**Prove:** `(and (@ <= (the int 0) _NU_29) (@ < _NU_29 (@ len a_1)))`
+
+## Goal `G_28`
+
+Precondition of parameter i in call to set-array
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `l1` of type `int`
+  * `al1` of type `int`
+  * `anext3` of type `(array int)`
+  * `_NU_32` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = l1 (@ - l (the int 1)))`
+  * `(@ = al1 (@ get-array a_1 l1))`
+  * `(and (@ =[] anext3 (@ set-array a_1 p1 al1)) (@ = (@ len anext3) (@ len a_1)))`
+  * `(@ = _NU_32 l1)`
+
+**Prove:** `(and (@ <= (the int 0) _NU_32) (@ < _NU_32 (@ len anext3)))`
+
+## Goal `G_29`
+
+Precondition of parameter p in call to partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `l1` of type `int`
+  * `al1` of type `int`
+  * `anext3` of type `(array int)`
+  * `anext4` of type `(array int)`
+  * `_NU_34` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = l1 (@ - l (the int 1)))`
+  * `(@ = al1 (@ get-array a_1 l1))`
+  * `(and (@ =[] anext3 (@ set-array a_1 p1 al1)) (@ = (@ len anext3) (@ len a_1)))`
+  * `(and (@ =[] anext4 (@ set-array anext3 l1 ap1)) (@ = (@ len anext4) (@ len anext3)))`
+  * `(@ = _NU_34 p)`
+
+**Prove:** `(@ _kappa_partition-rec_p _NU_34 anext4)`
+
+## Goal `G_30`
+
+Precondition of parameter l in call to partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `l1` of type `int`
+  * `al1` of type `int`
+  * `anext3` of type `(array int)`
+  * `anext4` of type `(array int)`
+  * `_NU_35` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = l1 (@ - l (the int 1)))`
+  * `(@ = al1 (@ get-array a_1 l1))`
+  * `(and (@ =[] anext3 (@ set-array a_1 p1 al1)) (@ = (@ len anext3) (@ len a_1)))`
+  * `(and (@ =[] anext4 (@ set-array anext3 l1 ap1)) (@ = (@ len anext4) (@ len anext3)))`
+  * `(@ = _NU_35 l1)`
+
+**Prove:** `(@ _kappa_partition-rec_l _NU_35 anext4 p)`
+
+## Goal `G_31`
+
+Precondition of parameter a in call to partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `l1` of type `int`
+  * `al1` of type `int`
+  * `anext3` of type `(array int)`
+  * `anext4` of type `(array int)`
+  * `_NU_36` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = l1 (@ - l (the int 1)))`
+  * `(@ = al1 (@ get-array a_1 l1))`
+  * `(and (@ =[] anext3 (@ set-array a_1 p1 al1)) (@ = (@ len anext3) (@ len a_1)))`
+  * `(and (@ =[] anext4 (@ set-array anext3 l1 ap1)) (@ = (@ len anext4) (@ len anext3)))`
+  * `(and (@ =[] _NU_36 anext4) (@ = (@ len _NU_36) (@ len anext4)))`
+
+**Prove:** `(@ _mu_partition-rec_a _NU_36 anext4 p l1)`
+
+## Goal `G_32`
+
+The type of (@ partition-rec p l1 anext4) must match the type of the result #1 of partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `l1` of type `int`
+  * `al1` of type `int`
+  * `anext3` of type `(array int)`
+  * `anext4` of type `(array int)`
+  * `_X_16` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = l1 (@ - l (the int 1)))`
+  * `(@ = al1 (@ get-array a_1 l1))`
+  * `(and (@ =[] anext3 (@ set-array a_1 p1 al1)) (@ = (@ len anext3) (@ len a_1)))`
+  * `(and (@ =[] anext4 (@ set-array anext3 l1 ap1)) (@ = (@ len anext4) (@ len anext3)))`
+  * `(@ _kappa_partition-rec_pend _X_16 p l1 anext4)`
+
+**Prove:** `(@ _kappa_partition-rec_pend _X_16 p l a_1)`
+
+## Goal `G_33`
+
+The type of (@ partition-rec p l1 anext4) must match the type of the result #2 of partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `p` of type `int`
+  * `l` of type `int`
+  * `a_1` of type `(array int)`
+  * `p1` of type `int`
+  * `b` of type `bool`
+  * `ap` of type `int`
+  * `ap1` of type `int`
+  * `b1` of type `bool`
+  * `l1` of type `int`
+  * `al1` of type `int`
+  * `anext3` of type `(array int)`
+  * `anext4` of type `(array int)`
+  * `_X_16` of type `int`
+  * `_X_17` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ _kappa_partition-rec_p p a)`
+  * `(@ _kappa_partition-rec_l l a p)`
+  * `(@ _mu_partition-rec_a a_1 a p l)`
+  * `(@ = p1 (@ + p (the int 1)))`
+  * `(<-> b (@ = p1 l))`
+  * `(not b)`
+  * `(@ = ap (@ get-array a_1 p))`
+  * `(@ = ap1 (@ get-array a_1 p1))`
+  * `(<-> b1 (@ > ap ap1))`
+  * `(not b1)`
+  * `(@ = l1 (@ - l (the int 1)))`
+  * `(@ = al1 (@ get-array a_1 l1))`
+  * `(and (@ =[] anext3 (@ set-array a_1 p1 al1)) (@ = (@ len anext3) (@ len a_1)))`
+  * `(and (@ =[] anext4 (@ set-array anext3 l1 ap1)) (@ = (@ len anext4) (@ len anext3)))`
+  * `(@ _kappa_partition-rec_pend _X_16 p l1 anext4)`
+  * `(@ _mu_partition-rec_res _X_17 p l1 anext4 _X_16)`
+
+**Prove:** `(@ _mu_partition-rec_res _X_17 p l a_1 _X_16)`
+
+## Goal `G_34`
+
+Precondition of parameter x_0 in call to len
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `_NU_37` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(and (@ =[] _NU_37 a) (@ = (@ len _NU_37) (@ len a)))`
+
+**Prove:** `true`
+
+## Goal `G_35`
+
+Precondition of parameter p in call to partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `la` of type `int`
+  * `_NU_38` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ = la (@ len a))`
+  * `(@ = _NU_38 (the int 0))`
+
+**Prove:** `(@ _kappa_partition-rec_p _NU_38 a)`
+
+## Goal `G_36`
+
+Precondition of parameter l in call to partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `la` of type `int`
+  * `_NU_39` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ = la (@ len a))`
+  * `(@ = _NU_39 la)`
+
+**Prove:** `(@ _kappa_partition-rec_l _NU_39 a (the int 0))`
+
+## Goal `G_37`
+
+Precondition of parameter a in call to partition-rec
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `la` of type `int`
+  * `_NU_40` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ = la (@ len a))`
+  * `(and (@ =[] _NU_40 a) (@ = (@ len _NU_40) (@ len a)))`
+
+**Prove:** `(@ _mu_partition-rec_a _NU_40 a (the int 0) la)`
+
+## Goal `G_38`
+
+The type of (@ partition-rec (the int 0) la a) must match the type of the result #1 of partition
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `la` of type `int`
+  * `_X_19` of type `int`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ = la (@ len a))`
+  * `(@ _kappa_partition-rec_pend _X_19 (the int 0) la a)`
+
+**Prove:** `(@ _kappa_partition_pend _X_19 a)`
+
+## Goal `G_39`
+
+The type of (@ partition-rec (the int 0) la a) must match the type of the result #2 of partition
+
+**For all**:
+
+  * `a` of type `(array int)`
+  * `la` of type `int`
+  * `_X_19` of type `int`
+  * `_X_20` of type `(array int)`
+
+**such that**:
+
+  * `(@ _mu_partition_a a)`
+  * `(@ = la (@ len a))`
+  * `(@ _kappa_partition-rec_pend _X_19 (the int 0) la a)`
+  * `(@ _mu_partition-rec_res _X_20 (the int 0) la a _X_19)`
+
+**Prove:** `(@ _mu_partition_res _X_20 a _X_19)`
+

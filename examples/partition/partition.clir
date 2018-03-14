@@ -1,0 +1,78 @@
+(verification-unit "partition"
+		   :documentation "This is the implementation of a verified partition algorithm in CLIR"
+       :external (set-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+                             (nv int))
+                            ((res (qual nu (array int) (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+       :external (get-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+                            ((res (qual nu int (@ = nu (@ get-array xs i))))))
+                            
+       :qset (Q (nu int () (@ <= (the int 0) nu)) (nu int ((* int)) (@ < * nu)))
+       :qset (QI i (nu (array int) ((* int)) (@ < i *))
+                   (nu (array int) ((* int)) (@ <= * i)))
+       :qset (QE i (nu (array int) ((* int)) (@ <= (@ get-array nu i) (@ get-array nu *)))
+                   (nu (array int) ((* int)) (@ <= (@ get-array nu *) (@ get-array nu i))))
+       :qset (QII i j)
+       :qset (QEE i j)
+       :qset (QLen (nu (array int) ((* int)) (@ <= (the int 0) *)) 
+                   (nu (array int) ((* int)) (@ <= * (@ len nu))) 
+                   (nu (array int) ((* int)) (@ < * (@ len nu)))
+                   (nu (array int) () (@ < (the int 0) (@ len nu)))))
+
+
+
+(define partition
+    ((a (array int)))
+    (
+     (pend int) 
+     (res (array int))
+    )
+
+    (declare (assertion
+        (precd (@ < (the int 0) (@ len a)))
+        (postcd (and 
+        
+            (forall ((i int))
+                (-> (and (@ <= (the int 0) i) (@ < i pend)) (@ <= (@ get-array res i) (@ get-array res pend))))
+                
+            (forall ((i int))
+                (-> (and (@ <= pend i) (@ < i (@ len res))) (@ >= (@ get-array res i) (@ get-array res pend))))
+            
+            (@ <= (the int 0) pend)
+
+            (@ < pend (@ len res))))))
+                
+    
+    (letfun (
+      (partition-rec 
+        ((p int) 
+         (l int) 
+         (a (array int)))
+        ((pend int)
+         (res (array int)))
+        
+        (declare (assertion (precd false) (postcd true)))
+        
+        (let ((p1 int)) (@ + p (the int 1))
+         (let ((b bool)) (@ = p1 l)
+         (case b (
+            (true (tuple p a))
+            (false (let ((ap int)) (@ get-array a p)
+                   (let ((ap1 int)) (@ get-array a p1)
+                   (let ((b1 bool)) (@ > ap ap1)
+                   (case b1 (
+                      (true (let ((anext1 (array int))) (@ set-array a p ap1) 
+                            (let ((anext2 (array int))) (@ set-array anext1 p1 ap)
+                            (@ partition-rec p1 l anext2))))
+                      (false (let ((l1 int)) (@ - l (the int 1))
+                             (let ((al1 int)) (@ get-array a l1)
+                             (let ((anext3 (array int))) (@ set-array a p1 al1)
+                             (let ((anext4 (array int))) (@ set-array anext3 l1 ap1)
+                             (@ partition-rec p l1 anext4))))))
+                  ))))))
+          ))))))
+      
+    (let ((la int)) (@ len a) (@ partition-rec (the int 0) la a))))
+       
+       
