@@ -486,7 +486,7 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>,
                          inverseCloneMap: Map<String, String>,
                          traceFileName: String?): Solution {
 
-    val buffer = if (traceFileName != null) StringBuffer() else null
+    val buffer = if (traceFileName != null) BufferedWriter(FileWriter(traceFileName)) else null
 
     val result = runPhase("Running iterative weakening") {
         println("\n")
@@ -515,9 +515,6 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>,
                 }
                 is CannotWeaken -> {
                     println("cannot weaken".asRed())
-                    if (traceFileName != null) {
-                        writeTraceFile(traceFileName, buffer!!)
-                    }
                     throw CannotWeakenGoalException(goalId, solution.toString(kappas, mus))
                 }
                 is KappaWeakened -> {
@@ -585,19 +582,7 @@ private fun findSolution(goals: List<Z3Goal>, kappas: Map<String, Kappa>,
         solution
     }
 
-    if (traceFileName != null) {
-        writeTraceFile(traceFileName, buffer!!)
-    }
-
     return result
-}
-
-private fun writeTraceFile(traceFileName: String, buffer: StringBuffer) {
-    val traceFile = File(traceFileName)
-    val traceWriter = FileWriter(traceFile)
-    traceWriter.write(buffer.toString())
-    traceWriter.close()
-    println("Trace written to: ${traceFile.name}")
 }
 
 /**

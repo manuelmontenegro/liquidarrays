@@ -30,7 +30,11 @@ package es.ucm.caviart.iterativeweakening.z3
 import com.microsoft.z3.*
 import es.ucm.caviart.ast.*
 import es.ucm.caviart.iterativeweakening.*
+import es.ucm.caviart.qstar.Substitution
+import es.ucm.caviart.qstar.applySubstitution
 import es.ucm.caviart.utils.FormulaCounter
+import es.ucm.caviart.utils.FreshNameGenerator
+import java.io.BufferedWriter
 
 
 /**
@@ -84,6 +88,23 @@ class Z3Goal(val name: String,
                     val lenSymbols: List<Symbol>,
                     val qQualifiers: List<BoolExpr>)
 
+    class KappaInstantiation(
+            val rootKappa: String,
+            val name: Symbol,
+            val qQualifiers: List<BoolExpr>)
+
+
+    class MuInstantiation(
+            val rootMu: String,
+            val name: Symbol,
+            val boundVar1: Symbol,
+            val boundVar2: Symbol,
+            val qIQualifiers: List<BoolExpr>,
+            val qEQualifiers: List<QEQualifier>,
+            val qIIQualifiers: List<BoolExpr>,
+            val qEEQualifiers: List<QEEQualifier>,
+            val qLenQualifiers: List<BoolExpr>)
+
     /**
      * The set of kappas appearing in the assumptions or conclusion
      */
@@ -113,6 +134,37 @@ class Z3Goal(val name: String,
      * The set of Z3 qualifiers corresponding to each Mu
      */
     private val muQualifiers: Map<String, MuInfo>
+
+    /**
+     * A map that contains each kappa instantiation, each one indexed by its name
+     */
+    private val kappaInstantiations: Map<String, KappaInstantiation>
+
+    /**
+     * The set of kappa instantiation names contained within the assumptions
+     */
+    private val lhsKappaInstantiations: Set<String>
+
+    /**
+     * The name of the kappa instantiation in the conclusion (if appliable)
+     */
+    private val rhsKappaInstantiation: String?
+
+    /**
+     * A map that contains each kappa instantiation, each one indexed by its name
+     */
+
+    private val muInstantiations: Map<String, MuInstantiation>
+
+    /**
+     * The set of kappa instantiation names contained within the assumptions
+     */
+    private val lhsMuInstantiations: Set<String>
+
+    /**
+     * The name of the kappa instantiation in the conclusion (if appliable)
+     */
+    private val rhsMuInstantiation: String?
 
     /**
      * A translation of the declarationMap parameter but as a FuncDecl
@@ -226,14 +278,105 @@ class Z3Goal(val name: String,
             )
         }
 
+        kappaInstantiations = mutableMapOf()
+        lhsKappaInstantiations = mutableSetOf()
+        muInstantiations = mutableMapOf()
+        lhsMuInstantiations = mutableSetOf()
+
         val z3Symbols = environment.mapValues { (k, _) -> ctx.mkSymbol(k) }
         val z3Environment = environment.map { (k, t) -> k to t.toZ3Sort(ctx) }.toMap()
-        val z3Assumptions = assumptions.map { it.toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment) }
-        val z3Conclusion = conclusion.toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment)
+        val z3Assumptions = assumptions.map {
+            if (it is PredicateApplication && it.name in mentionedKappas) {
+                val (instantiationName, result) = generateKappaInstantiation(it, z3Symbols, z3Environment, kappaInstantiations)
+                lhsKappaInstantiations += instantiationName
+                result
+            } else if (it is PredicateApplication && it.name in mentionedMus) {
+                val (instantiationName, result) = generateMuInstantiation(it, z3Symbols, z3Environment, muInstantiations)
+                lhsMuInstantiations += instantiationName
+                result
+            } else {
+                it.toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment)
+            }
+        }
+
+        val z3Conclusion = if (conclusion is PredicateApplication && conclusion.name in mentionedKappas) {
+            val (instantiationName, result) = generateKappaInstantiation(conclusion, z3Symbols, z3Environment, kappaInstantiations)
+            rhsKappaInstantiation = instantiationName
+            rhsMuInstantiation = null
+            result
+        } else if (conclusion is PredicateApplication && conclusion.name in mentionedMus) {
+            val (instantiationName, result) = generateMuInstantiation(conclusion, z3Symbols, z3Environment, muInstantiations)
+            rhsKappaInstantiation = null
+            rhsMuInstantiation = instantiationName
+            result
+        } else {
+            rhsKappaInstantiation = null
+            rhsMuInstantiation = null
+            conclusion.toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment)
+        }
+
 
         z3Assumptions.forEach { solver.add(it) }
         solver.add(ctx.mkNot(z3Conclusion))
     }
+
+
+
+    private fun generateKappaInstantiation(kappaApplication: PredicateApplication, z3Symbols: Map<String, StringSymbol>, z3Environment: Map<String, Sort>, kappaInstantiations: MutableMap<String, Z3Goal.KappaInstantiation>): Pair<String, BoolExpr> {
+        val instantiationName = kappaApplication.name + "_" + FreshNameGenerator.nextName("_INST")
+        val kappa = kappas[kappaApplication.name]!!
+        val instantiationSymbol = ctx.mkSymbol(instantiationName)
+        val subs: Substitution = kappa.arguments.map { it.varName }.zip(kappaApplication.arguments.map { it as Atomic }).toMap()
+        val qInstantiated = kappa.qStar.map { it.applySubstitution(subs).toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment) }
+        val newInst = KappaInstantiation(kappaApplication.name, instantiationSymbol, qInstantiated)
+        kappaInstantiations[instantiationName] = newInst
+        val result = ctx.mkBoolConst(instantiationSymbol)!!
+        return Pair(instantiationName, result)
+    }
+
+
+    private fun generateMuInstantiation(muApplication: PredicateApplication, z3Symbols: Map<String, StringSymbol>, z3Environment: Map<String, Sort>, muInstantiations: MutableMap<String, MuInstantiation>): Pair<String, BoolExpr> {
+
+        val instantiationName = muApplication.name + "_" + FreshNameGenerator.nextName("_INST")
+        val instantiationSymbol = ctx.mkSymbol(instantiationName)
+        val mu = mus[muApplication.name]!!
+        val boundVar1 = ctx.mkSymbol(mu.boundVar1)
+        val boundVar2 = ctx.mkSymbol(mu.boundVar2)
+        val extendedSymbolMap = z3Symbols + mapOf(mu.boundVar1 to boundVar1, mu.boundVar2 to boundVar2)
+        val extendedEnvironment = z3Environment + mapOf(mu.boundVar1 to ctx.mkIntSort(), mu.boundVar2 to ctx.mkIntSort())
+
+        val substitution: Substitution = mu.arguments.map { it.varName }.zip(muApplication.arguments.map { it as Atomic }).toMap()
+        val qIQualifiers = mu.qI.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment) }
+        val qEQualifiers = mu.qE.map {
+            val qualifier = it.qualifier.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment)
+            val newArrays = it.arrayNames.map { ctx.mkSymbol((substitution[it] as Variable).name) }
+            QEQualifier(qualifier, newArrays)
+        }
+        val qIIQualifiers = mu.qII.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment) }
+        val qEEQualifiers = mu.qEE.map {
+            val qualifier = it.qualifier.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment)
+            val newArrays1 = it.arrayNames1.map { ctx.mkSymbol((substitution[it] as Variable).name) }
+            val newArrays2 = it.arrayNames2.map { ctx.mkSymbol((substitution[it] as Variable).name) }
+            QEEQualifier(qualifier, newArrays1, newArrays2)
+        }
+        val qLenQualifiers = mu.qLen.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment) }
+
+        muInstantiations[instantiationName] = MuInstantiation(
+                name = instantiationSymbol,
+                rootMu = mu.name,
+                boundVar1 = boundVar1,
+                boundVar2 = boundVar2,
+                qIQualifiers = qIQualifiers,
+                qEQualifiers = qEQualifiers,
+                qIIQualifiers = qIIQualifiers,
+                qEEQualifiers = qEEQualifiers,
+                qLenQualifiers = qLenQualifiers
+        )
+        val result = ctx.mkBoolConst(instantiationSymbol)!!
+
+        return Pair(instantiationName, result)
+    }
+
 
 
     /**
@@ -251,27 +394,42 @@ class Z3Goal(val name: String,
      *          made valid by weakening a kappa or mu (KappaWeakened, MuWeakened).
      *
      */
-    fun check(solution: Solution, debugMessages: StringBuffer? = null): GoalSolveResult {
-        debugMessages?.append("*Checking goal* `$name`: $description\n\n")
+    fun check(solution: Solution, debugMessages: BufferedWriter? = null): GoalSolveResult {
+        debugMessages?.write("*Checking goal* `$name`: $description\n\n")
 
         // The assumptions and the negation of the conclusion in the goal are already
         // in the solver. We save them
 
         solver.push()
 
+
         // Now we add the definitions of those mus and kappas not occurring
         // in the right hand side. These are held constant for all the weakening process
 
+        /*
         val lhsKappas = if (rhsKappa == null) mentionedKappas else (mentionedKappas - rhsKappa)
-        val lhsMus = if (rhsMu == null) mentionedMus else (mentionedMus - rhsMu)
 
         lhsKappas.forEach {
             val z3Equivalence = kappaDefinitionToZ3(it, solution)
             solver.add(z3Equivalence)
         }
 
+        */
+
+        lhsKappaInstantiations.forEach {
+            val z3Equivalence = kappaInstantiationToZ3(it, solution)
+            solver.add(z3Equivalence)
+        }
+
+        /*
+        val lhsMus = if (rhsMu == null) mentionedMus else (mentionedMus - rhsMu)
         lhsMus.forEach {
             val z3Equivalence = muDefinitionToZ3(it, solution)
+            solver.add(z3Equivalence)
+        }
+        */
+        lhsMuInstantiations.forEach {
+            val z3Equivalence = muInstantiationToZ3(it, solution)
             solver.add(z3Equivalence)
         }
 
@@ -280,14 +438,25 @@ class Z3Goal(val name: String,
 
         // Now we add the definitions the mu or the kappa at the right hand side
 
+        rhsKappaInstantiation?.let {
+            val z3Equivalence = kappaInstantiationToZ3(it, solution)
+            solver.add(z3Equivalence)
+        }
+
+        rhsMuInstantiation?.let {
+            val z3Equivalence = muInstantiationToZ3(it, solution)
+            solver.add(z3Equivalence)
+        }
+        /*
         rhsKappa?.let {
             val z3Equivalence = kappaDefinitionToZ3(it, solution)
             solver.add(z3Equivalence)
-        }
+        }*/
+        /*
         rhsMu?.let {
             val z3Equivalence = muDefinitionToZ3(it, solution)
             solver.add(z3Equivalence)
-        }
+        }*/
 
         // And we are done! We check the validity of the formula
         val wholeFormulaVerdict: Status = checkStatus(debugMessages)
@@ -304,16 +473,24 @@ class Z3Goal(val name: String,
 
         // If it is not, but we have a kappa in the conclusion of
         // the formula, we weaken its definition
-            rhsKappa != null -> {
-                weakenKappa(solution, rhsKappa, debugMessages)
-                KappaWeakened(rhsKappa)
+        /*
+        rhsKappa != null -> {
+            weakenKappa(solution, rhsKappa, debugMessages)
+            KappaWeakened(rhsKappa)
+        }
+        */
+            rhsKappaInstantiation != null -> {
+                weakenKappaInstantiation(solution, rhsKappaInstantiation, debugMessages)
+                val rootKappa = kappaInstantiations[rhsKappaInstantiation]!!.rootKappa
+                KappaWeakened(rootKappa)
             }
 
         // Now the case in which we have a mu in the conclusion of
         // the formula
-            rhsMu != null -> {
-                weakenMu(solution, rhsMu, debugMessages)
-                MuWeakened(rhsMu)
+            rhsMuInstantiation != null -> {
+                weakenMuInstantiation(solution, rhsMuInstantiation, debugMessages)
+                val rootMu = muInstantiations[rhsMuInstantiation]!!.rootMu
+                MuWeakened(rootMu)
             }
 
         // If there is neither kappa nor mu in the conclusion, we cannot weaken.
@@ -329,22 +506,105 @@ class Z3Goal(val name: String,
         return result
     }
 
-    private fun checkStatus(debugMessages: StringBuffer?): Status {
+    private fun weakenKappaInstantiation(solution: Solution, rhsKappaInstantiation: String, debugMessages: BufferedWriter?) {
+        val instantiation = kappaInstantiations[rhsKappaInstantiation]!!
+        val rootKappa = instantiation.rootKappa
+
+        debugMessages?.write("### Weakening `$rhsKappaInstantiation`\n\n")
+
+        // We get the qualifiers corresponding to the current solution
+        val qualifiersInSolution: Set<Int> = solution.kappas[rootKappa]!!.toSet()
+
+
+        // For each qualifier, we change the definition of kappa so it *only* includes
+        // this qualifier. If the goal is valid, we include in the `acceptedQualifers` set.
+
+        val acceptedQualifiers = qualifiersInSolution.filter {
+            solution.kappas[rootKappa] = mutableSetOf(it)
+            val z3Equivalence = kappaInstantiationToZ3(rhsKappaInstantiation, solution)
+            debugMessages?.write("  Trying: `${z3Equivalence.sExpr}`\n\n")
+            solver.push()
+            solver.add(z3Equivalence)
+            val status = checkStatus(debugMessages)
+            solver.pop()
+            status == Status.UNSATISFIABLE
+        }
+
+        // Now the solution is modified with only the qualifiers that have made the goal valid
+        solution.kappas[rootKappa] = acceptedQualifiers.toMutableSet()
+    }
+
+    private fun kappaInstantiationToZ3(instName: String, solution: Solution): BoolExpr {
+        val instantiation = kappaInstantiations[instName]!!
+
+        val rhs = ctx.mkAnd(*solution.kappas[instantiation.rootKappa]!!.map {
+            instantiation.qQualifiers[it]
+        }.toTypedArray())
+
+        return ctx.mkIff(ctx.mkBoolConst(instantiation.name), rhs)
+    }
+
+
+    private fun muInstantiationToZ3(instName: String, solution: Solution): BoolExpr {
+        val instantiation = muInstantiations[instName]!!
+        val muName = instantiation.rootMu
+
+        val singleRefs = solution.mus[muName]!!.singleRefinements.map {
+            val accessedArrays = it.rhs.flatMap { instantiation.qEQualifiers[it].arrays }
+            val boundVarConst = ctx.mkIntConst(instantiation.boundVar1)
+            val lowerBoundI = ctx.mkLe(ctx.mkInt(0), boundVarConst)
+            val upperBoundsI = accessedArrays.map {
+                ctx.mkLt(boundVarConst, ctx.mkIntConst(it))
+            }
+            val qIElements = it.lhs.map { instantiation.qIQualifiers[it] }
+            val lhs = ctx.mkAnd(lowerBoundI, *upperBoundsI.toTypedArray(), *qIElements.toTypedArray())
+            val rhs = ctx.mkAnd(*it.rhs.map { instantiation.qEQualifiers[it].qualifier }.toTypedArray())
+            ctx.mkForall(arrayOf(boundVarConst), ctx.mkImplies(lhs, rhs), 0, null, null, null, null)
+        }
+
+        val doubleRefs = solution.mus[muName]!!.doubleRefinements.map {
+            val accessedArrays1 = it.rhs.flatMap { instantiation.qEEQualifiers[it].arrays1 }
+            val accessedArrays2 = it.rhs.flatMap { instantiation.qEEQualifiers[it].arrays2 }
+            val boundVarConst1 = ctx.mkIntConst(instantiation.boundVar1)
+            val boundVarConst2 = ctx.mkIntConst(instantiation.boundVar2)
+            val lowerBoundI1 = ctx.mkLe(ctx.mkInt(0), boundVarConst1)
+            val lowerBoundI2 = ctx.mkLe(ctx.mkInt(0), boundVarConst2)
+            val upperBoundsI1 = accessedArrays1.map {
+                ctx.mkLt(boundVarConst1, ctx.mkIntConst(it))
+            }
+            val upperBoundsI2 = accessedArrays2.map {
+                ctx.mkLt(boundVarConst2, ctx.mkIntConst(it))
+            }
+            val qIIElements = it.lhs.map { instantiation.qIIQualifiers[it] }
+            val lhs = ctx.mkAnd(lowerBoundI1, lowerBoundI2, *upperBoundsI1.toTypedArray(), *upperBoundsI2.toTypedArray(), *qIIElements.toTypedArray())
+            val rhs = ctx.mkAnd(*it.rhs.map { instantiation.qEEQualifiers[it].qualifier }.toTypedArray())
+            ctx.mkForall(arrayOf(boundVarConst1, boundVarConst2), ctx.mkImplies(lhs, rhs), 0, null, null, null, null)
+        }
+
+        val qLenRefs = solution.mus[muName]!!.qLen.map {
+            instantiation.qLenQualifiers[it]
+        }
+
+        return ctx.mkIff(ctx.mkBoolConst(instantiation.name), ctx.mkAnd(*singleRefs.toTypedArray(), *doubleRefs.toTypedArray(), *qLenRefs.toTypedArray()))
+    }
+
+    private fun checkStatus(debugMessages: BufferedWriter?): Status {
         FormulaCounter.increment()
         System.out.flush()
         debugMessages?.let {
-            it.append("```lisp\n")
-            it.append(solver)
-            it.append("```\n\n")
+            it.write("```lisp\n")
+            it.write(solver.toString())
+            it.write("```\n\n")
+            it.flush()
         }
         try {
             val verdict: Status = solver.check()
             print(".")
-            debugMessages?.append("*Result:* $verdict\n\n")
+            debugMessages?.write("*Result:* $verdict\n\n")
             return verdict
         } catch (e: Z3Exception) {
             print("T")
-            debugMessages?.append("*Timeout*\n\n")
+            debugMessages?.write("*Timeout*\n\n")
             return Status.UNKNOWN
         }
     }
@@ -355,8 +615,8 @@ class Z3Goal(val name: String,
      * (in particular, the binding corressponding to rhsKappa), so the formula becomes
      * valid.
      */
-    private fun weakenKappa(solution: Solution, rhsKappa: String, debugMessages: StringBuffer?) {
-        debugMessages?.append("### Weakening `$rhsKappa`\n\n")
+    private fun weakenKappa(solution: Solution, rhsKappa: String, debugMessages: BufferedWriter?) {
+        debugMessages?.write("### Weakening `$rhsKappa`\n\n")
 
         // We get the qualifiers corresponding to the current solution
         val qualifiersInSolution: Set<Int> = solution.kappas[rhsKappa]!!.toSet()
@@ -368,7 +628,7 @@ class Z3Goal(val name: String,
         val acceptedQualifiers = qualifiersInSolution.filter {
             solution.kappas[rhsKappa] = mutableSetOf(it)
             val z3Equivalence = kappaDefinitionToZ3(rhsKappa, solution)
-            debugMessages?.append("  Trying: `${z3Equivalence.sExpr}`\n\n")
+            debugMessages?.write("  Trying: `${z3Equivalence.sExpr}`\n\n")
             solver.push()
             solver.add(z3Equivalence)
             val status = checkStatus(debugMessages)
@@ -380,18 +640,98 @@ class Z3Goal(val name: String,
         solution.kappas[rhsKappa] = acceptedQualifiers.toMutableSet()
     }
 
+
+    private fun weakenMuInstantiation(solution: Solution, rhsMuInstantiation: String, debugMessages: BufferedWriter?) {
+        val instantiation = muInstantiations[rhsMuInstantiation]!!
+        val rootMu = instantiation.rootMu
+
+        debugMessages?.write("### Weakening `$rootMu`\n\n")
+
+        val muSolutionToWeaken = solution.mus[rootMu]!!
+
+        debugMessages?.write("#### Clasifying single refinements\n\n")
+
+        // For each singly-quantified refinement, we build a solution containing only that
+        // refinement and check whether the goal is valid. If it is, the refinement goes
+        // to the `acceptedSingleRefinements` list. Otherwise, it comes into `rejectedSingleRefinements`.
+        val (acceptedSingleRefinements, rejectedSingleRefinements) =
+                classifyRefinementsForInstantiation(solution, rhsMuInstantiation, muSolutionToWeaken.singleRefinements, { MuSolution(it, listOf(), setOf()) }, debugMessages)
+
+
+        val numberOfQI = muQualifiers[rootMu]!!.qIQualifiers.size
+
+        // For each single refinement, we strengthen its antecedent. As a result we can get many refinements
+        // whose left-hand sides are not comparable. We add them all to the newSigleRefinements
+        val newSingleRefinements = rejectedSingleRefinements.flatMap {
+            debugMessages?.write("#### Weakening rejected refinement\n\n")
+            weakenRefinementForInstantiation(it, numberOfQI, solution, rhsMuInstantiation, { MuSolution(it, listOf(), setOf()) }, debugMessages)
+        }
+
+
+        // Now the weakened refinements are added to the solution
+        // TODO: Perform pruning
+
+        acceptedSingleRefinements += newSingleRefinements
+        /*
+        acceptedSingleRefinements += if (pruneTrivialLHS) {
+            newSingleRefinements.filterNot { isTrivialSingleRefinement(rhsMuInstantiation, it, debugMessages) }
+        } else {
+            newSingleRefinements
+        }
+        */
+
+        // We do the same with the doubly-quantified refinements
+        debugMessages?.write("#### Clasifying double refinements\n\n")
+        val (acceptedDoubleRefinements, rejectedDoubleRefinements) =
+                classifyRefinementsForInstantiation(solution, rhsMuInstantiation, muSolutionToWeaken.doubleRefinements, { MuSolution(listOf(), it, setOf()) }, debugMessages)
+
+        val numberOfQII = muQualifiers[rootMu]!!.qIIQualifiers.size
+
+        val newDoubleRefinements = rejectedDoubleRefinements.flatMap {
+            debugMessages?.write("#### Weakening rejected refinement\n\n")
+            weakenRefinementForInstantiation(it, numberOfQII, solution, rhsMuInstantiation, { MuSolution(listOf(), it, setOf()) }, debugMessages)
+        }
+
+        // TODO: Perform pruning
+        acceptedDoubleRefinements += newDoubleRefinements
+        /*
+        acceptedDoubleRefinements += if (pruneTrivialLHS) {
+            newDoubleRefinements.filterNot { isTrivialDoubleRefinement(rhsMuInstantiation, it, debugMessages) }
+        } else {
+            newDoubleRefinements
+        }
+        */
+
+        // Now we try each length refinement, and take only those which make the formula valid
+        // It is similar to the kappa
+        val acceptedLenRefinements = muSolutionToWeaken.qLen.filter {
+            solution.mus[rootMu] = MuSolution(listOf(), listOf(), setOf(it))
+            val z3Equivalence = muInstantiationToZ3(rhsMuInstantiation, solution)
+            debugMessages?.write("  Weakening length refinement:\n\n ```lisp\n${z3Equivalence.sExpr}\n```\n\n")
+            solver.push()
+            solver.add(z3Equivalence)
+            val status = checkStatus(debugMessages)
+            debugMessages?.write("    Result: $status\n")
+            solver.pop()
+            status == Status.UNSATISFIABLE
+        }
+
+        solution.mus[rootMu] = MuSolution(acceptedSingleRefinements, acceptedDoubleRefinements, acceptedLenRefinements.toSet())
+    }
+
     /**
      * Assuming that the current goal is not valid by the given solution due to the
      * mu whose name is pased to the second parameter, it mutates the solution
      * (in particular, the binding corressponding to rhsMu), so the formula becomes
      * valid.
      */
-    private fun weakenMu(solution: Solution, rhsMu: String, debugMessages: StringBuffer?) {
-        debugMessages?.append("### Weakening `$rhsMu`\n\n")
+    /*
+    private fun weakenMu(solution: Solution, rhsMu: String, debugMessages: BufferedWriter?) {
+        debugMessages?.write("### Weakening `$rhsMu`\n\n")
 
         val muSolutionToWeaken = solution.mus[rhsMu]!!
 
-        debugMessages?.append("#### Clasifying single refinements\n\n")
+        debugMessages?.write("#### Clasifying single refinements\n\n")
         // For each singly-quantified refinement, we build a solution containing only that
         // refinement and check whether the goal is valid. If it is, the refinement goes
         // to the `acceptedSingleRefinements` list. Otherwise, it comes into `rejectedSingleRefinements`.
@@ -404,7 +744,7 @@ class Z3Goal(val name: String,
         // For each single refinement, we strengthen its antecedent. As a result we can get many refinements
         // whose left-hand sides are not comparable. We add them all to the newSigleRefinements
         val newSingleRefinements = rejectedSingleRefinements.flatMap {
-            debugMessages?.append("#### Weakening rejected refinement\n\n")
+            debugMessages?.write("#### Weakening rejected refinement\n\n")
             weakenRefinement(it, numberOfQI, solution, rhsMu, { MuSolution(it, listOf(), setOf()) }, debugMessages)
         }
 
@@ -417,14 +757,14 @@ class Z3Goal(val name: String,
         }
 
         // We do the same with the doubly-quantified refinements
-        debugMessages?.append("#### Clasifying double refinements\n\n")
+        debugMessages?.write("#### Clasifying double refinements\n\n")
         val (acceptedDoubleRefinements, rejectedDoubleRefinements) =
                 classifyRefinements(solution, rhsMu, muSolutionToWeaken.doubleRefinements, { MuSolution(listOf(), it, setOf()) }, debugMessages)
 
         val numberOfQII = muQualifiers[rhsMu]!!.qIIQualifiers.size
 
         val newDoubleRefinements = rejectedDoubleRefinements.flatMap {
-            debugMessages?.append("#### Weakening rejected refinement\n\n")
+            debugMessages?.write("#### Weakening rejected refinement\n\n")
             weakenRefinement(it, numberOfQII, solution, rhsMu, { MuSolution(listOf(), it, setOf()) }, debugMessages)
         }
 
@@ -439,17 +779,18 @@ class Z3Goal(val name: String,
         val acceptedLenRefinements = muSolutionToWeaken.qLen.filter {
             solution.mus[rhsMu] = MuSolution(listOf(), listOf(), setOf(it))
             val z3Equivalence = muDefinitionToZ3(rhsMu, solution)
-            debugMessages?.append("  Weakening length refinement:\n\n ```lisp\n${z3Equivalence.sExpr}\n```\n\n")
+            debugMessages?.write("  Weakening length refinement:\n\n ```lisp\n${z3Equivalence.sExpr}\n```\n\n")
             solver.push()
             solver.add(z3Equivalence)
             val status = checkStatus(debugMessages)
-            debugMessages?.append("    Result: $status\n")
+            debugMessages?.write("    Result: $status\n")
             solver.pop()
             status == Status.UNSATISFIABLE
         }
 
         solution.mus[rhsMu] = MuSolution(acceptedSingleRefinements, acceptedDoubleRefinements, acceptedLenRefinements.toSet())
     }
+    */
 
     /**
      * Given a list of refinements, it traverses the list so that a solution is
@@ -459,11 +800,12 @@ class Z3Goal(val name: String,
      * and another with those who did not.
      *
      */
+    /*
     private fun classifyRefinements(solution: Solution,
                                     muVar: String,
                                     refinements: List<Refinement>,
                                     builder: (List<Refinement>) -> MuSolution,
-                                    debugMessages: StringBuffer?): Pair<MutableList<Refinement>, MutableList<Refinement>> {
+                                    debugMessages: BufferedWriter?): Pair<MutableList<Refinement>, MutableList<Refinement>> {
         val accepted = mutableListOf<Refinement>()
         val rejected = mutableListOf<Refinement>()
 
@@ -488,19 +830,61 @@ class Z3Goal(val name: String,
 
         return Pair(accepted, rejected)
     }
+    */
 
+    /**
+     * Given a list of refinements, it traverses the list so that a solution is
+     * built with each refinement and the goal is checked under that solution.
+     *
+     * It returns two lists, one with those refinements which make the formula valid,
+     * and another with those who did not.
+     *
+     */
+    private fun classifyRefinementsForInstantiation(solution: Solution,
+                                                    muInstantiation: String,
+                                                    refinements: List<Refinement>,
+                                                    builder: (List<Refinement>) -> MuSolution,
+                                                    debugMessages: BufferedWriter?): Pair<MutableList<Refinement>, MutableList<Refinement>> {
+        val accepted = mutableListOf<Refinement>()
+        val rejected = mutableListOf<Refinement>()
+
+        val instantiation = muInstantiations[muInstantiation]!!
+        val rootMu = instantiation.rootMu
+
+        refinements.forEach {
+            // We update the solution so it only contains the given refinement
+            solution.mus[rootMu] = builder(listOf(it))
+            val z3Equivalence = muInstantiationToZ3(muInstantiation, solution)
+
+            // Is the formula still valid?
+            solver.push()
+            solver.add(z3Equivalence)
+            val status = checkStatus(debugMessages)
+            solver.pop()
+
+            // Depending on whether it is valid or not, the refinement goes to the set `accepted` or `rejected`.
+            if (status == Status.UNSATISFIABLE) {
+                accepted += it
+            } else {
+                rejected += it
+            }
+        }
+
+        return Pair(accepted, rejected)
+    }
 
     /**
      * Given a singly or doubly-quantified refinement, it tries to strenghten its left-hand
      * side so the goals becomes valid. If there are many uncomparable strenghtenings that make
      * the formula valid, then a refinement is returned for each one of them
      */
+    /*
     private fun weakenRefinement(refinement: Refinement,
                                  numberOfLHSQualifiers: Int,
                                  solution: Solution,
                                  rhsMu: String,
                                  builder: (List<Refinement>) -> MuSolution,
-                                 debugMessages: StringBuffer?): List<Refinement> {
+                                 debugMessages: BufferedWriter?): List<Refinement> {
 
 
         val result = mutableListOf<Refinement>()
@@ -511,7 +895,7 @@ class Z3Goal(val name: String,
         solver.push()
         val z3Definition = muDefinitionToZ3(rhsMu, solution)
         solver.add(z3Definition)
-        debugMessages?.append("Trying strongest mapping\n\n")
+        debugMessages?.write("Trying strongest mapping\n\n")
         val status = checkStatus(debugMessages)
         solver.pop()
 
@@ -537,7 +921,82 @@ class Z3Goal(val name: String,
             solver.push()
             val updatedDefinition = muDefinitionToZ3(rhsMu, solution)
             solver.add(updatedDefinition)
-            debugMessages?.append("Trying new superset.\n\n")
+            debugMessages?.write("Trying new superset.\n\n")
+            val updatedStatus = checkStatus(debugMessages)
+            solver.pop()
+
+
+            currentLhs = if (updatedStatus == Status.UNSATISFIABLE) {
+                // If the goal is valid, then we add the current refinement to the list
+                // of valid ones (list that will eventually be returned).
+                result.add(currentRefinement)
+
+                // We go to the next subset, but we no longer consider supersets of the
+                // current one
+                setIterator.next(false)
+            } else {
+                // We go to the next subset, but starting from the supersets of the
+                // current one
+                setIterator.next(true)
+            }
+
+            superSetNumber += 1
+        }
+        return result
+    }
+    */
+
+
+    /**
+     * Given a singly or doubly-quantified refinement, it tries to strenghten its left-hand
+     * side so the goals becomes valid. If there are many uncomparable strenghtenings that make
+     * the formula valid, then a refinement is returned for each one of them
+     */
+    private fun weakenRefinementForInstantiation(refinement: Refinement,
+                                                 numberOfLHSQualifiers: Int,
+                                                 solution: Solution,
+                                                 rhsInstantiationName: String,
+                                                 builder: (List<Refinement>) -> MuSolution,
+                                                 debugMessages: BufferedWriter?): List<Refinement> {
+
+        val instantiation = muInstantiations[rhsInstantiationName]!!
+        val rootMu = instantiation.rootMu
+
+        val result = mutableListOf<Refinement>()
+
+        // First we try the formula under the strongest possible refinement
+        val strongestLhs = (0 until numberOfLHSQualifiers).toSet()
+        solution.mus[rootMu] = builder(listOf(Refinement(strongestLhs, refinement.rhs)))
+        solver.push()
+        val z3Definition = muInstantiationToZ3(rhsInstantiationName, solution)
+        solver.add(z3Definition)
+        debugMessages?.write("Trying strongest mapping\n\n")
+        val status = checkStatus(debugMessages)
+        solver.pop()
+
+        // If it does not hold, then we return the empty list, so that refinement is
+        // discarded
+        if (status != Status.UNSATISFIABLE) {
+            return listOf()
+        }
+
+        // Assuming that the formula holds, now we iterate over all the supersets of the
+        // current left-hand side of the refinement, up to the strongest refinement possible.
+        var (currentLhs, setIterator) = iterateSupersetsOf(refinement.lhs, (0 until numberOfLHSQualifiers).toSet())
+
+        var superSetNumber = 0
+
+        while (currentLhs != null) {
+            // We build a refinement with the current superset and update
+            // the solution
+            val currentRefinement = Refinement(currentLhs.toSet(), refinement.rhs)
+            solution.mus[rootMu] = builder(listOf(currentRefinement))
+
+            // Is the goal valid?
+            solver.push()
+            val updatedDefinition = muInstantiationToZ3(rhsInstantiationName, solution)
+            solver.add(updatedDefinition)
+            debugMessages?.write("Trying new superset.\n\n")
             val updatedStatus = checkStatus(debugMessages)
             solver.pop()
 
@@ -599,6 +1058,7 @@ class Z3Goal(val name: String,
      *
      * @return A Z3 formula with the definition of the given mu
      */
+    /*
     private fun muDefinitionToZ3(muName: String, solution: Solution): Quantifier {
         val mu = muQualifiers[muName]!!
 
@@ -672,6 +1132,7 @@ class Z3Goal(val name: String,
                 0, null, null, null, null
         )
     }
+    */
 
     private fun buildSingleLHS(boundVarAsConst: IntExpr?, it: Refinement, muName: String): BoolExpr {
         return ctx.mkAnd(
@@ -712,7 +1173,7 @@ class Z3Goal(val name: String,
         )
     }
 
-    private fun isTrivialSingleRefinement(muName: String, refinement: Refinement, debugMessages: StringBuffer?): Boolean {
+    private fun isTrivialSingleRefinement(muName: String, refinement: Refinement, debugMessages: BufferedWriter?): Boolean {
         // We have to build a formula of the form
         // forall i. (lhs_1 /\ lhs_2 /\ ... /\ lhs_n == false)
         //
@@ -730,7 +1191,7 @@ class Z3Goal(val name: String,
 
         solver.push()
         solver.add(ctx.mkNot(allLhs))
-        debugMessages?.append("Checking whether LHS is trivial\n\n")
+        debugMessages?.write("Checking whether LHS is trivial\n\n")
         val status = checkStatus(debugMessages)
         solver.pop()
 
@@ -738,7 +1199,7 @@ class Z3Goal(val name: String,
     }
 
 
-    private fun isTrivialDoubleRefinement(muName: String, refinement: Refinement, debugMessages: StringBuffer?): Boolean {
+    private fun isTrivialDoubleRefinement(muName: String, refinement: Refinement, debugMessages: BufferedWriter?): Boolean {
         // We have to build a formula of the form
         // forall i, j. (lhs_1 /\ lhs_2 /\ ... /\ lhs_n == false)
         //
@@ -757,7 +1218,7 @@ class Z3Goal(val name: String,
 
         solver.push()
         solver.add(ctx.mkNot(allLhs))
-        debugMessages?.append("Checking whether LHS is trivial\n\n")
+        debugMessages?.write("Checking whether LHS is trivial\n\n")
         val status = checkStatus(debugMessages)
         solver.pop()
 
