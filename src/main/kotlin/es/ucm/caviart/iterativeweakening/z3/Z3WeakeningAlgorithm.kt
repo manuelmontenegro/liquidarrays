@@ -30,6 +30,8 @@ package es.ucm.caviart.iterativeweakening.z3
 import com.microsoft.z3.*
 import es.ucm.caviart.ast.*
 import es.ucm.caviart.iterativeweakening.*
+import es.ucm.caviart.qstar.Substitution
+import es.ucm.caviart.qstar.applySubstitution
 import es.ucm.caviart.utils.FormulaCounter
 
 
@@ -75,6 +77,13 @@ class Z3Goal(val name: String,
                  val qEEQualifiers: List<QEEQualifier>,
                  val qLenQualifiers: List<BoolExpr>)
 
+    class MuInstantiation(val boundVar1: Symbol,
+                          val boundVar2: Symbol,
+                          val qIQualifiers: List<BoolExpr>,
+                          val qEQualifiers: List<QEQualifier>,
+                          val qIIQualifiers: List<BoolExpr>,
+                          val qEEQualifiers: List<QEEQualifier>,
+                          val qLenQualifiers: List<BoolExpr>)
 
     class QEQualifier(val qualifier: BoolExpr, val arrays: List<Symbol>)
     class QEEQualifier(val qualifier: BoolExpr, val arrays1: List<Symbol>, val arrays2: List<Symbol>)
@@ -83,6 +92,8 @@ class Z3Goal(val name: String,
     class KappaInfo(val arguments: List<Pair<Symbol, Sort>>,
                     val lenSymbols: List<Symbol>,
                     val qQualifiers: List<BoolExpr>)
+
+    class KappaInstantiation(val qQualifiers: List<BoolExpr>)
 
     /**
      * The set of kappas appearing in the assumptions or conclusion
@@ -128,12 +139,16 @@ class Z3Goal(val name: String,
     /**
      * The solver which will be used in that context
      */
-    private val solver: Solver = ctx.mkSolver("AUFLIA")
+    private val solver: Solver = ctx.mkSolver("AUFLIRA")
 
 
     override fun toString(): String {
         return solver.toString()
     }
+
+
+    private val z3AssumptionFuncs: List<(Solution, Boolean) -> BoolExpr>
+    private val z3ConclusionFunc: (Solution, Boolean) -> BoolExpr
 
 
     init {
@@ -231,8 +246,154 @@ class Z3Goal(val name: String,
         val z3Assumptions = assumptions.map { it.toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment) }
         val z3Conclusion = conclusion.toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment)
 
+        z3AssumptionFuncs = assumptions.map {
+            if (it is PredicateApplication && it.name in kappaNames) {
+                val kappa = kappas[it.name]!!
+                val substitution: Substitution = kappa.arguments.map { it.varName }.zip(it.arguments.map { it as Atomic }).toMap();
+                val kappaInstantiation = KappaInstantiation(kappa.qStar.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment) });
+                { sol, _ ->
+                    val kappaSol = sol.kappas[it.name]!!
+                    ctx.mkAnd(*kappaSol.map { kappaInstantiation.qQualifiers[it] }.toTypedArray())
+                }
+            } else if (it is PredicateApplication && it.name in muNames) {
+                val mu = mus[it.name]!!
+                val substitution: Substitution = mu.arguments.map { it.varName }.zip(it.arguments.map { it as Atomic }).toMap()
+                val symbol1 = ctx.mkSymbol(mu.boundVar1)
+                val symbol2 = ctx.mkSymbol(mu.boundVar2)
+                val extendedSymbolMap = z3Symbols + mapOf(mu.boundVar1 to symbol1, mu.boundVar2 to symbol2)
+                val extendedEnvironment = z3Environment + mapOf(mu.boundVar1 to ctx.mkIntSort(), mu.boundVar2 to ctx.mkIntSort())
+                val muInstantiation = MuInstantiation(
+                        boundVar1 = symbol1,
+                        boundVar2 = symbol2,
+                        qIQualifiers = mu.qI.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment) },
+                        qEQualifiers = mu.qE.map {
+                            QEQualifier(it.qualifier.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment),
+                                    it.arrayNames.map { z3Symbols[(substitution[it] as Variable).name]!! })
+                        },
+                        qIIQualifiers = mu.qII.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment) },
+                        qEEQualifiers = mu.qEE.map {
+                            QEEQualifier(it.qualifier.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment),
+                                    it.arrayNames1.map { z3Symbols[(substitution[it] as Variable).name]!! },
+                                    it.arrayNames2.map { z3Symbols[(substitution[it] as Variable).name]!! })
+                        },
+                        qLenQualifiers = mu.qLen.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment) }
+                );
+                { sol: Solution, rhs: Boolean ->
+                    val muSol = sol.mus[it.name]!!
+                    val singleRefs = muSol.singleRefinements.map {
+                        val lowerBound1 = ctx.mkLe(ctx.mkInt(0), ctx.mkIntConst(symbol1))
+                        val arrayLenSymbols = it.rhs.flatMap { muInstantiation.qEQualifiers[it].arrays }
+                        val upperBounds1 = arrayLenSymbols.map { ctx.mkLt(ctx.mkIntConst(symbol1), ctx.mkIntConst(it)) }
+                        val qIElements = it.lhs.map { muInstantiation.qIQualifiers[it] }
+                        val qEElements = it.rhs.map { muInstantiation.qEQualifiers[it].qualifier }
+                        ctx.mkForall(arrayOf(ctx.mkIntConst(symbol1)), ctx.mkImplies(
+                                ctx.mkAnd(lowerBound1, *upperBounds1.toTypedArray(), *qIElements.toTypedArray()),
+                                ctx.mkAnd(*qEElements.toTypedArray())
+                        ), 0, null, null, null, null)
+                    }
+
+                    val doubleRefs = muSol.doubleRefinements.map {
+                        val lowerBound1 = ctx.mkLe(ctx.mkInt(0), ctx.mkIntConst(symbol1))
+                        val lowerBound2 = ctx.mkLe(ctx.mkInt(0), ctx.mkIntConst(symbol2))
+                        val arrayLenSymbols1 = it.rhs.flatMap { muInstantiation.qEEQualifiers[it].arrays1 }
+                        val arrayLenSymbols2 = it.rhs.flatMap { muInstantiation.qEEQualifiers[it].arrays1 }
+                        val upperBounds1 = arrayLenSymbols1.map { ctx.mkLt(ctx.mkIntConst(symbol1), ctx.mkIntConst(it)) }
+                        val upperBounds2 = arrayLenSymbols2.map { ctx.mkLt(ctx.mkIntConst(symbol2), ctx.mkIntConst(it)) }
+                        val qIIElements = it.lhs.map { muInstantiation.qIIQualifiers[it] }
+                        val qEEElements = it.rhs.map { muInstantiation.qEEQualifiers[it].qualifier }
+                        ctx.mkForall(arrayOf(ctx.mkIntConst(symbol1), ctx.mkIntConst(symbol2)), ctx.mkImplies(
+                                ctx.mkAnd(lowerBound1, lowerBound2, *upperBounds1.toTypedArray(), *upperBounds2.toTypedArray(), *qIIElements.toTypedArray()),
+                                if (rhs) ctx.mkAnd(*qEEElements.toTypedArray()) else ctx.mkFalse()
+                        ), 0, null, null, null, null)
+                    }
+
+                    val qlenRefs = muSol.qLen.map {
+                        muInstantiation.qLenQualifiers[it]
+                    }
+
+                    ctx.mkAnd(*singleRefs.toTypedArray(), *doubleRefs.toTypedArray(), *qlenRefs.toTypedArray())
+                }
+            } else {
+                { _: Solution, _: Boolean -> it.toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment) }
+            }
+        }
+
+        z3ConclusionFunc = if (conclusion is PredicateApplication && conclusion.name in kappaNames) {
+            val kappa = kappas[conclusion.name]!!
+            println("Expanding ${conclusion.toSExp()}")
+            val substitution: Substitution = kappa.arguments.map { it.varName }.zip(conclusion.arguments.map { it as Atomic }).toMap();
+            val kappaInstantiation = KappaInstantiation(kappa.qStar.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment) });
+            { sol, _ ->
+                val kappaSol = sol.kappas[conclusion.name]!!
+                ctx.mkAnd(*kappaSol.map { kappaInstantiation.qQualifiers[it] }.toTypedArray())
+            }
+        } else if (conclusion is PredicateApplication && conclusion.name in muNames) {
+            val mu = mus[conclusion.name]!!
+            val substitution: Substitution = mu.arguments.map { it.varName }.zip(conclusion.arguments.map { it as Atomic }).toMap()
+            val symbol1 = ctx.mkSymbol(mu.boundVar1)
+            val symbol2 = ctx.mkSymbol(mu.boundVar2)
+            val extendedSymbolMap = z3Symbols + mapOf(mu.boundVar1 to symbol1, mu.boundVar2 to symbol2)
+            val extendedEnvironment = z3Environment + mapOf(mu.boundVar1 to ctx.mkIntSort(), mu.boundVar2 to ctx.mkIntSort())
+            val muInstantiation = MuInstantiation(
+                    boundVar1 = symbol1,
+                    boundVar2 = symbol2,
+                    qIQualifiers = mu.qI.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment) },
+                    qEQualifiers = mu.qE.map {
+                        QEQualifier(it.qualifier.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment),
+                                it.arrayNames.map { z3Symbols[(substitution[it] as Variable).name]!! })
+                    },
+                    qIIQualifiers = mu.qII.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment) },
+                    qEEQualifiers = mu.qEE.map {
+                        QEEQualifier(it.qualifier.applySubstitution(substitution).toZ3BoolExpr(ctx, extendedSymbolMap, z3DeclarationMap, extendedEnvironment),
+                                it.arrayNames1.map { z3Symbols[(substitution[it] as Variable).name]!! },
+                                it.arrayNames2.map { z3Symbols[(substitution[it] as Variable).name]!! })
+                    },
+                    qLenQualifiers = mu.qLen.map { it.applySubstitution(substitution).toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment) }
+            );
+            { sol: Solution, rhs: Boolean ->
+                val muSol = sol.mus[conclusion.name]!!
+                val singleRefs = muSol.singleRefinements.map {
+                    val lowerBound1 = ctx.mkLe(ctx.mkInt(0), ctx.mkIntConst(symbol1))
+                    val arrayLenSymbols = it.rhs.flatMap { muInstantiation.qEQualifiers[it].arrays }
+                    val upperBounds1 = arrayLenSymbols.map { ctx.mkLt(ctx.mkIntConst(symbol1), ctx.mkIntConst(it)) }
+                    val qIElements = it.lhs.map { muInstantiation.qIQualifiers[it] }
+                    val qEElements = it.rhs.map { muInstantiation.qEQualifiers[it].qualifier }
+                    ctx.mkForall(arrayOf(ctx.mkIntConst(symbol1)), ctx.mkImplies(
+                            ctx.mkAnd(lowerBound1, *upperBounds1.toTypedArray(), *qIElements.toTypedArray()),
+                            ctx.mkAnd(*qEElements.toTypedArray())
+                    ), 0, null, null, null, null)
+                }
+
+                val doubleRefs = muSol.doubleRefinements.map {
+                    val lowerBound1 = ctx.mkLe(ctx.mkInt(0), ctx.mkIntConst(symbol1))
+                    val lowerBound2 = ctx.mkLe(ctx.mkInt(0), ctx.mkIntConst(symbol2))
+                    val arrayLenSymbols1 = it.rhs.flatMap { muInstantiation.qEEQualifiers[it].arrays1 }
+                    val arrayLenSymbols2 = it.rhs.flatMap { muInstantiation.qEEQualifiers[it].arrays1 }
+                    val upperBounds1 = arrayLenSymbols1.map { ctx.mkLt(ctx.mkIntConst(symbol1), ctx.mkIntConst(it)) }
+                    val upperBounds2 = arrayLenSymbols2.map { ctx.mkLt(ctx.mkIntConst(symbol2), ctx.mkIntConst(it)) }
+                    val qIIElements = it.lhs.map { muInstantiation.qIIQualifiers[it] }
+                    val qEEElements = it.rhs.map { muInstantiation.qEEQualifiers[it].qualifier }
+                    ctx.mkForall(arrayOf(ctx.mkIntConst(symbol1), ctx.mkIntConst(symbol2)), ctx.mkImplies(
+                            ctx.mkAnd(lowerBound1, lowerBound2, *upperBounds1.toTypedArray(), *upperBounds2.toTypedArray(), *qIIElements.toTypedArray()),
+                            if (rhs) ctx.mkAnd(*qEEElements.toTypedArray()) else ctx.mkFalse()
+                    ), 0, null, null, null, null)
+                }
+
+                val qlenRefs = muSol.qLen.map {
+                    muInstantiation.qLenQualifiers[it]
+                }
+
+
+                ctx.mkAnd(*singleRefs.toTypedArray(), *doubleRefs.toTypedArray(), *qlenRefs.toTypedArray())
+            }
+        } else {
+            { sol: Solution, _: Boolean -> conclusion.toZ3BoolExpr(ctx, z3Symbols, z3DeclarationMap, z3Environment) }
+        }
+
+        /*
         z3Assumptions.forEach { solver.add(it) }
         solver.add(ctx.mkNot(z3Conclusion))
+        */
     }
 
 
@@ -254,47 +415,9 @@ class Z3Goal(val name: String,
     fun check(solution: Solution, debugMessages: StringBuffer? = null): GoalSolveResult {
         debugMessages?.append("*Checking goal* `$name`: $description\n\n")
 
-        // The assumptions and the negation of the conclusion in the goal are already
-        // in the solver. We save them
-
-        solver.push()
-
-        // Now we add the definitions of those mus and kappas not occurring
-        // in the right hand side. These are held constant for all the weakening process
-
-        val lhsKappas = if (rhsKappa == null) mentionedKappas else (mentionedKappas - rhsKappa)
-        val lhsMus = if (rhsMu == null) mentionedMus else (mentionedMus - rhsMu)
-
-        lhsKappas.forEach {
-            val z3Equivalence = kappaDefinitionToZ3(it, solution)
-            solver.add(z3Equivalence)
-        }
-
-        lhsMus.forEach {
-            val z3Equivalence = muDefinitionToZ3(it, solution)
-            solver.add(z3Equivalence)
-        }
-
-        // We save the current state (assumptions + ¬goal + kappas and mus only in the lhs)
-        solver.push()
-
-        // Now we add the definitions the mu or the kappa at the right hand side
-
-        rhsKappa?.let {
-            val z3Equivalence = kappaDefinitionToZ3(it, solution)
-            solver.add(z3Equivalence)
-        }
-        rhsMu?.let {
-            val z3Equivalence = muDefinitionToZ3(it, solution)
-            solver.add(z3Equivalence)
-        }
 
         // And we are done! We check the validity of the formula
-        val wholeFormulaVerdict: Status = checkStatus(debugMessages)
-
-        // We discard the latest definition, so
-        // we restore the state to (assumptions + ¬goal + kappas and mus only in the lhs)
-        solver.pop()
+        val wholeFormulaVerdict: Status = checkStatus(solution, true, debugMessages)
 
         val result = when {
 
@@ -321,22 +444,25 @@ class Z3Goal(val name: String,
                 CannotWeaken()
         }
 
-        // After possibly weakening, we discard the definitions of the mus and kappas in
-        // the left-hand side, so
-        // we restore the state to (assumptions + ¬goal)
-        solver.pop()
-
         return result
     }
 
-    private fun checkStatus(debugMessages: StringBuffer?): Status {
+    private fun checkStatus(solution: Solution, genRhs: Boolean, debugMessages: StringBuffer?): Status {
         FormulaCounter.increment()
         System.out.flush()
+
+        solver.push()
+        z3AssumptionFuncs.forEach {
+            solver.add(it(solution, genRhs))
+        }
+        solver.add(ctx.mkNot(z3ConclusionFunc(solution, genRhs)))
+
         debugMessages?.let {
             it.append("```lisp\n")
             it.append(solver)
             it.append("```\n\n")
         }
+
         try {
             val verdict: Status = solver.check()
             print(".")
@@ -346,6 +472,8 @@ class Z3Goal(val name: String,
             print("T")
             debugMessages?.append("*Timeout*\n\n")
             return Status.UNKNOWN
+        } finally {
+            solver.pop()
         }
     }
 
@@ -367,12 +495,7 @@ class Z3Goal(val name: String,
 
         val acceptedQualifiers = qualifiersInSolution.filter {
             solution.kappas[rhsKappa] = mutableSetOf(it)
-            val z3Equivalence = kappaDefinitionToZ3(rhsKappa, solution)
-            debugMessages?.append("  Trying: `${z3Equivalence.sExpr}`\n\n")
-            solver.push()
-            solver.add(z3Equivalence)
-            val status = checkStatus(debugMessages)
-            solver.pop()
+            val status = checkStatus(solution, true, debugMessages)
             status == Status.UNSATISFIABLE
         }
 
@@ -410,11 +533,14 @@ class Z3Goal(val name: String,
 
 
         // Now the weakened refinements are added to the solution
+        acceptedSingleRefinements += newSingleRefinements
+        /*
         acceptedSingleRefinements += if (pruneTrivialLHS) {
             newSingleRefinements.filterNot { isTrivialSingleRefinement(rhsMu, it, debugMessages) }
         } else {
             newSingleRefinements
         }
+        */
 
         // We do the same with the doubly-quantified refinements
         debugMessages?.append("#### Clasifying double refinements\n\n")
@@ -428,23 +554,20 @@ class Z3Goal(val name: String,
             weakenRefinement(it, numberOfQII, solution, rhsMu, { MuSolution(listOf(), it, setOf()) }, debugMessages)
         }
 
+        acceptedDoubleRefinements += newDoubleRefinements
+        /*
         acceptedDoubleRefinements += if (pruneTrivialLHS) {
             newDoubleRefinements.filterNot { isTrivialDoubleRefinement(rhsMu, it, debugMessages) }
         } else {
             newDoubleRefinements
         }
+        */
 
         // Now we try each length refinement, and take only those which make the formula valid
         // It is similar to the kappa
         val acceptedLenRefinements = muSolutionToWeaken.qLen.filter {
             solution.mus[rhsMu] = MuSolution(listOf(), listOf(), setOf(it))
-            val z3Equivalence = muDefinitionToZ3(rhsMu, solution)
-            debugMessages?.append("  Weakening length refinement:\n\n ```lisp\n${z3Equivalence.sExpr}\n```\n\n")
-            solver.push()
-            solver.add(z3Equivalence)
-            val status = checkStatus(debugMessages)
-            debugMessages?.append("    Result: $status\n")
-            solver.pop()
+            val status = checkStatus(solution, true, debugMessages)
             status == Status.UNSATISFIABLE
         }
 
@@ -470,13 +593,7 @@ class Z3Goal(val name: String,
         refinements.forEach {
             // We update the solution so it only contains the given refinement
             solution.mus[muVar] = builder(listOf(it))
-            val z3Equivalence = muDefinitionToZ3(muVar, solution)
-
-            // Is the formula still valid?
-            solver.push()
-            solver.add(z3Equivalence)
-            val status = checkStatus(debugMessages)
-            solver.pop()
+            val status = checkStatus(solution, true, debugMessages)
 
             // Depending on whether it is valid or not, the refinement goes to the set `accepted` or `rejected`.
             if (status == Status.UNSATISFIABLE) {
@@ -508,12 +625,8 @@ class Z3Goal(val name: String,
         // First we try the formula under the strongest possible refinement
         val strongestLhs = (0 until numberOfLHSQualifiers).toSet()
         solution.mus[rhsMu] = builder(listOf(Refinement(strongestLhs, refinement.rhs)))
-        solver.push()
-        val z3Definition = muDefinitionToZ3(rhsMu, solution)
-        solver.add(z3Definition)
         debugMessages?.append("Trying strongest mapping\n\n")
-        val status = checkStatus(debugMessages)
-        solver.pop()
+        val status = checkStatus(solution, true, debugMessages)
 
         // If it does not hold, then we return the empty list, so that refinement is
         // discarded
@@ -534,18 +647,20 @@ class Z3Goal(val name: String,
             solution.mus[rhsMu] = builder(listOf(currentRefinement))
 
             // Is the goal valid?
-            solver.push()
-            val updatedDefinition = muDefinitionToZ3(rhsMu, solution)
-            solver.add(updatedDefinition)
             debugMessages?.append("Trying new superset.\n\n")
-            val updatedStatus = checkStatus(debugMessages)
-            solver.pop()
+            val updatedStatus = checkStatus(solution, true, debugMessages)
 
 
             currentLhs = if (updatedStatus == Status.UNSATISFIABLE) {
+
                 // If the goal is valid, then we add the current refinement to the list
-                // of valid ones (list that will eventually be returned).
-                result.add(currentRefinement)
+                // of valid ones (list that will eventually be returned). We have to check
+                // whether the lhs in the implication is trivial
+                val newStatus = checkStatus(solution, false, debugMessages)
+
+                if (newStatus == Status.UNSATISFIABLE) {
+                    result.add(currentRefinement)
+                }
 
                 // We go to the next subset, but we no longer consider supersets of the
                 // current one
@@ -712,6 +827,8 @@ class Z3Goal(val name: String,
         )
     }
 
+
+    /*
     private fun isTrivialSingleRefinement(muName: String, refinement: Refinement, debugMessages: StringBuffer?): Boolean {
         // We have to build a formula of the form
         // forall i. (lhs_1 /\ lhs_2 /\ ... /\ lhs_n == false)
@@ -731,7 +848,7 @@ class Z3Goal(val name: String,
         solver.push()
         solver.add(ctx.mkNot(allLhs))
         debugMessages?.append("Checking whether LHS is trivial\n\n")
-        val status = checkStatus(debugMessages)
+        val status = checkStatus(solution, debugMessages)
         solver.pop()
 
         return status == Status.UNSATISFIABLE
@@ -758,11 +875,13 @@ class Z3Goal(val name: String,
         solver.push()
         solver.add(ctx.mkNot(allLhs))
         debugMessages?.append("Checking whether LHS is trivial\n\n")
-        val status = checkStatus(debugMessages)
+        val status = checkStatus(solution, debugMessages)
         solver.pop()
 
         return status == Status.UNSATISFIABLE
     }
+    */
+
 
 
 }
