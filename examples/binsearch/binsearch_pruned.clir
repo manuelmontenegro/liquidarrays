@@ -1,0 +1,160 @@
+(verification-unit binsearch :external
+  (set-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+      (nv int))
+    (
+      (res
+        (qual nu (array int)
+          (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+  :external
+  (get-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+    ((res (qual nu int (@ = nu (@ get-array xs i))))))
+  :external
+  (semisum ((init int) (end (qual nu int (@ < init nu))))
+    ((res (qual nu int (and (@ <= init nu) (@ < nu end))))))
+  :qset
+  (Q (nu int () (@ <= (the int -1) nu)) (nu int () (@ <= (the int 0) nu))
+    (nu int ((* int)) (@ <= * nu))
+    (nu int ((* (array int)))
+      (-> (not (@ = nu (the int -1))) (@ < nu (@ len *))))
+    (nu int ((* (array int)) (** int))
+      (-> (not (@ = nu (the int -1))) (@ = (@ get-array * nu) **))))
+  :qset
+  (QI i (nu (array int) ((* int)) (@ = * (the int -1)))
+    (nu (array int) ((* int)) (@ < i *))
+    (nu (array int) ((* int)) (@ <= * i)))
+  :qset
+  (QE i (nu (array int) ((* int)) (not (@ = (@ get-array nu i) *)))
+    (nu (array int) ((* int) (** (array int)))
+      (not (@ = (@ get-array ** i) *))))
+  :qset
+  (QII i j (nu (array int) () (@ < i j)))
+  :qset
+  (QEE i j (nu (array int) () (@ <= (@ get-array nu i) (@ get-array nu j))))
+  :qset
+  (QLen (nu (array int) ((* int)) (@ <= * (@ len nu))))
+  :kappa
+  (_kappa_binsearch_key ((nu int))
+    (Q ))
+  :kappa
+  (_kappa_binsearch-rec_key ((nu int) (key int) (arr (array int)))
+    (Q 
+      
+      ))
+  :kappa
+  (_kappa_binsearch-rec_init ((nu int) (arr (array int)) (key int))
+    (Q (@ <= (the int 0) nu) 
+      
+      ))
+  :kappa
+  (_kappa_binsearch-rec_end ((nu int) (arr (array int)) (key int) (init int))
+    (Q  
+      (@ <= init nu)
+      ))
+  :kappa
+  (_kappa_binsearch-rec_r
+    ((nu int) (key int) (init int) (end int) (arr (array int)))
+    (Q (@ <= (the int -1) nu) 
+      (-> (not (@ = nu (the int -1))) (@ < nu (@ len arr)))
+      (-> (not (@ = nu (the int -1))) (@ = (@ get-array arr nu) key))
+      ))
+  :kappa
+  (_kappa_binsearch_r ((nu int) (key int) (arr (array int)))
+    (Q (@ <= (the int -1) nu) 
+      (-> (not (@ = nu (the int -1))) (@ < nu (@ len arr)))
+      (-> (not (@ = nu (the int -1))) (@ = (@ get-array arr nu) key))))
+  :mu
+  (_mu_binsearch_arr ((nu (array int)) (key int))
+    (QI i )
+    (QE i )
+    (QII i j (@ < i j))
+    (QEE i j (@ <= (@ get-array nu i) (@ get-array nu j)))
+    (QLen ))
+  :mu
+  (_mu_binsearch-rec_arr
+    ((nu (array int)) (arr (array int)) (key int) (init int) (end int))
+    (QI i       
+      (@ < i init)
+      (@ <= end i))
+    (QE i (not (@ = (@ get-array nu i) key)))
+    (QII i j (@ < i j))
+    (QEE i j (@ <= (@ get-array nu i) (@ get-array nu j)))
+    (QLen  (@ <= end (@ len nu))))
+  :mu
+  (_mu_binsearch-rec_dummy
+    ((nu (array int)) (key int) (init int) (end int) (arr (array int))
+      (r int))
+    (QI i 
+      (@ = r (the int -1))
+      )
+    (QE i 
+      (not (@ = (@ get-array arr i) key))
+      )
+    (QII i j )
+    (QEE i j )
+    (QLen 
+      ))
+  :mu
+  (_mu_binsearch_dummy ((nu (array int)) (key int) (arr (array int)) (r int))
+    (QI i (@ = r (the int -1)) 
+      )
+    (QE i  
+      (not (@ = (@ get-array arr i) key))
+      )
+    (QII i j )
+    (QEE i j )
+    (QLen )))
+(define binsearch
+  ((key (qual nu int (@ _kappa_binsearch_key nu)))
+    (arr (qual nu (array int) (@ _mu_binsearch_arr nu key))))
+  ((r (qual nu int (@ _kappa_binsearch_r nu key arr)))
+    (dummy (qual nu (array int) (@ _mu_binsearch_dummy nu key arr r))))
+  (declare
+    (assertion
+      (precd
+        (forall ((i int) (j int))
+          (-> (and (@ <= (the int 0) i) (@ < i j) (@ < j (@ len arr)))
+            (@ <= (@ get-array arr i) (@ get-array arr j)))))
+      (postcd
+        (and (@ <= (the int -1) r)
+          (-> (not (@ = r (the int -1)))
+            (and (@ < r (@ len arr)) (@ = (@ get-array arr r) key)))
+          (-> (@ = r (the int -1))
+            (forall ((i int))
+              (-> (and (@ <= (the int 0) i) (@ < i (@ len arr)))
+                (not (@ = (@ get-array arr i) key)))))))))
+  (letfun
+    (
+      (binsearch-rec
+        ((key (qual nu int (@ _kappa_binsearch-rec_key nu key arr)))
+          (init (qual nu int (@ _kappa_binsearch-rec_init nu arr key)))
+          (end (qual nu int (@ _kappa_binsearch-rec_end nu arr key init)))
+          (arr
+            (qual nu (array int)
+              (@ _mu_binsearch-rec_arr nu arr key init end))))
+        ((r (qual nu int (@ _kappa_binsearch-rec_r nu key init end arr)))
+          (dummy
+            (qual nu (array int)
+              (@ _mu_binsearch-rec_dummy nu key init end arr r))))
+        (declare (assertion (precd false) (postcd true)))
+        (let ((b1 bool)) (@ < init end)
+          (case b1
+            (
+              (true
+                (let ((mid int)) (@ semisum init end)
+                  (let ((amid int)) (@ get-array arr mid)
+                    (let ((b2 bool)) (@ < key amid)
+                      (case b2
+                        ((true (@ binsearch-rec key init mid arr))
+                          (false
+                            (let ((b3 bool)) (@ > key amid)
+                              (case b3
+                                (
+                                  (true
+                                    (let ((mid1 int)) (@ + mid (the int 1))
+                                      (@ binsearch-rec key mid1 end arr)))(false (tuple mid arr))))))))))))
+              (false (tuple (the int -1) arr)))))))
+    (let ((larr int)) (@ len arr) (@ binsearch-rec key (the int 0) larr arr))))

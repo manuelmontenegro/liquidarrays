@@ -1,0 +1,113 @@
+(verification-unit fill :external
+  (set-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+      (nv int))
+    (
+      (res
+        (qual nu (array int)
+          (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+  :external
+  (get-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+    ((res (qual nu int (@ = nu (@ get-array xs i))))))
+  :qset
+  (Q (nu int () (@ <= (the int 0) nu))
+    (nu int ((* (array int))) (@ <= nu (@ len *)))
+    (nu int ((* int) (** (array int)))
+      (-> (@ < nu (@ len **)) (@ = (@ get-array ** nu) *))))
+  :qset
+  (QI i (nu (array int) ((* int)) (@ < i *)))
+  :qset
+  (QE i (nu (array int) ((* int)) (not (@ = (@ get-array nu i) *)))
+    (nu (array int) ((* int) (** (array int)))
+      (not (@ = (@ get-array ** i) *))))
+  :qset
+  (QII i j)
+  :qset
+  (QEE i j)
+  :qset
+  (QLen (nu (array int) ((* int)) (@ <= * (@ len nu))))
+  :kappa
+  (_kappa_linsearch_x ((nu int)))
+  :kappa
+  (_kappa_linsearch-rec_k ((nu int) (x int) (arr (array int)))
+    (Q (@ <= (the int 0) nu) (@ <= nu (@ len arr))))
+  :kappa
+  (_kappa_linsearch-rec_idx ((nu int) (x int) (k int) (arr (array int)))
+    (Q (@ <= (the int 0) nu) (@ <= nu (@ len arr))
+      (-> (@ < nu (@ len arr)) (@ = (@ get-array arr nu) x))))
+  :kappa
+  (_kappa_linsearch_idx ((nu int) (x int) (arr (array int)))
+    (Q (@ <= (the int 0) nu) (@ <= nu (@ len arr))
+      (-> (@ < nu (@ len arr)) (@ = (@ get-array arr nu) x))))
+  :mu
+  (_mu_linsearch_arr ((nu (array int)) (x int)) (QI i)
+    (QE i (not (@ = (@ get-array nu i) x)))
+    (QII i j)
+    (QEE i j)
+    (QLen (@ <= x (@ len nu))))
+  :mu
+  (_mu_linsearch-rec_arr ((nu (array int)) (x int) (arr (array int)) (k int))
+    (QI i (@ < i k))
+    (QE i (not (@ = (@ get-array nu i) x)))
+    (QII i j)
+    (QEE i j)
+    (QLen (@ <= x (@ len nu)) (@ <= k (@ len nu))))
+  :mu
+  (_mu_linsearch-rec_dummy
+    ((nu (array int)) (x int) (k int) (arr (array int)) (idx int))
+    (QI i (@ < i idx))
+    (QE i       
+      (not (@ = (@ get-array arr i) x))
+      
+      )
+    (QII i j)
+    (QEE i j)
+    (QLen ))
+  :mu
+  (_mu_linsearch_dummy ((nu (array int)) (x int) (arr (array int)) (idx int))
+    (QI i  (@ < i idx))
+    (QE i 
+      (not (@ = (@ get-array arr i) x))
+      )
+    (QII i j)
+    (QEE i j)
+    (QLen )))
+(define linsearch
+  ((x (qual nu int (@ _kappa_linsearch_x nu)))
+    (arr (qual nu (array int) (@ _mu_linsearch_arr nu x))))
+  ((idx (qual nu int (@ _kappa_linsearch_idx nu x arr)))
+    (dummy (qual nu (array int) (@ _mu_linsearch_dummy nu x arr idx))))
+  (declare
+    (assertion (precd true)
+      (postcd
+        (and (@ <= (the int 0) idx) (@ <= idx (@ len arr))
+          (-> (@ < idx (@ len arr)) (@ = (@ get-array arr idx) x))
+          (forall ((i int))
+            (-> (and (@ <= (the int 0) i) (@ < i idx))
+              (not (@ = (@ get-array arr i) x))))))))
+  (letfun
+    (
+      (linsearch-rec
+        ((k (qual nu int (@ _kappa_linsearch-rec_k nu x arr)))
+          (arr (qual nu (array int) (@ _mu_linsearch-rec_arr nu x arr k))))
+        ((idx (qual nu int (@ _kappa_linsearch-rec_idx nu x k arr)))
+          (dummy
+            (qual nu (array int) (@ _mu_linsearch-rec_dummy nu x k arr idx))))
+        (declare (assertion (precd false) (postcd true)))
+        (let ((larr int)) (@ len arr)
+          (let ((b1 bool)) (@ < k larr)
+            (case b1
+              (
+                (true
+                  (let ((arr_k int)) (@ get-array arr k)
+                    (let ((b2 bool)) (@ = arr_k x)
+                      (case b2
+                        ((true (tuple k arr))
+                          (false
+                            (let ((k1 int)) (@ + k (the int 1))
+                              (@ linsearch-rec k1 arr))))))))
+                (false (tuple k arr))))))))
+    (@ linsearch-rec (the int 0) arr)))

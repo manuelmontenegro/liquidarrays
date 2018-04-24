@@ -1,0 +1,117 @@
+(verification-unit "insert"
+		   :sources "(((:lang :erlang)  (:module /insert.erl)))"
+		   :uses "(:ir)"
+		   :documentation "This is the implementation of a verified insertion sort in CLIR"
+       :external (set-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+                             (nv int))
+                            ((res (qual nu (array int) (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+       :external (get-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+                            ((res (qual nu int (@ = nu (@ get-array xs i))))))
+       :qset (Q (nu int () (@ <= (the int 0) nu)) (nu int ((* int)) (@ <= * nu)))
+       :qset (QI i)
+       :qset (QE i)
+       :qset (QII i j (nu (array int) () (@ <= i j))
+                      (nu (array int) ((* int)) (@ <= j *))
+                      (nu (array int) ((* int)) (@ <= * i))
+                      (nu (array int) ((* int)) (@ < i *))
+                      (nu (array int) ((* int)) (@ < * j))
+                      (nu (array int) ((* int)) (@ < j *)))
+       :qset (QEE i j (nu (array int) () (@ <= (@ get-array nu i) (@ get-array nu j))))
+       :qset (QLen (nu (array int) ((* int)) (@ < * (@ len nu)))))
+
+
+
+
+(define dutch-flag
+    ((arr (qual nu (array int) 
+        (forall ((i int))
+          (-> (and (@ <= (the int 0) i) (@ < i (@ len nu))) (and (@ <= (the int 0) (@ get-array nu i)) (@ <= (@ get-array nu i) (the int 2))))))))
+    ((l (qual nu int (@ <= (the int 0) nu)))
+     (m (qual nu int (@ <= l nu)))
+     (res (qual nu (array int) (and 
+        (@ = (@ len nu) (@ len arr))
+        (@ <= m (@ len nu))
+        (forall ((i int))
+                (-> (and (@ <= (the int 0) i) (@ < i l)) (@ = (@ get-array nu i) (the int 0))))
+        (forall ((i int))
+                (-> (and (@ <= l i) (@ < i m)) (@ = (@ get-array nu i) (the int 1))))
+        (forall ((i int))
+                (-> (and (@ <= m i) (@ < i (@ len nu))) (@ = (@ get-array nu i) (the int 2))))
+     ))))
+
+    (declare (assertion
+        (precd (and
+            (forall ((i int))
+                (-> (and (@ <= (the int 0) i) (@ < i (@ len arr))) (and (@ <= (the int 0) (@ get-array arr i)) (@ <= (@ get-array arr i) (the int 2)))))))
+        (postcd (and
+            (@ = (@ len res) (@ len arr))
+            (@ <= (the int 0) l)
+            (@ <= l m)
+            (@ <= m (@ len res))
+            (forall ((i int))
+                (-> (and (@ <= (the int 0) i) (@ < i l)) (@ = (@ get-array res i) (the int 0))))
+            (forall ((i int))
+                (-> (and (@ <= l i) (@ < i m)) (@ = (@ get-array res i) (the int 1))))
+            (forall ((i int))
+                (-> (and (@ <= m i) (@ < i (@ len res))) (@ = (@ get-array res i) (the int 2))))
+                ))))
+
+    (letfun
+      ((dutch-flag-rec
+        ((k (qual nu int (@ <= (the int 0) nu)))
+         (l_in (qual nu int (@ <= k nu)))
+         (m_in (qual nu int (@ <= l_in nu)))
+         (res_in (qual nu (array int) (and 
+            (@ <= m_in (@ len nu))
+            (forall ((i int))
+              (-> (and (@ <= (the int 0) i) (@ < i (@ len nu))) (and (@ <= (the int 0) (@ get-array nu i)) (@ <= (@ get-array nu i) (the int 2)))))
+            (forall ((i int))
+                (-> (and (@ <= (the int 0) i) (@ < i k)) (@ = (@ get-array nu i) (the int 0))))  
+            (forall ((i int))
+                (-> (and (@ <= l_in i) (@ < i m_in)) (@ = (@ get-array nu i) (the int 1))))
+            (forall ((i int))
+                (-> (and (@ <= m_in i) (@ < i (@ len nu))) (@ = (@ get-array nu i) (the int 2))))
+              ))
+        ))
+        ((l_out (qual nu int (@ <= (the int 0) nu)))
+         (m_out (qual nu int (@ <= l_out nu)))
+         (res_out (qual nu (array int) (and 
+            (@ = (@ len nu) (@ len res_in))
+            (@ <= m_out (@ len nu))
+            (forall ((i int))
+                    (-> (and (@ <= (the int 0) i) (@ < i l_out)) (@ = (@ get-array nu i) (the int 0))))
+            (forall ((i int))
+                    (-> (and (@ <= l_out i) (@ < i m_out)) (@ = (@ get-array nu i) (the int 1))))
+            (forall ((i int))
+                    (-> (and (@ <= m_out i) (@ < i (@ len nu))) (@ = (@ get-array nu i) (the int 2))))
+         ))))
+
+        (declare (assertion (precd false) (postcd true)))
+        
+        (let ((b bool)) (@ <= l_in k) 
+        (case b (
+          (true (tuple l_in m_in res_in)) 
+          (false (let ((res_in_k int)) (@ get-array res_in k)
+            (case res_in_k (
+              (0 
+                (let ((k1 int)) (@ + k (the int 1)) (@ dutch-flag-rec k1 l_in m_in res_in)))
+              (1
+                (let ((l1 int)) (@ - l_in (the int 1))
+                (let ((res_in_l int)) (@ get-array res_in l1)
+                (let ((resp (array int))) (@ set-array res_in k res_in_l)
+                (let ((resp2 (array int))) (@ set-array resp l1 (the int 1))
+                (@ dutch-flag-rec k l1 m_in resp2))))))
+              (2 
+                (let ((l1 int)) (@ - l_in (the int 1))
+                (let ((m1 int)) (@ - m_in (the int 1))
+                (let ((res_in_l int)) (@ get-array res_in l1)
+                (let ((resp (array int))) (@ set-array res_in k res_in_l)
+                (let ((resp2 (array int))) (@ set-array resp l1 (the int 1))
+                (let ((resp3 (array int))) (@ set-array resp2 m1 (the int 2))
+                (@ dutch-flag-rec k l1 m1 resp3))))))))
+            ))))
+        )))))
+      (let ((larr int)) (@ len arr)
+      (@ dutch-flag-rec (the int 0) larr larr arr))))
