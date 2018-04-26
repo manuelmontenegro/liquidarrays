@@ -1,0 +1,81 @@
+(verification-unit "partition"
+		   :documentation "This is the implementation of a verified partition algorithm in CLIR"
+       :external (set-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+                             (nv int))
+                            ((res (qual nu (array int) (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+       :external (get-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+                            ((res (qual nu int (@ = nu (@ get-array xs i))))))
+       :qset (Q (nu int () (@ <= (the int 0) nu)) (nu int ((* int)) (@ <= * nu)))
+       :qset (QI i (nu (array int) () (@ <= (the int 0) i))
+                   (nu (array int) ((* int)) (@ < i *))
+                   (nu (array int) ((* int)) (@ <= * i))
+                   (nu (array int) () (@ < i (@ len nu))))
+       :qset (QE i (nu (array int) ((* (array int))) (@ = (@ get-array nu i) (@ get-array * i))))
+       :qset (QII i j (nu (array int) () (@ <= (the int 0) i))
+                      (nu (array int) () (@ <= i j))
+                      (nu (array int) ((* int)) (@ <= * i))
+                      (nu (array int) ((* int)) (@ < i *))
+                      (nu (array int) ((* int)) (@ <= * j))
+                      (nu (array int) ((* int)) (@ < j *))
+                      (nu (array int) () (@ < j (@ len nu))))
+       :qset (QEE i j (nu (array int) () (@ <= (@ get-array nu i) (@ get-array nu j))))
+       :qset (QLen (nu (array int) ((* int)) (@ <= * (@ len nu))) (nu (array int) ((* (array int))) (@ = (@ len *) (@ len nu)))))
+
+(define minimum
+    ((begin (qual nu int (@ <= (the int 0) nu)))
+     (end (qual nu int (@ < begin nu)))
+     (arr (qual nu (array int) (@ <= end (@ len nu)))))
+     
+    ((res (qual nu int (and (@ <= begin nu) (@ < nu end))))
+    (dummy (qual nu (array int) (and 
+        (@ =[] nu arr)
+        (@ = (@ len nu) (@ len arr))
+        (forall ((i int)) (-> (and (@ <= begin i) (@ < i end)) (@ <= (@ get-array nu res) (@ get-array nu i))))))))
+    
+    (declare (assertion 
+      (precd (and (@ <= (the int 0) begin) (@ < begin end) (@ <= end (@ len arr))))
+      (postcd (and
+        (@ <= begin res)
+        (@ < res end)
+        (forall ((i int)) (-> (and (@ <= begin i) (@ < i end)) (@ <= (@ get-array arr res) (@ get-array arr i))))
+      ))))
+      
+    (letfun (
+      (minimum-rec 
+        ((k (qual nu int (and (@ <= begin nu) (@ <= nu end))))
+         (current_res (qual nu int (and (@ <= begin nu) (@ < nu k))))
+         (dummy (qual nu (array int) (and 
+            (@ =[] nu arr)
+            (@ = (@ len nu) (@ len arr))
+            (forall ((i int)) 
+                (-> (and (@ <= begin i) (@ < i k)) 
+                    (@ <= (@ get-array nu current_res) (@ get-array nu i))))))))
+        
+        ((res (qual nu int (and (@ <= begin nu) (@ < nu end))))
+        (dummy (qual nu (array int) (and 
+          (@ =[] nu arr)
+          (@ = (@ len nu) (@ len arr))
+          (forall ((i int)) (-> (and (@ <= begin i) (@ < i end)) (@ <= (@ get-array arr res) (@ get-array arr i))))))))
+      
+      (declare (assertion (precd false) (postcd true)))
+      
+      (let ((b1 bool)) (@ < k end) (case b1 (
+        (false (tuple current_res arr))
+        (true 
+          (let ((arr_k int)) (@ get-array arr k) 
+          (let ((arr_current_res int)) (@ get-array arr current_res) 
+          (let ((k1 int)) (@ + k (the int 1))
+          (let ((b bool)) (@ < arr_k arr_current_res) 
+            (case b (
+              (true (@ minimum-rec k1 k arr))
+              (false (@ minimum-rec k1 current_res arr))
+        ))))))))))))
+        
+    (let ((begin1 int)) (@ + begin (the int 1)) (@ minimum-rec begin1 begin arr))))
+       
+
+
+       
+       

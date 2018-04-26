@@ -1,0 +1,160 @@
+(verification-unit partition :external
+  (set-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+      (nv int))
+    (
+      (res
+        (qual nu (array int)
+          (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+  :external
+  (get-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+    ((res (qual nu int (@ = nu (@ get-array xs i))))))
+  :qset
+  (Q (nu int () (@ <= (the int 0) nu)) (nu int ((* int)) (@ < * nu))
+    (nu int ((* int)) (@ <= * nu))
+    (nu int ((* int)) (@ < nu *))
+    (nu int ((* int)) (@ <= nu *)))
+  :qset
+  (QI i (nu (array int) ((* int)) (@ <= * i))
+    (nu (array int) ((* int)) (@ < i *)))
+  :qset
+  (QE i
+    (nu (array int) ((* int)) (@ <= (@ get-array nu *) (@ get-array nu i))))
+  :qset
+  (QII i j)
+  :qset
+  (QEE i j)
+  :qset
+  (QLen (nu (array int) ((* int)) (@ <= * (@ len nu)))
+    (nu (array int) ((* (array int))) (@ =[] nu *)))
+  :kappa
+  (_kappa_minimum_begin ((nu int)) (Q (@ <= (the int 0) nu)))
+  :kappa
+  (_kappa_minimum_end ((nu int) (begin int))
+    (Q (@ < begin nu)))
+  :kappa
+  (_kappa_minimum-rec_k ((nu int) (begin int) (end int) (arr (array int)))
+    (Q (@ <= begin nu)
+      (@ <= nu end)))
+  :kappa
+  (_kappa_minimum-rec_current_res
+    ((nu int) (begin int) (end int) (arr (array int)) (k int))
+    (Q 
+      (@ <= begin nu)
+      (@ < nu k)
+      ))
+  :kappa
+  (_kappa_minimum-rec_res
+    ((nu int) (begin int) (end int) (arr (array int)) (k int)
+      (current_res int)
+      (dummy (array int)))
+    (Q 
+      (@ <= begin nu)
+      (@ < nu end)
+      ))
+  :kappa
+  (_kappa_minimum_res ((nu int) (begin int) (end int) (arr (array int)))
+    (Q (@ <= begin nu)
+      (@ < nu end)))
+  :mu
+  (_mu_minimum_arr ((nu (array int)) (begin int) (end int))
+    (QI i )
+    (QE i )
+    (QII i j)
+    (QEE i j)
+    (QLen (@ <= end (@ len nu))))
+  :mu
+  (_mu_minimum-rec_dummy
+    ((nu (array int)) (begin int) (end int) (arr (array int)) (k int)
+      (current_res int))
+    (QI i (@ <= begin i) 
+      (@ < i k)
+      )
+    (QE i 
+      (@ <= (@ get-array nu current_res) (@ get-array nu i)))
+    (QII i j)
+    (QEE i j)
+    (QLen 
+      (@ = (@ len nu) (@ len arr))
+      (@ =[] nu arr)))
+  :mu
+  (_mu_minimum-rec_dummy_out
+    ((nu (array int)) (begin int) (end int) (arr (array int)) (k int)
+      (current_res int)
+      (dummy (array int))
+      (res int))
+    (QI i (@ <= begin i) 
+      (@ < i end)
+      )
+    (QE i 
+      (@ <= (@ get-array nu res) (@ get-array nu i)))
+    (QII i j)
+    (QEE i j)
+    (QLen (@ <= begin (@ len nu)) (@ <= end (@ len nu)) (@ <= k (@ len nu))
+      (@ = (@ len nu) (@ len arr))
+      (@ =[] nu arr)
+      ))
+  :mu
+  (_mu_minimum_dummy
+    ((nu (array int)) (begin int) (end int) (arr (array int)) (res int))
+    (QI i (@ <= begin i) 
+      (@ < i end)
+      )
+    (QE i 
+      (@ <= (@ get-array nu res) (@ get-array nu i)))
+    (QII i j)
+    (QEE i j)
+    (QLen 
+      (@ = (@ len nu) (@ len arr))
+      (@ =[] nu arr))))
+(define minimum
+  ((begin (qual nu int (@ _kappa_minimum_begin nu)))
+    (end (qual nu int (@ _kappa_minimum_end nu begin)))
+    (arr (qual nu (array int) (@ _mu_minimum_arr nu begin end))))
+  ((res (qual nu int (@ _kappa_minimum_res nu begin end arr)))
+    (dummy (qual nu (array int) (@ _mu_minimum_dummy nu begin end arr res))))
+  (declare
+    (assertion
+      (precd
+        (and (@ <= (the int 0) begin) (@ < begin end) (@ <= end (@ len arr))))
+      (postcd
+        (and (@ <= begin res) (@ < res end)
+          (forall ((i int))
+            (-> (and (@ <= begin i) (@ < i end))
+              (@ <= (@ get-array arr res) (@ get-array arr i))))))))
+  (letfun
+    (
+      (minimum-rec
+        ((k (qual nu int (@ _kappa_minimum-rec_k nu begin end arr)))
+          (current_res
+            (qual nu int
+              (@ _kappa_minimum-rec_current_res nu begin end arr k)))
+          (dummy
+            (qual nu (array int)
+              (@ _mu_minimum-rec_dummy nu begin end arr k current_res))))
+        (
+          (res
+            (qual nu int
+              (@ _kappa_minimum-rec_res nu begin end arr k current_res
+                dummy)))
+          (dummy_out
+            (qual nu (array int)
+              (@ _mu_minimum-rec_dummy_out nu begin end arr k current_res
+                dummy res))))
+        (declare (assertion (precd false) (postcd true)))
+        (let ((b1 bool)) (@ < k end)
+          (case b1
+            ((false (tuple current_res arr))
+              (true
+                (let ((arr_k int)) (@ get-array arr k)
+                  (let ((arr_current_res int)) (@ get-array arr current_res)
+                    (let ((k1 int)) (@ + k (the int 1))
+                      (let ((b bool)) (@ < arr_k arr_current_res)
+                        (case b
+                          ((true (@ minimum-rec k1 k arr))
+                            (false (@ minimum-rec k1 current_res arr))))))))))))))
+    (let ((begin1 int)) (@ + begin (the int 1))
+      (@ minimum-rec begin1 begin arr))))
