@@ -1,0 +1,88 @@
+(verification-unit insert_sort :external
+  (set-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+      (nv int))
+    (
+      (res
+        (qual nu (array int)
+          (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+  :external
+  (get-array
+    ((xs (array int))
+      (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+    ((res (qual nu int (@ = nu (@ get-array xs i))))))
+  :external
+  (insert
+    ((k (qual nu int (@ <= (the int 0) nu)))
+      (a
+        (qual nu (array int)
+          (and (@ < k (@ len nu))
+            (forall ((i int) (j int))
+              (-> (and (@ <= (the int 0) i) (@ <= i j) (@ < j k))
+                (@ <= (@ get-array nu i) (@ get-array nu j))))))))
+    (
+      (res
+        (qual nu (array int)
+          (and
+            (forall ((i int) (j int))
+              (-> (and (@ <= (the int 0) i) (@ <= i j) (@ <= j k))
+                (@ <= (@ get-array nu i) (@ get-array nu j))))
+            (@ = (@ len nu) (@ len a)))))))
+  :qset
+  (Q (nu int () (@ <= (the int 0) nu)))
+  :qset
+  (QI i)
+  :qset
+  (QE i)
+  :qset
+  (QII i j (nu (array int) () (@ <= i j))
+    (nu (array int) ((* int)) (@ < j *)))
+  :qset
+  (QEE i j (nu (array int) () (@ <= (@ get-array nu i) (@ get-array nu j))))
+  :qset
+  (QLen (nu (array int) ((* int)) (@ <= * (@ len nu))))
+  :kappa
+  (_kappa_f1_k ((nu int) (a (array int))) (Q (@ <= (the int 0) nu)))
+  :mu
+  (_mu_insert-sort_a ((nu (array int))) (QI i) (QE i) (QII i j)
+    (QEE i j)
+    (QLen))
+  :mu
+  (_mu_f1_a ((nu (array int)) (a (array int)) (k int)) (QI i) (QE i)
+    (QII i j (@ <= i j) (@ < j k))
+    (QEE i j (@ <= (@ get-array nu i) (@ get-array nu j)))
+    (QLen (@ <= k (@ len nu))))
+  :mu
+  (_mu_f1_res ((nu (array int)) (k int) (a (array int))) (QI i) (QE i)
+    (QII i j (@ <= i j) (@ < j k))
+    (QEE i j (@ <= (@ get-array nu i) (@ get-array nu j)))
+    (QLen (@ <= k (@ len nu))))
+  :mu
+  (_mu_insert-sort_res ((nu (array int)) (a (array int))) (QI i) (QE i)
+    (QII i j (@ <= i j))
+    (QEE i j (@ <= (@ get-array nu i) (@ get-array nu j)))
+    (QLen)))
+(define insert-sort ((a (qual nu (array int) (@ _mu_insert-sort_a nu))))
+  ((res (qual nu (array int) (@ _mu_insert-sort_res nu a))))
+  (declare
+    (assertion (precd true)
+      (postcd
+        (forall ((i int) (j int))
+          (-> (and (@ <= (the int 0) i) (@ <= i j) (@ < j (@ len res)))
+            (@ <= (@ get-array res i) (@ get-array res j)))))))
+  (letfun
+    (
+      (f1
+        ((k (qual nu int (@ _kappa_f1_k nu a)))
+          (a (qual nu (array int) (@ _mu_f1_a nu a k))))
+        ((res (qual nu (array int) (@ _mu_f1_res nu k a))))
+        (declare (assertion (precd false) (postcd true)))
+        (let ((la int)) (@ len a)
+          (let ((b bool)) (@ < k la)
+            (case b
+              (
+                (true
+                  (let ((ap (array int))) (@ insert k a)
+                    (let ((k1 int)) (@ + k (the int 1)) (@ f1 k1 ap))))(false a)))))))
+    (@ f1 (the int 0) a)))

@@ -35,9 +35,12 @@
               (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i idx)) (not (@ = (@ get-array arr i) x))))))))
     (letfun (
         (linsearch-rec 
-            ((k (qual nu int (and (@ <= (the int 0) nu) (@ <= nu (@ len arr)))))) 
-            ((idx 
-              (qual nu int (and (@ <= (the int 0) nu) (@ <= nu (@ len arr)) (-> (@ < nu (@ len arr)) (@ = (@ get-array arr nu) x))))) (dummy (array int))) 
+            ((k (qual nu int (and (@ <= (the int 0) nu))))
+            (arr (qual nu (array int) (and (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i k)) (not (@ = (@ get-array nu i) x)))) 
+                                            (@ <= k (@ len nu)))))) 
+                                            
+            ((idx (qual nu int (and (@ <= (the int 0) nu) (@ <= nu (@ len arr)) (-> (@ < nu (@ len arr)) (@ = (@ get-array arr nu) x))))) 
+              (dummy (qual nu (array int) (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i idx)) (not (@ = (@ get-array arr i) x))))))) 
             (declare (assertion (precd false) (postcd true)))
             
             (let ((larr int)) (@ len arr)
@@ -48,8 +51,8 @@
                 (let ((b2 bool)) (@ = arr_k x)
                 (case b2 (
                   (true (tuple k arr))
-                  (false (let ((k1 int)) (@ + k (the int 1)) (@ linsearch-rec k1)))
+                  (false (let ((k1 int)) (@ + k (the int 1)) (@ linsearch-rec k1 arr)))
                 )))))
               (false (tuple k arr))
             ))))))
-        (@ linsearch-rec (the int 0))))
+        (@ linsearch-rec (the int 0) arr)))

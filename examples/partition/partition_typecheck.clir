@@ -14,7 +14,7 @@
        :qset (QII i j (nu (array int) () (@ <= i j))
                       (nu (array int) ((* int)) (@ < j *)))
        :qset (QEE i j (nu (array int) () (@ <= (@ get-array nu i) (@ get-array nu j))))
-       :qset (QLen (nu (array int) ((* int)) (@ <= * (@ len nu)) (@ < (the int 0) (@ len nu)))))
+       :qset (QLen (nu (array int) ((* int)) (@ <= * (@ len nu))) (nu (array int) () (@ < (the int 0) (@ len nu)))))
 
 
 
