@@ -1,0 +1,91 @@
+(verification-unit "binsearch"
+	   :sources (((:lang :handmade-clir)
+			      (:module :self)))
+	   :uses (:ir)
+	   :documentation "A function that performs binary search"
+       :external (set-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+                             (nv int))
+                            ((res (qual nu (array int) (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+       :external (get-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+                            ((res (qual nu int (@ = nu (@ get-array xs i))))))
+       :external (semisum ((init int) (end (qual nu int (@ < init nu)))) ((res (qual nu int (and (@ <= init nu) (@ < nu end))))))
+       :qset (Q (nu int () (@ <= (the int 0) nu)) 
+                (nu int ((* (array int))) (@ <= nu (@ len *)))
+                (nu int ((* int) (** (array int))) 
+                (-> (@ < nu (@ len **)) (@ = (@ get-array ** nu) *))))
+       :qset (QI i (nu (array int) ((* int)) (@ < i *)))
+       :qset (QE i (nu (array int) ((* int)) (not (@ = (@ get-array nu i) *))) (nu (array int) ((* int) (** (array int))) 
+              (not (@ = (@ get-array ** i) *))))
+       :qset (QLen (nu (array int) ((* int)) (@ <= * (@ len nu)))))
+(define binsearch 
+    ((key (qual nu int true)) 
+     (arr (qual nu (array int) 
+          (forall ((i int) (j int)) (-> (and (@ <= (the int 0) i) (@ < i j) (@ < j (@ len nu))) 
+                                        (@ <= (@ get-array nu i) (@ get-array nu j))))))) 
+     
+     ((r (qual nu int (and (@ <= (the int -1) nu) 
+          (-> (not (@ = nu (the int -1))) (and
+                (@ < nu (@ len arr))
+                (@ = (@ get-array arr nu) key))))))
+     (dummy (qual nu (array int) (and 
+            
+             
+            (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i (@ len arr)) (@ = r (the int -1))) (not (@ = (@ get-array arr i) key))))
+     ))))
+     
+    (declare
+        (assertion
+            (precd (forall ((i int) (j int)) (-> (and (@ <= (the int 0) i) (@ < i j) (@ < j (@ len arr))) 
+                                        (@ <= (@ get-array arr i) (@ get-array arr j)))))
+            (postcd (and
+              (@ <= (the int -1) r)
+              (-> (not (@ = r (the int -1))) (and
+                (@ < r (@ len arr))
+                (@ = (@ get-array arr r) key)))
+              (-> (@ = r (the int -1))
+                (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i (@ len arr))) (not (@ = (@ get-array arr i) key)))))))))
+    (letfun (
+        (binsearch-rec 
+            ((key (qual nu int true)) 
+             (init (qual nu int (@ <= (the int 0) nu))) 
+             (end (qual nu int (@ <= init nu))) 
+             (arr (qual nu (array int) (and 
+                (@ <= end (@ len nu))
+                (forall ((i int) (j int)) (-> (and (@ <= (the int 0) i) (@ < i j) (@ < j (@ len nu))) 
+                                        (@ <= (@ get-array nu i) (@ get-array nu j))))
+                (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i init)) 
+                                        (not (@ = (@ get-array nu i) key))))
+                (forall ((i int)) (-> (and (@ <= end i) (@ < i (@ len nu))) 
+                                        (not (@ = (@ get-array nu i) key))))))))
+             
+            ((r (qual nu int (and (@ <= (the int -1) nu) 
+                (-> (not (@ = nu (the int -1))) (and
+                    (@ < nu (@ len arr))
+                    (@ = (@ get-array arr nu) key))))))
+             (dummy (qual nu (array int) (and
+                  
+                  (-> (@ = r (the int -1))
+                    (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i (@ len arr))) (not (@ = (@ get-array arr i) key)))))
+             )))) 
+            
+            (declare (assertion (precd false) (postcd true)))
+            
+            
+            (let ((b1 bool)) (@ < init end) 
+            (case b1 (
+              (true (let ((mid int)) (@ semisum init end) 
+                    (let ((amid int)) (@ get-array arr mid)
+                    (let ((b2 bool)) (@ < key amid)
+                    (case b2 (
+                      (true (@ binsearch-rec key init mid arr))
+                      (false (let ((b3 bool)) (@ > key amid) 
+                             (case b3 (
+                                (true (let ((mid1 int)) (@ + mid (the int 1)) (@ binsearch-rec key mid1 end arr)))
+                                (false (tuple mid arr))
+                             ))))))))))
+                             
+              (false (tuple (the int -1) arr)))))))
+              
+        (let ((larr int)) (@ len arr) (@ binsearch-rec key (the int 0) larr arr))))

@@ -1,0 +1,58 @@
+(verification-unit "fill"
+	   :sources (((:lang :handmade-clir)
+			      (:module :self)))
+	   :uses (:ir)
+	   :documentation "A function that fills the elements of an array with a given value"
+       :external (set-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+                             (nv int))
+                            ((res (qual nu (array int) (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+       :external (get-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+                            ((res (qual nu int (@ = nu (@ get-array xs i))))))
+       :qset (Q (nu int () (@ <= (the int 0) nu)) 
+                (nu int ((* (array int))) (@ <= nu (@ len *)))
+                (nu int ((* int) (** (array int))) 
+                (-> (@ < nu (@ len **)) (@ = (@ get-array ** nu) *))))
+       :qset (QI i (nu (array int) ((* int)) (@ < i *)))
+       :qset (QE i (nu (array int) ((* int)) (not (@ = (@ get-array nu i) *))) (nu (array int) ((* int) (** (array int))) 
+              (not (@ = (@ get-array ** i) *))))
+       :qset (QLen (nu (array int) ((* int)) (@ <= * (@ len nu)))))
+(define linsearch (
+        (x (qual nu int true)) 
+        (arr (qual nu (array int) true))) 
+        
+        ((idx (qual nu int (and (@ <= (the int 0) nu) (@ <= nu (@ len arr)) (-> (@ < nu (@ len arr)) (@ = (@ get-array arr nu) x)))))
+         (dummy (qual nu (array int) (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i idx)) (not (@ = (@ get-array arr i) x)))))))
+         
+    (declare
+        (assertion
+            (precd true)
+            (postcd (and
+              (@ <= (the int 0) idx)
+              (@ <= idx (@ len arr))
+              (-> (@ < idx (@ len arr)) (@ = (@ get-array arr idx) x))
+              (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i idx)) (not (@ = (@ get-array arr i) x))))))))
+    (letfun (
+        (linsearch-rec 
+            ((k (qual nu int (and (@ <= (the int 0) nu))))
+            (arr (qual nu (array int) (and (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i k)) (not (@ = (@ get-array nu i) x)))) 
+                                            (@ <= k (@ len nu)))))) 
+                                            
+            ((idx (qual nu int (and (@ <= (the int 0) nu) (@ <= nu (@ len arr)) (-> (@ < nu (@ len arr)) (@ = (@ get-array arr nu) x))))) 
+              (dummy (qual nu (array int) (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i idx)) (not (@ = (@ get-array arr i) x))))))) 
+            (declare (assertion (precd false) (postcd true)))
+            
+            (let ((larr int)) (@ len arr)
+            (let ((b1 bool)) (@ < k larr)
+            (case b1 (
+              (true 
+                (let ((arr_k int)) (@ get-array arr k)
+                (let ((b2 bool)) (@ = arr_k x)
+                (case b2 (
+                  (true (tuple k arr))
+                  (false (let ((k1 int)) (@ + k (the int 1)) (@ linsearch-rec k1 arr)))
+                )))))
+              (false (tuple k arr))
+            ))))))
+        (@ linsearch-rec (the int 0) arr)))

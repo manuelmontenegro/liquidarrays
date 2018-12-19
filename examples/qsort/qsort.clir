@@ -1,0 +1,84 @@
+(verification-unit "partition"
+		   :documentation "This is the implementation of a verified partition algorithm in CLIR"
+       :external (set-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+                             (nv int))
+                            ((res (qual nu (array int) (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+       :external (get-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+                            ((res (qual nu int (@ = nu (@ get-array xs i))))))
+       :external (partition 
+                  ((c (qual nu int (@ <= (the int 0) nu)))
+                   (f (qual nu int (@ <= c nu))) 
+                   (a (qual nu (array int) (and 
+                          (@ <= f (@ len nu)) 
+                          (forall ((i int) (j int)) (-> (and (@ <= (the int 0) i) (@ < i c) (@ <= c j) (@ < j f))
+                                                          (@ <= (@ get-array nu i) (@ get-array nu j))))
+                          (forall ((i int) (j int)) (-> (and (@ <= c i) (@ < i f) (@ <= f j) (@ < j (@ len nu)))
+                                                          (@ <= (@ get-array nu i) (@ get-array nu j)))))))) 
+                  ((pend (qual nu int (and (@ <= c nu) (@ < nu f)))) 
+                   (res (qual nu (array int) 
+                         (and 
+                            (@ = (@ len nu) (@ len a))
+                            (forall ((i int)) (-> (and (@ <= c i) (@ < i pend)) (@ <= (@ get-array nu i) (@ get-array nu pend))))
+                            (forall ((i int)) (-> (and (@ < pend i) (@ < i f)) (@ <= (@ get-array nu pend) (@ get-array nu i))))
+                            (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i c)) (@ = (@ get-array nu i) (@ get-array a i))))
+                            (forall ((i int)) (-> (and (@ <= f i) (@ < i (@ len nu))) (@ = (@ get-array nu i) (@ get-array a i))))
+                            (forall ((i int) (j int)) 
+                                (-> 
+                                  (and (@ <= (the int 0) i) (@ < i c) (@ <= c j) (@ < j f)) 
+                                    (@ = (@ get-array nu i) (@ get-array nu j))))
+                            (forall ((i int) (j int)) 
+                                (-> 
+                                  (and (@ <= c i) (@ < i f) (@ <= f j) (@ < j (@ len nu))) 
+                                    (@ = (@ get-array nu i) (@ get-array nu j)))))))))                     
+       :qset (Q (nu int () (@ <= (the int 0) nu)) (nu int ((* int)) (@ <= * nu)))
+       :qset (QI i (nu (array int) () (@ <= (the int 0) i))
+                   (nu (array int) ((* int)) (@ < i *))
+                   (nu (array int) ((* int)) (@ <= * i))
+                   (nu (array int) () (@ < i (@ len nu))))
+       :qset (QE i (nu (array int) ((* (array int))) (@ = (@ get-array nu i) (@ get-array * i))))
+       :qset (QII i j (nu (array int) () (@ <= (the int 0) i))
+                      (nu (array int) () (@ <= i j))
+                      (nu (array int) ((* int)) (@ <= * i))
+                      (nu (array int) ((* int)) (@ < i *))
+                      (nu (array int) ((* int)) (@ <= * j))
+                      (nu (array int) ((* int)) (@ < j *))
+                      (nu (array int) () (@ < j (@ len nu))))
+       :qset (QEE i j (nu (array int) () (@ <= (@ get-array nu i) (@ get-array nu j))))
+       :qset (QLen (nu (array int) ((* int)) (@ <= * (@ len nu))) (nu (array int) ((* (array int))) (@ = (@ len *) (@ len nu)))))
+
+
+
+(define qsort
+    ((a (array int)))
+    ((res (array int)))
+
+    (declare (assertion
+        (precd true)
+        (postcd 
+            (forall ((i int) (j int))
+                (-> (and (@ <= (the int 0) i) (@ <= i j) (@ < j (@ len res))) (@ <= (@ get-array res i) (@ get-array res j)))))))
+    
+    (letfun (
+      (qsort-rec 
+        ((c int)
+         (f int)
+         (a (array int)))
+        ((res (array int)))
+        
+        (declare (assertion (precd false) (postcd true)))
+        
+        (let ((b bool)) (@ <= f c)
+           (case b (
+             (false (let ((p int) (resP (array int))) (@ partition c f a)
+                               (let ((q1 (array int))) (@ qsort-rec c p resP)
+                                (let ((p1 int)) (@ + p (the int 1))
+                                 (let ((q2 (array int))) (@ qsort-rec p1 f q1)
+                                  q2))))
+             )
+             (true a))))))
+      
+    (let ((la int)) (@ len a) (@ qsort-rec (the int 0) la a))))
+       
+       

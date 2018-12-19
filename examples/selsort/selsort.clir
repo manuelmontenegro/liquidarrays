@@ -1,0 +1,79 @@
+(verification-unit "partition"
+		   :documentation "This is the implementation of a verified partition algorithm in CLIR"
+       :external (set-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+                             (nv int))
+                            ((res (qual nu (array int) (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+       :external (get-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+                            ((res (qual nu int (@ = nu (@ get-array xs i))))))
+       :qset (Q (nu int () (@ <= (the int 0) nu)) (nu int ((* int)) (@ <= * nu)) (nu int ((* int)) (@ < * nu)))
+       :qset (QI i (nu (array int) ((* int)) (@ <= * i))
+                   (nu (array int) ((* int)) (@ < i *)))
+       :qset (QE i (nu (array int) ((* int)) (@ <= (@ get-array nu *) (@ get-array nu i))))
+       :qset (QII i j (nu (array int) () (@ <= i j))
+                      (nu (array int) ((* int)) (@ < i *))
+                      (nu (array int) ((* int)) (@ <= * j))
+                      (nu (array int) ((* int)) (@ < j *)))
+       :qset (QEE i j (nu (array int) () (@ <= (@ get-array nu i) (@ get-array nu j))))
+       :qset (QLen (nu (array int) ((* int)) (@ <= * (@ len nu))) (nu (array int) ((* (array int))) (@ = (@ len nu) (@ len *)))))
+
+
+
+(define selsort
+    ((arr (array int)))
+    ((res (array int)))
+
+    (declare (assertion
+        (precd true)
+        (postcd 
+            (forall ((i int) (j int))
+                (-> (and (@ <= (the int 0) i) (@ <= i j) (@ < j (@ len res))) (@ <= (@ get-array res i) (@ get-array res j)))))))
+    
+    (letfun (
+      (outer-loop
+        ((k int)
+         (res_in (array int)))
+        ((res_out (array int)))
+        
+        (declare (assertion (precd false) (postcd true)))
+        
+        (let ((lres int)) (@ len res_in)
+        (let ((lres1 int)) (@ - lres (the int 1))
+        (let ((b bool)) (@ < k lres1)
+           (case b (
+             (true (let ((k1 int)) (@ + k (the int 1)) (@ inner-loop k k k1 res_in)))
+             (false res_in)))))))
+             
+      (inner-loop
+              ((k int)
+               (min int)
+               (l int)
+               (res_in (array int)))
+              ((res_out (array int)))
+              
+              (declare (assertion (precd false) (postcd true)))
+              
+              (let ((lres int)) (@ len res_in)
+              (let ((b1 bool)) (@ < l lres)
+              (case b1 (
+                (true 
+                  (let ((res_l int)) (@ get-array res_in l)
+                  (let ((res_min int)) (@ get-array res_in min)
+                  (let ((b2 bool)) (@ < res_l res_min)
+                  (let ((l1 int)) (@ + l (the int 1))
+                    (case b2 (
+                      (true (@ inner-loop k l l1 res_in))
+                      (false (@ inner-loop k min l1 res_in))))))))) 
+                (false 
+                  (let ((res_min int)) (@ get-array res_in min) 
+                  (let ((res_k int)) (@ get-array res_in k) 
+                  (let ((resp1 (array int))) (@ set-array res_in k res_min) 
+                  (let ((resp2 (array int))) (@ set-array resp1 min res_k)
+                  (let ((k1 int)) (@ + k (the int 1)) 
+                  (@ outer-loop k1 resp2)))))))
+              ))))))
+      
+    (@ outer-loop (the int 0) arr)))
+       
+       

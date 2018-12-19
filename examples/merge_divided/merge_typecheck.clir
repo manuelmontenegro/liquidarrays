@@ -1,0 +1,119 @@
+(verification-unit "merge"
+		   :documentation "This is the implementation of a verified merge algorithm in CLIR"
+       :external (set-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs)))))
+                             (nv int))
+                            ((res (qual nu (array int) (and (@ =[] nu (@ set-array xs i nv)) (@ = (@ len nu) (@ len xs)))))))
+       :external (get-array ((xs (array int))
+                             (i (qual nu int (and (@ <= (the int 0) nu) (@ < nu (@ len xs))))))
+                            ((res (qual nu int (@ = nu (@ get-array xs i))))))
+       :external (copy ((source (array int))
+                        (from (qual nu int (@ <= (the int 0) nu)))
+                        (length (qual nu int (and (@ <= (the int 0) nu) (@ <= (@ + from nu) (@ len source)))))
+                        (dest (array int))
+                        (dest_from (qual nu int (and (@ <= (the int 0) nu) (@ <= (@ + nu length) (@ len dest))))))
+                            
+                        ((res (qual nu (array int) (and
+                          (@ = (@ len nu) (@ len dest))
+                          (forall ((i int)) (-> (and (@ <= (the int 0) i) (@ < i dest_from)) 
+                                            (@ = (@ get-array nu i) (@ get-array dest i))))
+                          (forall ((i int)) (-> (and (@ <= (@ + dest_from length) i) (@ < i (@ len nu))) 
+                                            (@ = (@ get-array nu i) (@ get-array dest i))))
+                                            
+                          (forall ((i int) (j int)) (-> (and (@ <= from i) (@ < i (@ + from length)) (@ <= dest_from j) (@ < j (@ + dest_from length)) (@ = (@ - i from) (@ - j dest_from))) 
+                                            (@ = (@ get-array nu j) (@ get-array source i))))
+                        )))))
+       :qset (Q (nu int () (@ <= (the int 0) nu)) (nu int ((* int)) (@ <= * nu)))
+       :qset (QI i (nu (array int) () (@ <= (the int 0) i))
+                   (nu (array int) ((* int)) (@ < i *))
+                   (nu (array int) ((* int)) (@ <= * i))
+                   (nu (array int) () (@ < i (@ len nu))))
+       :qset (QE i (nu (array int) ((* (array int))) (@ = (@ get-array nu i) (@ get-array * i))))
+       :qset (QII i j (nu (array int) () (@ <= (the int 0) i))
+                      (nu (array int) () (@ <= i j))
+                      (nu (array int) ((* int)) (@ <= * i))
+                      (nu (array int) ((* int)) (@ < i *))
+                      (nu (array int) ((* int)) (@ <= * j))
+                      (nu (array int) ((* int)) (@ < j *))
+                      (nu (array int) () (@ < j (@ len nu))))
+       :qset (QEE i j (nu (array int) () (@ <= (@ get-array nu i) (@ get-array nu j))))
+       :qset (QLen (nu (array int) ((* int)) (@ <= * (@ len nu))) (nu (array int) ((* (array int))) (@ = (@ len *) (@ len nu)))))
+
+
+
+(define merge
+    ((a (qual nu int (@ <= (the int 0) nu)))
+     (m (qual nu int (@ <= a nu)))
+     (b (qual nu int (@ <= m nu)))
+     (arr (qual nu (array int) (and
+          (forall ((i int) (j int)) (-> (and (@ <= a i) (@ <= i j) (@ < j m)) (@ <= (@ get-array nu i) (@ get-array nu j))))
+          (forall ((i int) (j int)) (-> (and (@ <= m i) (@ <= i j) (@ < j b)) (@ <= (@ get-array nu i) (@ get-array nu j))))
+          (@ <= b (@ len nu))
+        )
+      )))
+    ((res (qual nu (array int) (and 
+        (@ = (@ len nu) (@ len arr))
+        (forall ((i int) (j int)) (-> (and (@ <= a i) (@ <= i j) (@ < j b)) (@ <= (@ get-array nu i) (@ get-array nu j))))
+    ))))
+
+    (declare (assertion
+        (precd (and
+            (@ <= (the int 0) a)
+            (@ <= a m)
+            (@ <= m b)
+            (@ <= b (@ len arr))
+            (forall ((i int) (j int)) (-> (and (@ <= a i) (@ <= i j) (@ < j m)) (@ <= (@ get-array arr i) (@ get-array arr j))))
+            (forall ((i int) (j int)) (-> (and (@ <= m i) (@ <= i j) (@ < j b)) (@ <= (@ get-array arr i) (@ get-array arr j))))
+          ))
+        (postcd (and 
+          (@ = (@ len res) (@ len arr))
+          (forall ((i int) (j int)) (-> (and (@ <= a i) (@ <= i j) (@ < j b)) (@ <= (@ get-array res i) (@ get-array res j))))
+        ))))
+    
+    (letfun (
+      (f1 ((ca (qual nu int (and (@ <= a nu) (@ <= nu m))))
+           (cm (qual nu int (and (@ <= m nu) (@ <= nu b))))
+           (k (qual nu int (@ = (@ + nu m) (@ + ca cm))))
+           (res_in (qual nu (array int) (and 
+              (@ = (@ len nu) (@ len arr))
+              (forall ((i int) (j int)) (-> (and (@ <= a i) (@ < i k) (@ <= ca j) (@ < j m)) (@ <= (@ get-array nu i) (@ get-array arr j))))
+              (forall ((i int) (j int)) (-> (and (@ <= a i) (@ < i k) (@ <= cm j) (@ < j b)) (@ <= (@ get-array nu i) (@ get-array arr j))))
+              (forall ((i int) (j int)) (-> (and (@ <= a i) (@ <= i j) (@ < j k)) (@ <= (@ get-array nu i) (@ get-array nu j))))
+            )))) 
+          ((res_out (qual nu (array int) (and 
+              (@ = (@ len nu) (@ len arr))
+              (forall ((i int) (j int)) (-> (and (@ <= a i) (@ <= i j) (@ < j b)) (@ <= (@ get-array nu i) (@ get-array nu j))))
+          )))) 
+          
+          
+      (declare (assertion
+        (precd false)
+        (postcd true)))
+        
+      (let ((b1 bool)) (@ < ca m) 
+      (let ((b2 bool)) (@ < cm b) 
+        (case b1 (
+          (true (case b2 (
+            (true 
+              (let ((arr_ca int)) (@ get-array arr ca)
+              (let ((arr_cm int)) (@ get-array arr cm)
+              (let ((b3 bool)) (@ <= arr_ca arr_cm) 
+              (case b3 (
+                (true 
+                  (let ((resp (array int))) (@ set-array res_in k arr_ca) 
+                  (let ((cap int)) (@ + ca (the int 1)) 
+                  (let ((kp int)) (@ + k (the int 1)) (@ f1 cap cm kp resp)))))
+                (false 
+                  (let ((resp (array int))) (@ set-array res_in k arr_cm) 
+                    (let ((cmp int)) (@ + cm (the int 1)) 
+                    (let ((kp int)) (@ + k (the int 1)) (@ f1 ca cmp kp resp))))))
+              )))))
+            (false (let ((m_ca int)) (@ - m ca) (@ copy arr ca m_ca res_in k))))
+          ))
+          (false (let ((b_cm int)) (@ - b cm) (@ copy arr cm b_cm res_in k))))
+      ))))
+      )
+      
+    (@ f1 a m a arr)))
+       
+       
