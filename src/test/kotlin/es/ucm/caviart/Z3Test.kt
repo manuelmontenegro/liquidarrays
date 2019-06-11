@@ -14,7 +14,7 @@ import kotlin.test.assertEquals
 class Z3Test {
     @Test fun checkVersion() {
         assertEquals(4, Version.getMajor())
-        assertEquals(6, Version.getMinor())
+        assertEquals(8, Version.getMinor())
     }
 
     @Test fun assertTrue() {

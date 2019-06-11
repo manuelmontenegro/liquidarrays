@@ -160,7 +160,7 @@ class Z3ASTTest {
         val ast2 = PredicateApplication("<", listOf(Literal("3", ConstrType("int")), Literal("5", ConstrType("int"))))
         val ast3 = PredicateApplication("<", listOf(Literal("5", ConstrType("int")), Literal("7", ConstrType("int"))))
         val z3 = Implication(listOf(ast1, ast2, ast3)).toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
-        assertTrue(z3.isImplies, "(-> (< 1 2) (< 3 5) (< 5 7)) is a not expression")
+        assertTrue(z3.isImplies, "(-> (< 1 2) (< 3 5) (< 5 7)) is an implication")
         assertEquals("(=> (< 1 2) (=> (< 3 5) (< 5 7)))", z3.sExpr)
     }
 
@@ -169,7 +169,7 @@ class Z3ASTTest {
         val ast2 = PredicateApplication("<", listOf(Literal("3", ConstrType("int")), Literal("5", ConstrType("int"))))
         val ast3 = PredicateApplication("<", listOf(Literal("5", ConstrType("int")), Literal("7", ConstrType("int"))))
         val z3 = Iff(listOf(ast1, ast2, ast3)).toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
-        assertTrue(z3.isIff, "(<-> (< 1 2) (< 3 5) (< 5 7)) is a not expression")
+        assertTrue(z3.isEq || z3.isIff, "(<-> (< 1 2) (< 3 5) (< 5 7)) is an if and only if expression")
         assertEquals("(= (= (< 1 2) (< 3 5)) (< 5 7))", z3.sExpr)
     }
 
