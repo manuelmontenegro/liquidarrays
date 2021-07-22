@@ -13,9 +13,9 @@ This repository contains a prototype that implements the ideas explained in the 
 
 ### Requirements
 
-* Z3 version 4.6.0 [https://github.com/Z3Prover/z3/wiki], although newer versions may work. **Z3 Java bindings are also required**.
-* Java SE runtime environment (ver. 7 or greater). [https://www.oracle.com/technetwork/es/java/javase/overview/index.html]
-* Maven v3.5 or greater. [https://maven.apache.org]
+* Z3 version 4.8.11 [https://github.com/Z3Prover/z3/wiki], although newer versions may work. **Z3 Java bindings are also required**.
+* Java SE runtime environment (ver. 8 or greater). [https://www.oracle.com/technetwork/es/java/javase/overview/index.html]
+* Maven v3.6 or greater. [https://maven.apache.org]
 
  
 ### Build instructions
@@ -25,7 +25,7 @@ This repository contains a Maven project which depends on the Z3 bindings for Ja
 Go to the directory where the file `com.microsoft.z3.jar` is located. This file is included with Z3 Java bindings. In Fedora Linux it is located under `/usr/lib64/z3` directory. Execute the following in the shell:
 
 ```
-mvn install:install-file -Dfile=com.microsoft.z3.jar -DgroupId=com.microsoft -DartifactId=z3 -Dversion=4.6.0 -Dpackaging=jar
+mvn install:install-file -Dfile=com.microsoft.z3.jar -DgroupId=com.microsoft -DartifactId=z3 -Dversion=4.8.11 -Dpackaging=jar
 ```
 
 Checkout the Git repository and compile the project:

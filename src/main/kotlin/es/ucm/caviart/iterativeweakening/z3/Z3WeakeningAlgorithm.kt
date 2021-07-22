@@ -118,7 +118,7 @@ class Z3Goal(val name: String,
      * A translation of the declarationMap parameter but as a FuncDecl
      * instead of an UninterpretedFunctionType
      */
-    private val z3DeclarationMap: Map<String, FuncDecl>
+    private val z3DeclarationMap: Map<String, FuncDecl<out Sort>>
 
     /**
      * The context in which all expressions will be created

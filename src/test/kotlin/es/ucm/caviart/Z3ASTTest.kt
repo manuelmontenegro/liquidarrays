@@ -177,14 +177,14 @@ class Z3ASTTest {
         val ast = ForAll(listOf(HMTypedVar("x", ConstrType("int"))), PredicateApplication(">=", listOf(Variable("x"), Literal("0", ConstrType("int")))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isQuantifier, "(forall ((x int)) (>= x 0)) is a quantified expression")
-        assertEquals("(forall ((x Int)) (>= x 0))", z3.sExpr)
+        assertEquals("(forall ((x Int)) (! (>= x 0) :weight 0))", z3.sExpr)
     }
 
     @Test fun existsAST() {
         val ast = Exists(listOf(HMTypedVar("x", ConstrType("int"))), PredicateApplication(">=", listOf(Variable("x"), Literal("0", ConstrType("int")))))
         val z3 = ast.toZ3BoolExpr(ctx, mapOf(), mapOf(), mapOf())
         assertTrue(z3.isQuantifier, "(exists ((x int)) (>= x 0)) is a quantified expression")
-        assertEquals("(exists ((x Int)) (>= x 0))", z3.sExpr)
+        assertEquals("(exists ((x Int)) (! (>= x 0) :weight 0))", z3.sExpr)
     }
 
     @Test fun orderingProperty() {

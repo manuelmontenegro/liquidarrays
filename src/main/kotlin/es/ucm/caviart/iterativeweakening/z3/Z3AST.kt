@@ -52,7 +52,7 @@ typealias TypeEnv = Map<String, Sort>
         /**
          * A mapping from function symbols to Z3 function declarations
          */
-typealias DeclarationMap = Map<String, FuncDecl>
+typealias DeclarationMap = Map<String, FuncDecl<out Sort>>
 
 
 /**
@@ -78,7 +78,7 @@ fun Type.toZ3Sort(ctx: Context): Sort = when (this) {
 fun Term.toZ3ArithExpr(ctx: Context,
                        symbolMap: SymbolMap,
                        declarationMap: DeclarationMap,
-                       typeEnv: TypeEnv): ArithExpr = when (this) {
+                       typeEnv: TypeEnv): ArithExpr<out ArithSort> = when (this) {
     is Literal -> when {
         type is ConstrType && type.typeConstructor == "int" -> ctx.mkInt(Integer.parseInt(value))
         else -> throw UnsupportedTypeException(type)
@@ -106,8 +106,8 @@ fun Term.toZ3ArithExpr(ctx: Context,
             }
             "get-array" -> ctx.mkSelect(
                     arguments[0].toZ3ArrayExpr(ctx, symbolMap, declarationMap, typeEnv),
-                    arguments[1].toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv)
-            ) as ArithExpr
+                    arguments[1].toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv) as ArithExpr<IntSort>
+            ) as ArithExpr<out ArithSort>
             else -> {
                 val args = arguments.map {
                     it.toZ3Expr(ctx, symbolMap, declarationMap, typeEnv)
@@ -127,11 +127,11 @@ fun Term.toZ3ArithExpr(ctx: Context,
 fun Term.toZ3ArrayExpr(ctx: Context,
                        symbolMap: SymbolMap,
                        declarationMap: DeclarationMap,
-                       typeEnv: TypeEnv): ArrayExpr = when (this) {
+                       typeEnv: TypeEnv): ArrayExpr<IntSort, out Sort> = when (this) {
     is Variable -> {
         val varSort = typeEnv[name] ?: throw UndefinedVariable(name)
         when (varSort) {
-            is ArraySort ->
+            is ArraySort<*, *> ->
                 ctx.mkArrayConst(symbolMap[name], ctx.mkIntSort(), varSort.range)
             else -> throw Z3TypeMismatch(varSort)
         }
@@ -139,9 +139,9 @@ fun Term.toZ3ArrayExpr(ctx: Context,
     is FunctionApplication -> {
         when (name) {
             "set-array" -> ctx.mkStore(
-                    arguments[0].toZ3ArrayExpr(ctx, symbolMap, declarationMap, typeEnv),
-                    arguments[1].toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv),
-                    arguments[2].toZ3Expr(ctx, symbolMap, declarationMap, typeEnv)
+                    arguments[0].toZ3ArrayExpr(ctx, symbolMap, declarationMap, typeEnv) as ArrayExpr<IntSort, Sort>,
+                    arguments[1].toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv) as ArithExpr<IntSort>,
+                    arguments[2].toZ3Expr(ctx, symbolMap, declarationMap, typeEnv) as Expr<Sort>
             )
             else -> throw UnsupportedZ3AST(this)
         }
@@ -156,7 +156,7 @@ fun Term.toZ3ArrayExpr(ctx: Context,
 fun Term.toZ3Expr(ctx: Context,
                   symbolMap: SymbolMap,
                   declarationMap: DeclarationMap,
-                  typeEnv: TypeEnv): Expr = when (this) {
+                  typeEnv: TypeEnv): Expr<out Sort> = when (this) {
 
     is Literal -> when (type) {
         ConstrType("int") -> toZ3ArithExpr(ctx, symbolMap, declarationMap, typeEnv)
@@ -336,7 +336,7 @@ fun getTypeBindingExpression(ctx:Context, typeEnv: TypeEnv, declarationMap: Decl
 }
 */
 
-fun UninterpretedFunctionType.toFuncDecl(name: String, ctx: Context): FuncDecl =
+fun UninterpretedFunctionType.toFuncDecl(name: String, ctx: Context): FuncDecl<out Sort> =
         ctx.mkFuncDecl(name, argumentTypes.map { it.toZ3Sort(ctx) }.toTypedArray(), resultType.toZ3Sort(ctx))
 
 
