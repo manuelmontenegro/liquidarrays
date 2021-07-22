@@ -36,7 +36,7 @@
       (postcd (and
         (@ <= begin res)
         (@ < res end)
-        (forall ((i int)) (-> (and (@ <= begin i) (@ < i end)) (@ <= (@ get-array arr res) (@ get-array arr i))))
+        (forall ((i int)) (-> (and (@ <= begin i) (@ < i end)) (@ < (@ get-array arr res) (@ get-array arr i))))
       ))))
       
     (letfun (
