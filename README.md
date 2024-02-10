@@ -6,8 +6,8 @@ This repository contains a prototype that implements the ideas explained in the 
 
 * M. Montenegro, S. Nieva, R. Peña, C. Segura. [_Liquid Types for Array Invariant Synthesis_](https://10.1007/978-3-319-68167-2_20). Proceedings of the 15th International Symposium on Automated Verification and Analysis, ATVA 2017.
 
-* M. Montenegro, S. Nieva, R. Peña, C. Segura. _Extending Liquid Types to Arrays_. Submitted to Transactions on Computer Logic, 2019.
-
+* M. Montenegro, S. Nieva, R. Peña, C. Segura. [_Extending Liquid Types to Arrays_](https://dl.acm.org/doi/10.1145/3362740). ACM Transactions on Computational Logic, Vol. 21, No. 2, Article 13, pp. 1-41 (2020)
+s
 
 ## Building liquidarrays
 
